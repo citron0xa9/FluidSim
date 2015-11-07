@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+# Build Paths usw
+Debug/
+x64/
+FluidSim/Debug/
+FluidSim/x64/
+ipch/
