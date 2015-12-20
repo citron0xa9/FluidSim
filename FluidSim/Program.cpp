@@ -1,10 +1,12 @@
 #include "Program.h"
 #include "Log.h"
 
+#include <algorithm>
+
 GLuint Program::m_usedProgramId = 0;
 const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp" };
 
-Program::Program()
+Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables{ lightSrcVars }, m_loadedMaterialId{-1}
 {
 	m_Id = glCreateProgram();
 }
@@ -95,4 +97,40 @@ void Program::loadMaterial(const Material& material)
 	uniLoc.specularExponent = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.specularExponent.c_str());
 
 	material.loadIntoProgram(uniLoc, *this);
+
+	m_loadedMaterialId = material.getId();
+}
+
+int Program::getLoadedMaterialId() const
+{
+	return m_loadedMaterialId;
+}
+
+ShaderLightSourceVariable Program::popFreeLightSourceVariable(const LightSourceType &lightSrcType)
+{
+	auto freeVariable = std::find_if(m_FreeShaderLightSourceVariables.begin(), m_FreeShaderLightSourceVariables.end(),
+									[&lightSrcType](const ShaderLightSourceVariable &var){return (var.type == lightSrcType); });
+
+	if (freeVariable == m_FreeShaderLightSourceVariables.end()) {
+		throw std::runtime_error("getFreeLightSourceUniformLocation: no free variable found");
+	}
+
+	ShaderLightSourceVariable returnValue = *freeVariable;
+	m_FreeShaderLightSourceVariables.erase(freeVariable);
+	return returnValue;
+}
+
+GLint Program::getUniformLocation(const GLchar *name)
+{
+	return glGetUniformLocation(m_Id, name);
+}
+
+void Program::loadLights(const std::vector<LightSource> &lights)
+{
+	std::for_each(lights.begin(), lights.end(), [this](const LightSource &light){light.loadIntoProgram(*this); });
+}
+
+GLuint Program::getId() const
+{
+	return m_Id;
 }

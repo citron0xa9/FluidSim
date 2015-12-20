@@ -20,10 +20,15 @@ public:
 	virtual ~Material();
 
 	void loadIntoProgram(const MaterialUniformLocations &uniLoc, Program &prog) const;
+
+	unsigned int getId() const;
 private:
 	glm::vec3 m_AmbientCoefficient;
 	glm::vec3 m_DiffuseCoefficient;
 	glm::vec3 m_SpecularCoefficient;
 	GLint m_SpecularExponent;
+
+	unsigned int m_Id;
+	static unsigned int m_NextId;
 };
 

@@ -8,6 +8,8 @@ class SunLightSource : public LightSource
 public:
 	SunLightSource(GLfloat intensity, glm::vec3 direction);
 	virtual ~SunLightSource();
+
+	virtual void loadIntoProgram(Program& program) const override;
 	
 private:
 	glm::vec3 m_Direction;

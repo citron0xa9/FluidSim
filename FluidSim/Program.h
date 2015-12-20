@@ -5,6 +5,7 @@
 #include <string>
 #include "Shader.h"
 #include "Material.h"
+#include "LightSource.h"
 
 struct UniformNames {
 	std::string ambientCoefficient;
@@ -18,7 +19,7 @@ struct UniformNames {
 class Program
 {
 public:
-	Program();
+	Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars);
 	virtual ~Program();
 
 	void attachShader(Shader* shader);
@@ -30,10 +31,22 @@ public:
 	static void unuse();
 
 	void loadMaterial(const Material &material);
+	void loadLights(const std::vector<LightSource> &lights);
+
+	ShaderLightSourceVariable popFreeLightSourceVariable(const LightSourceType &lightSrcType);
+	GLint getUniformLocation(const GLchar *name);
+
+	GLuint getId() const;
+
+	int getLoadedMaterialId() const;
+
 private:
 	GLuint m_Id;
 	static GLuint m_usedProgramId;
 	std::unordered_map<GLuint,Shader*> m_AttachedShaders;
+	std::vector<ShaderLightSourceVariable> m_FreeShaderLightSourceVariables;
+
+	int m_loadedMaterialId;
 
 	static const UniformNames m_UNIFORM_NAMES;
 };

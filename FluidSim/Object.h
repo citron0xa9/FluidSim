@@ -5,6 +5,7 @@
 #include "Program.h"
 #include "Geometry.h"
 #include "Material.h"
+#include "Scene.h"
 
 class Object
 {
@@ -13,6 +14,8 @@ public:
 	virtual ~Object();
 
 	void render() const;
+
+	Program& getProgram() const;
 private:
 	//std::string m_Name;
 
