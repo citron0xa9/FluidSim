@@ -1,8 +1,9 @@
 #include "Scene.h"
 
 
-Scene::Scene()
+Scene::Scene() : m_Camera{}
 {
+
 }
 
 
@@ -45,5 +46,11 @@ Program& Scene::addProgram(const Program &program)
 void Scene::render()
 {
 	//call render on each object
-	std::for_each(m_Objects.begin(), m_Objects.end(), [](const Object &obj){obj.render(); });
+	glm::mat4x4 viewProjectTransform = m_Camera.getViewPerspectiveTransform();
+	std::for_each(m_Objects.begin(), m_Objects.end(), [&viewProjectTransform](const Object &obj){obj.render(viewProjectTransform); });
+}
+
+void Scene::setAspectRatio(float ratio)
+{
+	m_Camera.setAspectRatio(ratio);
 }

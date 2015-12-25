@@ -7,7 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 
-Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{false}
+Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ false }, m_Vao{false}
 {
 
 	/*
@@ -30,12 +30,16 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{f
 	//push data to gpu
 	m_VertexData.pushData(vertexData, GL_STATIC_DRAW, true);
 	m_Ibo.pushData(indices, GL_STATIC_DRAW, true);
+
+	m_numberOfElements = indices.size();
 }
 
-void Geometry::setupAttribArrays(VertexArrO& vao, GLuint vertexPosIndex, GLuint normalIndex)
+void Geometry::setupAttribArrays(Program &prog)
 {
-	vao.addVertexAttribArray(m_VertexData, true, true, vertexPosIndex, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
-	vao.addVertexAttribArray(m_VertexData, false, true, normalIndex, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<const GLvoid*>(sizeof(GLfloat)*3) );
+	m_Vao.addVertexAttribArray(m_VertexData, true, true, prog.getVertexPosIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
+	m_Vao.addVertexAttribArray(m_VertexData, false, true, prog.getNormalIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<const GLvoid*>(sizeof(GLfloat)*3) );
+	m_Vao.enableVertexAttribArray(false, prog.getVertexPosIndex());
+	m_Vao.enableVertexAttribArray(false, prog.getNormalIndex());
 }
 
 void Geometry::parseObjFile(const std::string filePath, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData)
@@ -143,4 +147,13 @@ void Geometry::parseFace(std::istringstream& lineStream, std::vector<GLfloat>& v
 
 Geometry::~Geometry()
 {
+}
+
+void Geometry::render()
+{
+	m_VertexData.bind();
+	m_Vao.bind();
+	m_Ibo.bind();
+
+	glDrawElements(GL_TRIANGLES, m_numberOfElements, GL_UNSIGNED_SHORT, nullptr);
 }

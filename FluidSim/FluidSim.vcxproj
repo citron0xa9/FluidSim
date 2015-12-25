@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BufferO.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferO.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FluidSim.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GLViewer.cpp" />

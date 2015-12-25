@@ -9,6 +9,7 @@
 #include "IndexBufO.h"
 #include "VertexArrO.h"
 #include "IndexCombination.h"
+#include "Program.h"
 
 #define GEOMETRY_IBO_INDEX_TYPE GL_UNSIGNED_SHORT
 
@@ -18,10 +19,13 @@ public:
 	Geometry(const std::string& filePath);
 	virtual ~Geometry();
 
-	void setupAttribArrays(VertexArrO& vao, GLuint vertexPosIndex, GLuint normalIndex);
+	void setupAttribArrays(Program &prog);
+	void render();
 private:
 	VertexBufO m_VertexData;
 	IndexBufO m_Ibo;
+	VertexArrO m_Vao;
+	GLsizei m_numberOfElements;
 
 	void parseObjFile(const std::string filePath, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData);
 	void parseVertex(std::istringstream& lineStream, std::vector<glm::vec3>& vertices);

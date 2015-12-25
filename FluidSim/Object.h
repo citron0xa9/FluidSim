@@ -13,7 +13,7 @@ public:
 	Object(Scene& scene, Material& material, Geometry& geometry, Program& renderProg);
 	virtual ~Object();
 
-	void render() const;
+	void render(const glm::mat4x4 &viewProjectTransform) const;
 
 	Program& getProgram() const;
 private:

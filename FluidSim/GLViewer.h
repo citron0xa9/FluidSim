@@ -6,6 +6,7 @@
 #include "VertexArrO.h"
 #include "VertexBufO.h"
 #include "Program.h"
+#include "Scene.h"
 
 class GLViewer {
 public:
@@ -59,5 +60,7 @@ private:
 	const static unsigned int m_UPDATE_INTERVAL_MS = 250;
 
 	static GLViewer* m_instance;
+
+	Scene m_Scene;
 };
 

@@ -11,6 +11,7 @@ enum class LightSourceType {
 struct ShaderLightSourceVariable {
 	std::string name;
 	LightSourceType type;
+	ShaderLightSourceVariable(const char *cstrName, LightSourceType t) : name{ cstrName }, type{ t } {}
 };
 
 class LightSource

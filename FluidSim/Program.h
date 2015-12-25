@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glm/mat4x4.hpp>
 #include <unordered_map>
 #include <string>
 #include "Shader.h"
@@ -12,8 +13,9 @@ struct UniformNames {
 	std::string diffuseCoefficient;
 	std::string specularCoefficient;
 	std::string specularExponent;
-	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp) : ambientCoefficient{ ambC }, diffuseCoefficient{ diffC }, specularCoefficient{ specC },
-		specularExponent{ specExp } {}
+	std::string modelViewProjectTransform;
+	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform) : ambientCoefficient{ ambC }, diffuseCoefficient{ diffC }, specularCoefficient{ specC },
+		specularExponent{ specExp }, modelViewProjectTransform{ mvpTransform } {}
 };
 
 class Program
@@ -35,10 +37,14 @@ public:
 
 	ShaderLightSourceVariable popFreeLightSourceVariable(const LightSourceType &lightSrcType);
 	GLint getUniformLocation(const GLchar *name);
+	GLuint getVertexPosIndex() const;
+	GLuint getNormalIndex() const;
 
 	GLuint getId() const;
 
 	int getLoadedMaterialId() const;
+
+	void loadModelViewProjectTransform(const glm::mat4x4 &transform);
 
 private:
 	GLuint m_Id;

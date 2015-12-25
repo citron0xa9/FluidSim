@@ -6,6 +6,7 @@
 #include "LightSource.h"
 #include "Program.h"
 #include "Material.h"
+#include "Camera.h"
 
 class Scene
 {
@@ -20,8 +21,10 @@ public:
 	Program& addProgram(const Program& Program);
 
 	void render();
+	void setAspectRatio(float ratio);
 
 private:
+	Camera m_Camera;
 	std::vector<Object> m_Objects;
 	std::vector<LightSource> m_LightSources;
 

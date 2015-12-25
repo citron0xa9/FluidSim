@@ -16,10 +16,11 @@ Program& Object::getProgram() const
 	return m_RenderProg;
 }
 
-void Object::render() const
+void Object::render(const glm::mat4x4 &viewProjectTransform) const
 {
 	if (m_RenderProg.getLoadedMaterialId() != m_Material.getId()) {
 		m_RenderProg.loadMaterial(m_Material);
 	}
+	m_RenderProg.loadModelViewProjectTransform(viewProjectTransform*m_ModelTransform);
 	m_RenderProg.use();
 }

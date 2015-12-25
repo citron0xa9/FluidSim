@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "Log.h"
 #include "Debug.h"
+#include "SunLightSource.h"
 
 GLViewer* GLViewer::m_instance = nullptr;
 
@@ -75,18 +76,61 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	std::cout << "Initialized, OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 	GLenum err = glGetError();
 
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
 	DEBUG(cullMsg);
 
-	setupTriangle();
+	//setupTriangle();
+
+	/*
+	 * Setup scene
+	*/
+	m_Scene.setAspectRatio(static_cast<float>(width) / height);
+	Geometry &geom = m_Scene.addGeometryFromFile("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\objects\\sphere2.obj");
+	
+	SunLightSource light{ 10.0, glm::vec3(4.0, 10.0, 5.0) };
+	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
+	m_Scene.addLightSource(light);
+
+	Material material{ glm::vec3(1.0, 0.0, 0.2), glm::vec3(1.0, 0.0, 0.2), glm::vec3(0.7, 0.7, 0.7), 30 };
+	Material &matRef = m_Scene.addMaterial(material);
+
+	/*
+	* setup scene: setup program
+	*/
+	std::vector<ShaderLightSourceVariable> lightSrcVars;
+	lightSrcVars.push_back(lightSrcVar);
+
+	Program prog{ lightSrcVars };
+	
+	Shader vertexShader{ GL_VERTEX_SHADER };
+	vertexShader.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic3D.vert");
+
+	Shader fragmentShader{ GL_FRAGMENT_SHADER };
+	fragmentShader.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic3D_phong.frag");
+
+	prog.attachShader(&vertexShader);
+	prog.attachShader(&fragmentShader);
+
+	vertexShader.compile();
+	fragmentShader.compile();
+	prog.link();
+	prog.detachAllShaders();
+
+	Program &progRef = m_Scene.addProgram(prog);
+
+	//create and add object to scene
+	Object sphere{ m_Scene, matRef, geom, progRef };
+	m_Scene.addObject(sphere);
 }
 
 GLViewer::~GLViewer()
 {
 	try {
-		cleanupTriangle();
+		//cleanupTriangle();
 	}
 	catch (const std::exception& ex) {
 		ERROR_MSG("In destructor: " << ex.what());
@@ -99,6 +143,7 @@ void GLViewer::ResizeFunction(int width, int height) {
 	if (viewer == nullptr) {
 		throw std::runtime_error("ResizeFunction: Instance of GLViewer doesn't exist");
 	}
+	viewer->m_Scene.setAspectRatio(static_cast<float>(width) / height);
 	viewer->setWidth(width);
 	viewer->setHeight(height);
 }
@@ -111,7 +156,7 @@ void GLViewer::RenderFunction(void) {
 	viewer->incrementFrameCount();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	viewer->drawTriangle();
+	viewer->m_Scene.render();
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -183,6 +228,7 @@ std::string GLViewer::getTitlePrefix() const {
 	return m_TitlePrefix;
 }
 
+#if 0
 void GLViewer::setupTriangle()
 {
 	std::vector<GLfloat> trianglePos{
@@ -254,6 +300,7 @@ void GLViewer::setupTriangle()
 		throw std::exception("Setting up triangle failed: opengl error");
 	}
 }
+#endif
 
 void GLViewer::cleanup()
 {

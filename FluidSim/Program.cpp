@@ -2,9 +2,10 @@
 #include "Log.h"
 
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
 
 GLuint Program::m_usedProgramId = 0;
-const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp" };
+const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform" };
 
 Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables{ lightSrcVars }, m_loadedMaterialId{-1}
 {
@@ -125,6 +126,16 @@ GLint Program::getUniformLocation(const GLchar *name)
 	return glGetUniformLocation(m_Id, name);
 }
 
+GLuint Program::getVertexPosIndex() const
+{
+	return 0;
+}
+
+GLuint Program::getNormalIndex() const
+{
+	return 1;
+}
+
 void Program::loadLights(const std::vector<LightSource> &lights)
 {
 	std::for_each(lights.begin(), lights.end(), [this](const LightSource &light){light.loadIntoProgram(*this); });
@@ -133,4 +144,13 @@ void Program::loadLights(const std::vector<LightSource> &lights)
 GLuint Program::getId() const
 {
 	return m_Id;
+}
+
+void Program::loadModelViewProjectTransform(const glm::mat4x4 &transform)
+{
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.modelViewProjectTransform.c_str());
+	if (location == -1) {
+		throw std::runtime_error("Error getting uniform location for the mvpTransform");
+	}
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 }
