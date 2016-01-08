@@ -14,7 +14,4 @@ struct IndexCombination {
 	GLushort vboIndex;	//at which index lays this combination in the vbo
 };
 
-bool operator==(const IndexCombination& a, const IndexCombination& b)
-{
-	return std::equal(std::begin(a.indices), std::end(a.indices), std::begin(b.indices));
-}
+bool operator==(const IndexCombination& a, const IndexCombination& b);

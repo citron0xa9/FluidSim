@@ -1,6 +1,7 @@
 #include "Geometry.h"
 #include "IndexCombination.h"
 #include "StrUtils.h"
+#include "Log.h"
 #include <fstream>
 #include <vector>
 #include <glm/vec3.hpp>
@@ -17,21 +18,21 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ 
 	*/
 
 	//final arrays for vbo and ibo
-	std::vector<GLfloat> vertexData;
-	std::vector<GLushort> indices;
+	//std::vector<GLfloat> vertexData;
+	//std::vector<GLushort> indices;
 
 	try {
-		parseObjFile(filePath, vertexData, indices);
+		parseObjFile(filePath, m_vertexDataRAM, m_indicesRAM);
 	}
 	catch (const std::exception& ex) {
-		throw std::exception("Parsing .obj file failed: " << ex.what);
+		throw std::exception((std::string("Parsing .obj file failed: ") + ex.what()).c_str());
 	}
 
 	//push data to gpu
-	m_VertexData.pushData(vertexData, GL_STATIC_DRAW, true);
-	m_Ibo.pushData(indices, GL_STATIC_DRAW, true);
+	m_VertexData.pushData(m_vertexDataRAM, GL_STATIC_DRAW, true);
+	m_Ibo.pushData(m_indicesRAM, GL_STATIC_DRAW, true);
 
-	m_numberOfElements = indices.size();
+	m_numberOfElements = m_indicesRAM.size();
 }
 
 void Geometry::setupAttribArrays(Program &prog)
@@ -60,7 +61,17 @@ void Geometry::parseObjFile(const std::string filePath, std::vector<GLfloat>& vb
 	objFile.open(filePath);
 	std::string line;
 	while (!objFile.eof()) {
-		std::getline(objFile, line);
+		try {
+			std::getline(objFile, line);
+		}
+		catch (const std::exception &ex) {
+			if (!objFile.eof()) {
+				throw ex;
+			}
+			else {
+				continue;
+			}
+		}
 		std::istringstream lstream(line);
 		std::string type;
 		lstream >> type;
@@ -74,6 +85,12 @@ void Geometry::parseObjFile(const std::string filePath, std::vector<GLfloat>& vb
 			parseFace(lstream, vboData, iboData, vertices, normals, &nextVboIndex, combinations);
 		}
 		else if (type.compare("s") == 0) {
+			//ignore line
+		}
+		else if (type.compare("o") == 0) {
+			//ignore line
+		}
+		else if (type.compare("#") == 0) {
 			//ignore line
 		}
 		else {
@@ -111,8 +128,8 @@ void Geometry::parseFace(std::istringstream& lineStream, std::vector<GLfloat>& v
 		//parse it into the struct
 		IndexCombination comb;
 		std::vector<std::string> combinationParts = strutils::split(combinationStr, '/');
-		comb.indices[0] = static_cast<GLushort>(atoi(combinationParts[0].c_str));
-		comb.indices[1] = static_cast<GLushort>(atoi(combinationParts[2].c_str));
+		comb.indices[0] = static_cast<GLushort>(atoi(combinationParts[0].c_str()))-1;
+		comb.indices[1] = static_cast<GLushort>(atoi(combinationParts[2].c_str()))-1;
 
 		//get pointer to this comb in the combinations vector + additional action if it is a new combination
 		auto savedComb = std::find(combinations.begin(), combinations.end(), comb);
@@ -156,4 +173,32 @@ void Geometry::render()
 	m_Ibo.bind();
 
 	glDrawElements(GL_TRIANGLES, m_numberOfElements, GL_UNSIGNED_SHORT, nullptr);
+}
+
+void Geometry::debugRender(const glm::mat4x4 &mvpTransform) {
+	DEBUG("\n==================================\nDEBUG RENDER: MODE: GL_TRIANGLES, going to render " << m_indicesRAM.size() / 3 << " triangles");
+	for (int i = 0; i < m_indicesRAM.size(); i+=3) {
+		DEBUG("+++++++++++++++++++++");
+		DEBUG("Triangle " << i / 3 << ":");
+		debugRenderTriangle(mvpTransform, i);
+
+	}
+}
+
+void Geometry::debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex)
+{
+	DEBUG("\tLocalSpace:");
+	for (int i = 0; i < 3; i++) {
+		int vertIndex = m_indicesRAM[startIndex + i]*6;
+		DEBUG("\tVertex " << i);
+		DEBUG("\t\t (" << m_vertexDataRAM[vertIndex] << ", " << m_vertexDataRAM[vertIndex + 1] << ", " << m_vertexDataRAM[vertIndex + 2] << ")");
+	}
+	DEBUG("\tNormalized Device Coords:");
+	
+	for (int i = 0; i < 3; i++) {
+		int vertIndex = m_indicesRAM[startIndex + i] * 6;
+		DEBUG("\tVertex " << i);
+		glm::vec4 vertTransformed = mvpTransform*glm::vec4(m_vertexDataRAM[vertIndex], m_vertexDataRAM[vertIndex + 1], m_vertexDataRAM[vertIndex + 2], 1.0);
+		DEBUG("\t\t (" << vertTransformed.x/vertTransformed.w << ", " << vertTransformed.y/vertTransformed.w << ", " << vertTransformed.z/vertTransformed.w << ")");
+	}
 }

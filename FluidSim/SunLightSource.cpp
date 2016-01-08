@@ -1,4 +1,5 @@
 #include "SunLightSource.h"
+#include "Program.h"
 
 
 SunLightSource::SunLightSource(GLfloat intensity, glm::vec3 direction) : LightSource{ intensity }, m_Direction{direction}
@@ -24,4 +25,9 @@ void SunLightSource::loadIntoProgram(Program &program) const
 	program.use();
 	glUniform1f(intensityUniformLocation, m_Intensity);
 	glUniform3fv(directionUniformLocation, 1, &m_Direction[0]);
+}
+
+LightSource* SunLightSource::clone() const
+{
+	return new SunLightSource(*this);
 }

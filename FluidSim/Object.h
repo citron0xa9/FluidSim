@@ -5,7 +5,8 @@
 #include "Program.h"
 #include "Geometry.h"
 #include "Material.h"
-#include "Scene.h"
+
+extern class Scene;
 
 class Object
 {

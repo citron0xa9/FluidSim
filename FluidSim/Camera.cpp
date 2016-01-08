@@ -40,3 +40,8 @@ glm::mat4x4 Camera::getViewPerspectiveTransform() const
 {
 	return m_ViewPerspectiveTransform;
 }
+
+glm::vec3 Camera::getLookAt() const
+{
+	return m_LookAt;
+}

@@ -10,6 +10,7 @@ public:
 	virtual ~SunLightSource();
 
 	virtual void loadIntoProgram(Program& program) const override;
+	virtual LightSource* clone() const override;
 	
 private:
 	glm::vec3 m_Direction;

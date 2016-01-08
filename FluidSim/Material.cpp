@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "Program.h"
 
 
 unsigned int Material::m_NextId = 0;

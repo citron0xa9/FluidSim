@@ -30,7 +30,17 @@ void Shader::setSourcePath(const std::string& path)
 	srcFile.open(path);
 	std::string line;
 	while (!srcFile.eof()) {
-		std::getline(srcFile, line);
+		try {
+			std::getline(srcFile, line);
+		}
+		catch (const std::exception &ex) {
+			if (!srcFile.eof()) {
+				throw ex;
+			}
+			else {
+				continue;
+			}
+		}
 		srcStr = srcStr + line + "\n";
 	}
 	srcFile.close();

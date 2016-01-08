@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 #include "VertexBufO.h"
 #include "IndexBufO.h"
 #include "VertexArrO.h"
@@ -21,16 +22,23 @@ public:
 
 	void setupAttribArrays(Program &prog);
 	void render();
+
+	void debugRender(const glm::mat4x4 &mvpTransform);
 private:
 	VertexBufO m_VertexData;
 	IndexBufO m_Ibo;
 	VertexArrO m_Vao;
 	GLsizei m_numberOfElements;
 
+	std::vector<GLfloat> m_vertexDataRAM;
+	std::vector<GLushort> m_indicesRAM;
+
 	void parseObjFile(const std::string filePath, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData);
 	void parseVertex(std::istringstream& lineStream, std::vector<glm::vec3>& vertices);
 	void parseNormal(std::istringstream& lineStream, std::vector<glm::vec3>& normals);
 	void parseFace(std::istringstream& lineStream, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData,
 		std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals, GLushort *nextVboIndex, std::list<IndexCombination>& combinations);
+
+	void debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex);
 };
 

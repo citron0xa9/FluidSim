@@ -14,8 +14,10 @@ struct UniformNames {
 	std::string specularCoefficient;
 	std::string specularExponent;
 	std::string modelViewProjectTransform;
-	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform) : ambientCoefficient{ ambC }, diffuseCoefficient{ diffC }, specularCoefficient{ specC },
-		specularExponent{ specExp }, modelViewProjectTransform{ mvpTransform } {}
+	std::string modelTransform;
+	std::string cameraLookAt;
+	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform, const char *modTransform, const char *camLookAt) : ambientCoefficient( ambC ), diffuseCoefficient( diffC ), specularCoefficient( specC ),
+		specularExponent( specExp ), modelViewProjectTransform( mvpTransform ), modelTransform( modTransform ), cameraLookAt( camLookAt ) {}
 };
 
 class Program
@@ -33,7 +35,7 @@ public:
 	static void unuse();
 
 	void loadMaterial(const Material &material);
-	void loadLights(const std::vector<LightSource> &lights);
+	void loadLights(const std::vector<LightSource*> &lights);
 
 	ShaderLightSourceVariable popFreeLightSourceVariable(const LightSourceType &lightSrcType);
 	GLint getUniformLocation(const GLchar *name);
@@ -45,6 +47,8 @@ public:
 	int getLoadedMaterialId() const;
 
 	void loadModelViewProjectTransform(const glm::mat4x4 &transform);
+	void loadModelTransform(const glm::mat4x4 &transform);
+	void loadCameraLookAt(const glm::vec3 &lookAt);
 
 private:
 	GLuint m_Id;

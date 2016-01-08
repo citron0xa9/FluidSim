@@ -5,9 +5,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 GLuint Program::m_usedProgramId = 0;
-const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform" };
+const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraLookAt" };
 
-Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables{ lightSrcVars }, m_loadedMaterialId{-1}
+Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables( lightSrcVars ), m_loadedMaterialId(-1)
 {
 	m_Id = glCreateProgram();
 }
@@ -136,9 +136,9 @@ GLuint Program::getNormalIndex() const
 	return 1;
 }
 
-void Program::loadLights(const std::vector<LightSource> &lights)
+void Program::loadLights(const std::vector<LightSource*> &lights)
 {
-	std::for_each(lights.begin(), lights.end(), [this](const LightSource &light){light.loadIntoProgram(*this); });
+	std::for_each(lights.begin(), lights.end(), [this](const LightSource *light){light->loadIntoProgram(*this); });
 }
 
 GLuint Program::getId() const
@@ -153,4 +153,22 @@ void Program::loadModelViewProjectTransform(const glm::mat4x4 &transform)
 		throw std::runtime_error("Error getting uniform location for the mvpTransform");
 	}
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+}
+
+void Program::loadModelTransform(const glm::mat4x4 &transform)
+{
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.modelTransform.c_str());
+	if (location == -1) {
+		throw std::runtime_error("Error getting uniform location for the modelTransform");
+	}
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
+}
+
+void Program::loadCameraLookAt(const glm::vec3 &lookAt)
+{
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.cameraLookAt.c_str());
+	if (location == -1) {
+		throw std::runtime_error("Error getting uniform location for cameraLookAt");
+	}
+	glUniform3fv(location, 1, glm::value_ptr(lookAt));
 }

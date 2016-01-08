@@ -42,7 +42,7 @@ void GLViewer::deleteInstance() {
 	}
 }
 
-GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]) : m_width{ width }, m_height{ height }, m_title{ titlePrefix }, m_TitlePrefix{ titlePrefix } {
+GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]) : m_width( width ), m_height( height ), m_title( titlePrefix ), m_TitlePrefix( titlePrefix ) {
 	glutSetOption(
 		GLUT_ACTION_ON_WINDOW_CLOSE,
 		GLUT_ACTION_GLUTMAINLOOP_RETURNS
@@ -77,7 +77,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	GLenum err = glGetError();
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
@@ -89,7 +89,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	 * Setup scene
 	*/
 	m_Scene.setAspectRatio(static_cast<float>(width) / height);
-	Geometry &geom = m_Scene.addGeometryFromFile("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\objects\\sphere2.obj");
+	Geometry &geom = m_Scene.addGeometryFromFile("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\objects\\sphere.obj");
 	
 	SunLightSource light{ 10.0, glm::vec3(4.0, 10.0, 5.0) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
@@ -104,7 +104,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	std::vector<ShaderLightSourceVariable> lightSrcVars;
 	lightSrcVars.push_back(lightSrcVar);
 
-	Program prog{ lightSrcVars };
+	Program &prog = m_Scene.addProgram(lightSrcVars);
 	
 	Shader vertexShader{ GL_VERTEX_SHADER };
 	vertexShader.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic3D.vert");
@@ -120,11 +120,11 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	prog.link();
 	prog.detachAllShaders();
 
-	Program &progRef = m_Scene.addProgram(prog);
-
 	//create and add object to scene
-	Object sphere{ m_Scene, matRef, geom, progRef };
+	Object sphere{ m_Scene, matRef, geom, prog };
 	m_Scene.addObject(sphere);
+
+	m_Scene.render();
 }
 
 GLViewer::~GLViewer()
@@ -156,7 +156,7 @@ void GLViewer::RenderFunction(void) {
 	viewer->incrementFrameCount();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	viewer->m_Scene.render();
+	//viewer->m_Scene.render();
 
 	glutSwapBuffers();
 	glutPostRedisplay();

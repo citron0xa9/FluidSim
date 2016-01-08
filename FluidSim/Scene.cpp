@@ -12,6 +12,12 @@ Scene::~Scene()
 	for (auto geometryPtr : m_GeometriePtrs) {
 		delete geometryPtr;
 	}
+	for (auto &elem : m_ProgramPtrs) {
+		delete elem.second;
+	}
+	for (auto &elem : m_LightSources) {
+		delete elem;
+	}
 }
 
 void Scene::addObject(const Object &obj)
@@ -21,8 +27,8 @@ void Scene::addObject(const Object &obj)
 
 void Scene::addLightSource(const LightSource &lightSource)
 {
-	m_LightSources.push_back(lightSource);
-	std::for_each(m_Programs.begin(), m_Programs.end(), [this](Program &prog){prog.loadLights(m_LightSources); });
+	m_LightSources.push_back(lightSource.clone());
+	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSources); });
 }
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
@@ -38,15 +44,18 @@ Material& Scene::addMaterial(const Material &material)
 	return m_Materials.back();
 }
 
-Program& Scene::addProgram(const Program &program)
+Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVars)
 {
-	return (*((m_Programs.insert(std::make_pair(program.getId(), program))).first)).second;
+	Program *newProg = new Program{ lightVars };
+	return *((*((m_ProgramPtrs.insert(std::make_pair(newProg->getId(), newProg))).first)).second);
 }
 
 void Scene::render()
 {
 	//call render on each object
 	glm::mat4x4 viewProjectTransform = m_Camera.getViewPerspectiveTransform();
+	glm::vec3 lookAt = m_Camera.getLookAt();
+	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&lookAt](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraLookAt(lookAt); });
 	std::for_each(m_Objects.begin(), m_Objects.end(), [&viewProjectTransform](const Object &obj){obj.render(viewProjectTransform); });
 }
 

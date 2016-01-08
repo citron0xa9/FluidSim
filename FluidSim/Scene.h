@@ -18,7 +18,7 @@ public:
 	void addLightSource(const LightSource &lightSource);
 	Geometry& addGeometryFromFile(const std::string &fileName);
 	Material& addMaterial(const Material &material);
-	Program& addProgram(const Program& Program);
+	Program& addProgram(const std::vector<ShaderLightSourceVariable> &lightVars);
 
 	void render();
 	void setAspectRatio(float ratio);
@@ -26,10 +26,10 @@ public:
 private:
 	Camera m_Camera;
 	std::vector<Object> m_Objects;
-	std::vector<LightSource> m_LightSources;
+	std::vector<LightSource*> m_LightSources;
 
 	std::list<Geometry*> m_GeometriePtrs;
 	std::list<Material> m_Materials;
-	std::unordered_map<GLuint, Program> m_Programs;
+	std::unordered_map<GLuint, Program*> m_ProgramPtrs;
 };
 

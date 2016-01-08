@@ -10,6 +10,7 @@ public:
 	virtual ~Camera();
 
 	glm::mat4x4 getViewPerspectiveTransform() const;
+	glm::vec3 getLookAt() const;
 	void setAspectRatio(float ratio);
 
 private:

@@ -2,7 +2,8 @@
 
 #include <glm/vec3.hpp>
 #include <gl/glew.h>
-#include "Program.h"
+
+extern class Program;
 
 
 struct MaterialUniformLocations {
