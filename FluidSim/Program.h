@@ -15,9 +15,9 @@ struct UniformNames {
 	std::string specularExponent;
 	std::string modelViewProjectTransform;
 	std::string modelTransform;
-	std::string cameraLookAt;
-	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform, const char *modTransform, const char *camLookAt) : ambientCoefficient( ambC ), diffuseCoefficient( diffC ), specularCoefficient( specC ),
-		specularExponent( specExp ), modelViewProjectTransform( mvpTransform ), modelTransform( modTransform ), cameraLookAt( camLookAt ) {}
+	std::string cameraLookDirection;
+	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform, const char *modTransform, const char *camLookDir) : ambientCoefficient( ambC ), diffuseCoefficient( diffC ), specularCoefficient( specC ),
+		specularExponent( specExp ), modelViewProjectTransform( mvpTransform ), modelTransform( modTransform ), cameraLookDirection( camLookDir ) {}
 };
 
 class Program
@@ -48,7 +48,7 @@ public:
 
 	void loadModelViewProjectTransform(const glm::mat4x4 &transform);
 	void loadModelTransform(const glm::mat4x4 &transform);
-	void loadCameraLookAt(const glm::vec3 &lookAt);
+	void loadCameraLookDirection(const glm::vec3 &lookDirection);
 
 private:
 	GLuint m_Id;

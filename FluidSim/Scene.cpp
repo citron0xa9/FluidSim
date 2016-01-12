@@ -54,12 +54,17 @@ void Scene::render()
 {
 	//call render on each object
 	glm::mat4x4 viewProjectTransform = m_Camera.getViewPerspectiveTransform();
-	glm::vec3 lookAt = m_Camera.getLookAt();
-	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&lookAt](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraLookAt(lookAt); });
+	glm::vec3 lookDirection = m_Camera.getLookDirection();
+	//std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&lookAt](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraLookDirection(lookDirection); });
 	std::for_each(m_Objects.begin(), m_Objects.end(), [&viewProjectTransform](const Object &obj){obj.render(viewProjectTransform); });
 }
 
 void Scene::setAspectRatio(float ratio)
 {
 	m_Camera.setAspectRatio(ratio);
+}
+
+Camera& Scene::getCamera()
+{
+	return m_Camera;
 }

@@ -26,5 +26,5 @@ void Object::render(const glm::mat4x4 &viewProjectTransform) const
 	m_RenderProg.use();
 
 	m_Geometry.render();
-	m_Geometry.debugRender(viewProjectTransform*m_ModelTransform);
+	//m_Geometry.debugRender(viewProjectTransform*m_ModelTransform);
 }

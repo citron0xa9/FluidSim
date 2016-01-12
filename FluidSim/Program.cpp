@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 GLuint Program::m_usedProgramId = 0;
-const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraLookAt" };
+const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraLookDirection" };
 
 Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables( lightSrcVars ), m_loadedMaterialId(-1)
 {
@@ -148,6 +148,7 @@ GLuint Program::getId() const
 
 void Program::loadModelViewProjectTransform(const glm::mat4x4 &transform)
 {
+	use();
 	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.modelViewProjectTransform.c_str());
 	if (location == -1) {
 		throw std::runtime_error("Error getting uniform location for the mvpTransform");
@@ -157,6 +158,7 @@ void Program::loadModelViewProjectTransform(const glm::mat4x4 &transform)
 
 void Program::loadModelTransform(const glm::mat4x4 &transform)
 {
+	use();
 	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.modelTransform.c_str());
 	if (location == -1) {
 		throw std::runtime_error("Error getting uniform location for the modelTransform");
@@ -164,11 +166,12 @@ void Program::loadModelTransform(const glm::mat4x4 &transform)
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
-void Program::loadCameraLookAt(const glm::vec3 &lookAt)
+void Program::loadCameraLookDirection(const glm::vec3 &lookDirection)
 {
-	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.cameraLookAt.c_str());
+	use();
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.cameraLookDirection.c_str());
 	if (location == -1) {
 		throw std::runtime_error("Error getting uniform location for cameraLookAt");
 	}
-	glUniform3fv(location, 1, glm::value_ptr(lookAt));
+	glUniform3fv(location, 1, glm::value_ptr(lookDirection));
 }

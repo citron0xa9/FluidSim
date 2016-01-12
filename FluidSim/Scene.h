@@ -23,6 +23,8 @@ public:
 	void render();
 	void setAspectRatio(float ratio);
 
+	Camera& getCamera();
+
 private:
 	Camera m_Camera;
 	std::vector<Object> m_Objects;

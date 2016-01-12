@@ -45,3 +45,23 @@ glm::vec3 Camera::getLookAt() const
 {
 	return m_LookAt;
 }
+
+glm::vec3 Camera::getLookDirection() const
+{
+	return m_LookAt - m_Position;
+}
+
+void Camera::setPosition(glm::vec3 pos) {
+	m_Position = pos;
+	calculateViewPerspectiveTransform();
+}
+
+void Camera::setLookAt(glm::vec3 pos) {
+	m_LookAt = pos;
+	calculateViewPerspectiveTransform();
+}
+
+void Camera::setFovY(float f) {
+	m_FovY = f;
+	calculateViewPerspectiveTransform();
+}

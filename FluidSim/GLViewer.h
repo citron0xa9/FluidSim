@@ -30,6 +30,8 @@ public:
 	void setFrameCount(const unsigned int count);
 	unsigned int getFrameCount() const;
 	void incrementFrameCount();
+
+	Scene& getScene();
 private:
 	GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]);
 	GLViewer(const GLViewer& v) {

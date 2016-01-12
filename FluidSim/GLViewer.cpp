@@ -21,7 +21,7 @@ void GLViewer::initInstance(const char* titlePrefix, unsigned int width, unsigne
 	}
 	glutInit(&argc, argv);
 
-	glutInitContextVersion(4, 0);
+	glutInitContextVersion(4, 5);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
@@ -74,6 +74,8 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	std::cout << "Initialized, OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
+	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
 	GLenum err = glGetError();
 
 	glEnable(GL_DEPTH_TEST);
@@ -88,12 +90,8 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	/*
 	 * Setup scene
 	*/
-	m_Scene.setAspectRatio(static_cast<float>(width) / height);
-	Geometry &geom = m_Scene.addGeometryFromFile("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\objects\\sphere.obj");
-	
-	SunLightSource light{ 10.0, glm::vec3(4.0, 10.0, 5.0) };
+	SunLightSource light{ 1.0, glm::vec3(0.0, 0.0, -1.0) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
-	m_Scene.addLightSource(light);
 
 	Material material{ glm::vec3(1.0, 0.0, 0.2), glm::vec3(1.0, 0.0, 0.2), glm::vec3(0.7, 0.7, 0.7), 30 };
 	Material &matRef = m_Scene.addMaterial(material);
@@ -105,12 +103,12 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	lightSrcVars.push_back(lightSrcVar);
 
 	Program &prog = m_Scene.addProgram(lightSrcVars);
-	
+
 	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic3D.vert");
+	vertexShader.setSourcePath("shaders\\basic3D.vert");
 
 	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic3D_phong.frag");
+	fragmentShader.setSourcePath("shaders\\basic3D_phong.frag");
 
 	prog.attachShader(&vertexShader);
 	prog.attachShader(&fragmentShader);
@@ -120,11 +118,18 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	prog.link();
 	prog.detachAllShaders();
 
+	m_Scene.addLightSource(light);
+
+	//setup geometry
+	m_Scene.setAspectRatio(static_cast<float>(width) / height);
+	Geometry &geom = m_Scene.addGeometryFromFile("objects\\sphere2.obj");
+	geom.setupAttribArrays(prog);
+
 	//create and add object to scene
 	Object sphere{ m_Scene, matRef, geom, prog };
 	m_Scene.addObject(sphere);
 
-	m_Scene.render();
+	//m_Scene.render();
 }
 
 GLViewer::~GLViewer()
@@ -156,7 +161,7 @@ void GLViewer::RenderFunction(void) {
 	viewer->incrementFrameCount();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//viewer->m_Scene.render();
+	viewer->m_Scene.render();
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -209,6 +214,11 @@ void GLViewer::setFrameCount(const unsigned int count) {
 
 void GLViewer::incrementFrameCount() {
 	m_FrameCount++;
+}
+
+Scene & GLViewer::getScene()
+{
+	return m_Scene;
 }
 
 void GLViewer::setTitle(const std::string& title) {
