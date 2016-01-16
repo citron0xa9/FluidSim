@@ -90,11 +90,11 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	/*
 	 * Setup scene
 	*/
-	SunLightSource light{ 1.0, glm::vec3(0.0, 0.0, -1.0) };
+	SunLightSource light{ 0.8f, glm::vec3(0.0, 0.0, -1.0) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
 
-	Material material{ glm::vec3(1.0, 0.0, 0.2), glm::vec3(1.0, 0.0, 0.2), glm::vec3(0.7, 0.7, 0.7), 30 };
-	Material &matRef = m_Scene.addMaterial(material);
+	Material sphereMaterial{ glm::vec3(1.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.7, 0.7, 0.7), 30 };
+	Material &matRef = m_Scene.addMaterial(sphereMaterial);
 
 	/*
 	* setup scene: setup program
@@ -122,12 +122,19 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	//setup geometry
 	m_Scene.setAspectRatio(static_cast<float>(width) / height);
-	Geometry &geom = m_Scene.addGeometryFromFile("objects\\sphere2.obj");
-	geom.setupAttribArrays(prog);
+	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere2.obj");
+	geomSphere.setupAttribArrays(prog);
+
+	Geometry &geomCube = m_Scene.addGeometryFromFile("objects\\cube.obj");
+	geomCube.setupAttribArrays(prog);
 
 	//create and add object to scene
-	Object sphere{ m_Scene, matRef, geom, prog };
+	Object sphere{ m_Scene, matRef, geomSphere, prog };
 	m_Scene.addObject(sphere);
+
+	Object cube{ m_Scene, matRef, geomCube, prog };
+	cube.translate(glm::vec3(-3.0, 0.0, 0.0));
+	m_Scene.addObject(cube);
 
 	//m_Scene.render();
 }

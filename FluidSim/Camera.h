@@ -2,11 +2,12 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <glm/trigonometric.hpp>
 
 class Camera
 {
 public:
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 1.3f), glm::vec3 lookAt = glm::vec3(0.0,0.0,0.0), glm::vec3 up = glm::vec3(0.0,1.0,0.0), float fovy = 35.0f, float aspectRatio = 4.0f/3.0f, float near = 0.1f, float far = 100.0f);
+	Camera(glm::vec3 position = glm::vec3(0.0f, 1.8f, 8.6f), glm::vec3 lookAt = glm::vec3(0.0,0.0,0.0), glm::vec3 up = glm::vec3(0.0,1.0,0.0), float fovy = glm::radians(35.0f), float aspectRatio = 4.0f/3.0f, float near = 0.1f, float far = 100.0f);
 	virtual ~Camera();
 
 	glm::mat4x4 getViewPerspectiveTransform() const;

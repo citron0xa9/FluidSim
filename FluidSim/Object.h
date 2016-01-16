@@ -17,6 +17,8 @@ public:
 	void render(const glm::mat4x4 &viewProjectTransform) const;
 
 	Program& getProgram() const;
+
+	void translate(const glm::vec3 &delta);
 private:
 	//std::string m_Name;
 
