@@ -23,7 +23,7 @@ void cli() {
 				for (int i = 0; i < 3; i++) {
 					std::cin >> pos[i];
 				}
-				inst->getScene().getCamera().setPosition(pos);
+				//inst->getScene().getCamera().setPosition(pos);
 			}
 			else if (cmd == "setCameraFovY") {
 				float f;

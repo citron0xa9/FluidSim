@@ -53,6 +53,10 @@ private:
 	static void RenderFunction(void);
 	static void IdleFunction(void);
 	static void Timer_FPS(int value);
+	static void KeyboardFunction(unsigned char key, int x, int y);
+	static void KeyboardFunctionUp(unsigned char key, int x, int y);
+	static void MouseFunction(int button, int state, int x, int y);
+	static void MouseMotionFunction(int x, int y);
 
 	unsigned int m_width, m_height;
 	int m_WindowHandle;
@@ -64,5 +68,8 @@ private:
 	static GLViewer* m_instance;
 
 	Scene m_Scene;
+
+	bool m_MouseRotationReady;
+	glm::vec2 m_LastMouseCoordinates;
 };
 

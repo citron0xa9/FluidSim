@@ -8,10 +8,14 @@
 #include <sstream>
 #include <vector>
 
+
 #include "Shader.h"
 #include "Log.h"
 #include "Debug.h"
 #include "SunLightSource.h"
+#include "TriangleNetObject.h"
+
+#include <glm/geometric.hpp>
 
 GLViewer* GLViewer::m_instance = nullptr;
 
@@ -63,6 +67,11 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	glutIdleFunc(&IdleFunction);
 	glutTimerFunc(0, &Timer_FPS, 0);	//call Timer_FPS immediately if everything is set up
 	glutCloseFunc(&cleanup);
+
+	glutMouseFunc(&MouseFunction);
+	glutMotionFunc(&MouseMotionFunction);
+	glutKeyboardFunc(&KeyboardFunction);
+	glutKeyboardUpFunc(&KeyboardFunctionUp);
 
 	glewExperimental = GL_TRUE;
 	GLenum glewInitResult = glewInit();
@@ -129,12 +138,14 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	geomCube.setupAttribArrays(prog);
 
 	//create and add object to scene
-	Object sphere{ m_Scene, matRef, geomSphere, prog };
+	TriangleNetObject sphere{ m_Scene, matRef, geomSphere, prog };
 	m_Scene.addObject(sphere);
 
-	Object cube{ m_Scene, matRef, geomCube, prog };
+	TriangleNetObject cube{ m_Scene, matRef, geomCube, prog };
 	cube.translate(glm::vec3(-3.0, 0.0, 0.0));
 	m_Scene.addObject(cube);
+
+	m_Scene.getCamera().translate(glm::vec3(0, 0, 3));
 
 	//m_Scene.render();
 }
@@ -209,6 +220,84 @@ void GLViewer::Timer_FPS(int value) {
 	}
 	viewer->setFrameCount(0);
 	glutTimerFunc(m_UPDATE_INTERVAL_MS, Timer_FPS, 1);	//we do not call for the first time -> pass value 1
+}
+
+void GLViewer::KeyboardFunction(unsigned char key, int x, int y)
+{
+	std::cout << "Called keyboard func with key: " << key << std::endl;
+	GLViewer* viewer = GLViewer::getInstance();
+	if (viewer == nullptr) {
+		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
+	}
+	switch (key) {
+	case 'w':
+		viewer->m_Scene.getCamera().addForwardVelocity(1.0);
+		break;
+	case 'a':
+		viewer->m_Scene.getCamera().addLeftVelocity(1.0);
+		break;
+	case 'd':
+		viewer->m_Scene.getCamera().addRightVelocity(1.0);
+		break;
+	case 's':
+		viewer->m_Scene.getCamera().addBackwardVelocity(1.0);
+		break;
+	}
+}
+
+void GLViewer::KeyboardFunctionUp(unsigned char key, int x, int y)
+{
+	GLViewer* viewer = GLViewer::getInstance();
+	if (viewer == nullptr) {
+		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
+	}
+	switch (key) {
+	case 'w':
+		viewer->m_Scene.getCamera().addForwardVelocity(-1.0);
+		break;
+	case 'a':
+		viewer->m_Scene.getCamera().addLeftVelocity(-1.0);
+		break;
+	case 'd':
+		viewer->m_Scene.getCamera().addRightVelocity(-1.0);
+		break;
+	case 's':
+		viewer->m_Scene.getCamera().addBackwardVelocity(-1.0);
+		break;
+	}
+}
+
+void GLViewer::MouseFunction(int button, int state, int x, int y)
+{
+	GLViewer* viewer = GLViewer::getInstance();
+	if (viewer == nullptr) {
+		throw std::runtime_error("MouseFunction: instance of GLViewer doesn't exist");
+	}
+
+	viewer->m_LastMouseCoordinates = glm::vec2(x, y);
+	viewer->m_MouseRotationReady = (state == GLUT_DOWN) ? true : false;
+}
+
+void GLViewer::MouseMotionFunction(int x, int y)
+{
+	GLViewer* viewer = GLViewer::getInstance();
+	if (viewer == nullptr) {
+		throw std::runtime_error("MouseMotionFunction: instance of GLViewer doesn't exist");
+	}
+	if (!viewer->m_MouseRotationReady) {
+		return;
+	}
+
+	glm::vec2 currentCoordinates = glm::vec2(x, y);
+	glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
+
+	float rotationXDeg = delta.y/100.0f;
+	float rotationYDeg = delta.x/100.0f;
+	Camera &cam = viewer->m_Scene.getCamera();
+	cam.rotateLocalX(rotationXDeg);
+	cam.rotateLocalY(rotationYDeg);
+	
+	viewer->m_LastMouseCoordinates = currentCoordinates;
 }
 
 unsigned int GLViewer::getFrameCount() const {

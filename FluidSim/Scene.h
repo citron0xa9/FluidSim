@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <unordered_set>
+#include <thread>
 #include "Object.h"
+#include "Geometry.h"
 #include "LightSource.h"
 #include "Program.h"
 #include "Material.h"
@@ -26,12 +28,18 @@ public:
 	Camera& getCamera();
 
 private:
+	void step(float secondsPassed);
+	void stepLoop();
+
 	Camera m_Camera;
-	std::vector<Object> m_Objects;
+	std::vector<Object*> m_ObjectPtrs;
 	std::vector<LightSource*> m_LightSources;
 
 	std::list<Geometry*> m_GeometriePtrs;
 	std::list<Material> m_Materials;
 	std::unordered_map<GLuint, Program*> m_ProgramPtrs;
+
+	std::thread m_StepLoopThread;
+	bool m_Alive;
 };
 

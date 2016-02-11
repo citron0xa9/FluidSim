@@ -1,31 +1,36 @@
 #pragma once
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
+#include "Object.h"
 #include <glm/trigonometric.hpp>
 
-class Camera
+class Camera : public Object
 {
 public:
-	Camera(glm::vec3 position = glm::vec3(0.0f, 1.8f, 8.6f), glm::vec3 lookAt = glm::vec3(0.0,0.0,0.0), glm::vec3 up = glm::vec3(0.0,1.0,0.0), float fovy = glm::radians(35.0f), float aspectRatio = 4.0f/3.0f, float near = 0.1f, float far = 100.0f);
+	Camera(Scene &scene, float fovy = glm::radians(35.0f), float aspectRatio = 4.0f/3.0f, float near = 0.1f, float far = 100.0f);
 	virtual ~Camera();
 
+	virtual Object* copy() const override;
+
 	glm::mat4x4 getViewPerspectiveTransform() const;
-	glm::vec3 getLookAt() const;
-	glm::vec3 getLookDirection() const;
 	void setAspectRatio(float ratio);
-	void setPosition(glm::vec3 pos);
 	void setFovY(float f);
-	void setLookAt(glm::vec3 pos);
+
+	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
+
+	virtual void translate(const glm::vec3 &delta) override;
+
+	glm::vec3 getLookDirection() const;
+
+protected:
+	virtual void rotate(float degrees, const glm::vec3 &axis) override;
 
 private:
 	void calculatePerspectiveTransform();
 	void calculateViewTransform();
 	void calculateViewPerspectiveTransform();
 
-	glm::vec3 m_Position;
-	glm::vec3 m_LookAt;
-	glm::vec3 m_Up;
+	static glm::vec3 localLookDirection();
+	static glm::vec3 upVector();
 
 	float m_FovY;
 	float m_AspectRatio;
