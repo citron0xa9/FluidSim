@@ -77,6 +77,9 @@ void Camera::render(const glm::mat4x4 & viewProjectTransform) const
 
 void Camera::translate(const glm::vec3 & delta)
 {
+	if (delta == glm::vec3(0)) {
+		return;
+	}
 	Object::translate(delta);
 	calculateViewPerspectiveTransform();
 }
@@ -88,6 +91,9 @@ glm::vec3 Camera::getLookDirection() const
 
 void Camera::rotate(float degrees, const glm::vec3 & axis)
 {
+	if (degrees == 0) {
+		return;
+	}
 	Object::rotate(degrees, axis);
 	std::cout << "Rotating " << degrees << " around (" << axis.x << ", " << axis.y << ", " << axis.z << ")" << std::endl;
 	calculateViewPerspectiveTransform();

@@ -229,20 +229,23 @@ void GLViewer::KeyboardFunction(unsigned char key, int x, int y)
 	if (viewer == nullptr) {
 		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
 	}
-	switch (key) {
-	case 'w':
-		viewer->m_Scene.getCamera().addForwardVelocity(1.0);
-		break;
-	case 'a':
-		viewer->m_Scene.getCamera().addLeftVelocity(1.0);
-		break;
-	case 'd':
-		viewer->m_Scene.getCamera().addRightVelocity(1.0);
-		break;
-	case 's':
-		viewer->m_Scene.getCamera().addBackwardVelocity(1.0);
-		break;
+	if ((viewer->m_KeysPressedState.count(key) == 0) || !(viewer->m_KeysPressedState[key])) {
+		switch (key) {
+		case 'w':
+			viewer->m_Scene.getCamera().addForwardVelocity(2.0);
+			break;
+		case 'a':
+			viewer->m_Scene.getCamera().addLeftVelocity(2.0);
+			break;
+		case 'd':
+			viewer->m_Scene.getCamera().addRightVelocity(2.0);
+			break;
+		case 's':
+			viewer->m_Scene.getCamera().addBackwardVelocity(2.0);
+			break;
+		}
 	}
+	viewer->m_KeysPressedState[key] = true;
 }
 
 void GLViewer::KeyboardFunctionUp(unsigned char key, int x, int y)
@@ -253,18 +256,19 @@ void GLViewer::KeyboardFunctionUp(unsigned char key, int x, int y)
 	}
 	switch (key) {
 	case 'w':
-		viewer->m_Scene.getCamera().addForwardVelocity(-1.0);
+		viewer->m_Scene.getCamera().addForwardVelocity(-2.0);
 		break;
 	case 'a':
-		viewer->m_Scene.getCamera().addLeftVelocity(-1.0);
+		viewer->m_Scene.getCamera().addLeftVelocity(-2.0);
 		break;
 	case 'd':
-		viewer->m_Scene.getCamera().addRightVelocity(-1.0);
+		viewer->m_Scene.getCamera().addRightVelocity(-2.0);
 		break;
 	case 's':
-		viewer->m_Scene.getCamera().addBackwardVelocity(-1.0);
+		viewer->m_Scene.getCamera().addBackwardVelocity(-2.0);
 		break;
 	}
+	viewer->m_KeysPressedState[key] = false;
 }
 
 void GLViewer::MouseFunction(int button, int state, int x, int y)
@@ -291,8 +295,8 @@ void GLViewer::MouseMotionFunction(int x, int y)
 	glm::vec2 currentCoordinates = glm::vec2(x, y);
 	glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
 
-	float rotationXDeg = delta.y/100.0f;
-	float rotationYDeg = delta.x/100.0f;
+	float rotationXDeg = -delta.y/1000.0f;
+	float rotationYDeg = -delta.x/1000.0f;
 	Camera &cam = viewer->m_Scene.getCamera();
 	cam.rotateLocalX(rotationXDeg);
 	cam.rotateLocalY(rotationYDeg);

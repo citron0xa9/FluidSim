@@ -1,15 +1,17 @@
 #include "Scene.h"
 #include <chrono>
 
-Scene::Scene() : m_Camera{*this}, m_Alive{true}, m_StepLoopThread{&Scene::stepLoop, this}
+Scene::Scene() : m_Camera{*this}, m_Alive{true}
 {
-
+	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
 }
 
 
 Scene::~Scene()
 {
 	m_Alive = false;
+	m_StepLoopThread.join();
+
 	for (auto geometryPtr : m_GeometriePtrs) {
 		delete geometryPtr;
 	}
@@ -22,8 +24,6 @@ Scene::~Scene()
 	for (auto &elem : m_ObjectPtrs) {
 		delete elem;
 	}
-
-	m_StepLoopThread.join();
 }
 
 void Scene::stepLoop()

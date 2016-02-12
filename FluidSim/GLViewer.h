@@ -58,6 +58,8 @@ private:
 	static void MouseFunction(int button, int state, int x, int y);
 	static void MouseMotionFunction(int x, int y);
 
+	std::unordered_map<unsigned char, bool> m_KeysPressedState;
+
 	unsigned int m_width, m_height;
 	int m_WindowHandle;
 	std::string m_title;
