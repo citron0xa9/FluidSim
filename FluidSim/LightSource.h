@@ -3,7 +3,7 @@
 #include <string>
 #include <gl/glew.h>
 
-extern class Program;
+class Program;
 
 enum class LightSourceType {
 	SUNLIGHT

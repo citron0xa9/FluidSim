@@ -42,16 +42,10 @@ void Camera::calculatePerspectiveTransform()
 	m_PerspectiveTransform = glm::perspective(m_FovY, m_AspectRatio, m_NearClippingPlane, m_FarClippingPlane);
 }
 
-std::ostream& operator<<(std::ostream& os, const glm::vec3 &vec) {
-	os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
-	return os;
-}
-
 void Camera::calculateViewTransform()
 {
 	glm::vec3 position = glm::vec3(m_TranslationTransform*glm::vec4(origin(), 1.0));
 	glm::vec3 lookAt = position + glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(), 1.0));
-	std::cout << "Calculating view tranform, with pos: " << position << "and look at " << lookAt << std::endl;
 	m_ViewTransform = glm::lookAt(position, lookAt, upVector());
 }
 
@@ -89,12 +83,16 @@ glm::vec3 Camera::getLookDirection() const
 	return glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(),1.0));
 }
 
+glm::vec3 Camera::getPosition() const
+{
+	return glm::vec3(m_TranslationTransform*glm::vec4(origin(), 1.0));
+}
+
 void Camera::rotate(float degrees, const glm::vec3 & axis)
 {
 	if (degrees == 0) {
 		return;
 	}
 	Object::rotate(degrees, axis);
-	std::cout << "Rotating " << degrees << " around (" << axis.x << ", " << axis.y << ", " << axis.z << ")" << std::endl;
 	calculateViewPerspectiveTransform();
 }

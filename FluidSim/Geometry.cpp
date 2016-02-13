@@ -32,7 +32,7 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ 
 	m_VertexData.pushData(m_vertexDataRAM, GL_STATIC_DRAW, true);
 	m_Ibo.pushData(m_indicesRAM, GL_STATIC_DRAW, true);
 
-	m_numberOfElements = m_indicesRAM.size();
+	m_numberOfElements = static_cast<GLsizei>(m_indicesRAM.size());
 }
 
 void Geometry::setupAttribArrays(Program &prog)

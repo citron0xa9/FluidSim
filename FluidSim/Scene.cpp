@@ -31,7 +31,7 @@ void Scene::stepLoop()
 	int stepTimeMilliseconds = 15;
 	while (m_Alive) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(stepTimeMilliseconds));
-		step(stepTimeMilliseconds / 1000.0);
+		step(stepTimeMilliseconds / 1000.0f);
 	}
 }
 
@@ -70,8 +70,8 @@ void Scene::render()
 	//call render on each object
 	glm::mat4x4 viewProjectTransform = m_Camera.getViewPerspectiveTransform();
 
-	//glm::vec3 lookDirection = m_Camera.getLookDirection();
-	//std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&lookAt](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraLookDirection(lookDirection); });
+	glm::vec3 camPosition = m_Camera.getPosition();
+	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&camPosition](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraPosition(camPosition); });
 	std::for_each(m_ObjectPtrs.begin(), m_ObjectPtrs.end(), [&viewProjectTransform](const Object *obj){obj->render(viewProjectTransform); });
 }
 

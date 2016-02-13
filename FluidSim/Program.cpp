@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 GLuint Program::m_usedProgramId = 0;
-const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraLookDirection" };
+const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraPosition" };
 
 Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables( lightSrcVars ), m_loadedMaterialId(-1)
 {
@@ -166,12 +166,12 @@ void Program::loadModelTransform(const glm::mat4x4 &transform)
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
-void Program::loadCameraLookDirection(const glm::vec3 &lookDirection)
+void Program::loadCameraPosition(const glm::vec3 &position)
 {
 	use();
-	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.cameraLookDirection.c_str());
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.cameraPosition.c_str());
 	if (location == -1) {
-		throw std::runtime_error("Error getting uniform location for cameraLookAt");
+		throw std::runtime_error("Error getting uniform location for cameraPosition");
 	}
-	glUniform3fv(location, 1, glm::value_ptr(lookDirection));
+	glUniform3fv(location, 1, glm::value_ptr(position));
 }

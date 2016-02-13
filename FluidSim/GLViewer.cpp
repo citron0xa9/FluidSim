@@ -88,7 +88,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	GLenum err = glGetError();
 
 	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
@@ -99,11 +99,14 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	/*
 	 * Setup scene
 	*/
-	SunLightSource light{ 0.8f, glm::vec3(0.0, 0.0, -1.0) };
+	SunLightSource light{ 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
 
-	Material sphereMaterial{ glm::vec3(1.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.7, 0.7, 0.7), 30 };
-	Material &matRef = m_Scene.addMaterial(sphereMaterial);
+	Material sphereMaterial{ glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.2f), 10 };
+	Material &sphereMatRef = m_Scene.addMaterial(sphereMaterial);
+
+	Material cubeMaterial{ glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.1f), 10 };
+	Material &cubeMatRef = m_Scene.addMaterial(cubeMaterial);
 
 	/*
 	* setup scene: setup program
@@ -138,10 +141,10 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	geomCube.setupAttribArrays(prog);
 
 	//create and add object to scene
-	TriangleNetObject sphere{ m_Scene, matRef, geomSphere, prog };
+	TriangleNetObject sphere{ m_Scene, sphereMatRef, geomSphere, prog };
 	m_Scene.addObject(sphere);
 
-	TriangleNetObject cube{ m_Scene, matRef, geomCube, prog };
+	TriangleNetObject cube{ m_Scene, cubeMatRef, geomCube, prog };
 	cube.translate(glm::vec3(-3.0, 0.0, 0.0));
 	m_Scene.addObject(cube);
 
@@ -224,7 +227,6 @@ void GLViewer::Timer_FPS(int value) {
 
 void GLViewer::KeyboardFunction(unsigned char key, int x, int y)
 {
-	std::cout << "Called keyboard func with key: " << key << std::endl;
 	GLViewer* viewer = GLViewer::getInstance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");

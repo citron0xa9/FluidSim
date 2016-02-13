@@ -20,6 +20,7 @@ public:
 	virtual void translate(const glm::vec3 &delta) override;
 
 	glm::vec3 getLookDirection() const;
+	glm::vec3 getPosition() const;
 
 protected:
 	virtual void rotate(float degrees, const glm::vec3 &axis) override;
