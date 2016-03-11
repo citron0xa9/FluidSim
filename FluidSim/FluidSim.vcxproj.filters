@@ -13,6 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{91571433-1f93-4f60-822f-bb70638dcaab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics-Core">
+      <UniqueIdentifier>{73cb2566-534f-4fdd-8bc0-de475876a307}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics-Core">
+      <UniqueIdentifier>{669713ad-a6b7-48e0-b1f0-67d323f21241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{355df553-d9b4-49e3-9ad0-246842d85789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{b50e192a-3d10-46f0-a80a-8dbb3c8eaef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Space">
+      <UniqueIdentifier>{abdcdd21-558a-4ba1-9ad9-580dc5af9381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Space">
+      <UniqueIdentifier>{0537712a-67d0-4852-8a18-185d255f77ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -21,61 +42,73 @@
     <ClInclude Include="GLViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBufO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexArrO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexAttribArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Program.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BufferO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBufO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexCombination.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StrUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightSource.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BufferO.h">
+      <Filter>Header Files\Graphics-Core</Filter>
     </ClInclude>
-    <ClInclude Include="SunLightSource.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Geometry.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBufO.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexCombination.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Program.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexArrO.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBufO.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexAttribArray.h">
+      <Filter>Header Files\Graphics-Core</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TriangleNetObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleNetObject.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SunLightSource.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="StrUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformGridGeometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fsmath.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CellPointsIterator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,52 +119,61 @@
     <ClCompile Include="GLViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBufO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexArrO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexAttribArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Program.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BufferO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBufO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Geometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightSource.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="BufferO.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="SunLightSource.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="IndexBufO.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
     <ClCompile Include="IndexCombination.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="TriangleNetObject.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Program.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleNetObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexArrO.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSource.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SunLightSource.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexAttribArray.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBufO.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="UniformGridGeometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UniformGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CellPointsIterator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CellPointsIterator.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
@@ -160,12 +161,15 @@
     <ClInclude Include="GLViewer.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="fsmath.h" />
     <ClInclude Include="TriangleNetObject.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StrUtils.h" />
     <ClInclude Include="SunLightSource.h" />
+    <ClInclude Include="UniformGrid.h" />
+    <ClInclude Include="UniformGridGeometry.h" />
     <ClInclude Include="VertexArrO.h" />
     <ClInclude Include="VertexAttribArray.h" />
     <ClInclude Include="VertexBufO.h" />
@@ -173,6 +177,7 @@
   <ItemGroup>
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CellPointsIterator.cpp" />
     <ClCompile Include="FluidSim.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GLViewer.cpp" />
@@ -186,6 +191,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SunLightSource.cpp" />
+    <ClCompile Include="UniformGrid.cpp" />
+    <ClCompile Include="UniformGridGeometry.cpp" />
     <ClCompile Include="VertexArrO.cpp" />
     <ClCompile Include="VertexAttribArray.cpp" />
     <ClCompile Include="VertexBufO.cpp" />
