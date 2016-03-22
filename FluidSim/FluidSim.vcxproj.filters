@@ -34,6 +34,12 @@
     <Filter Include="Source Files\Space">
       <UniqueIdentifier>{0537712a-67d0-4852-8a18-185d255f77ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Objects\Sim">
+      <UniqueIdentifier>{ef711ff4-80ed-4705-bbc2-b1682e9e6aa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects\Sim">
+      <UniqueIdentifier>{c44076a1-e9a6-40c2-9a04-0a4f644ca367}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -99,17 +105,29 @@
     <ClInclude Include="Log.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="UniformGridGeometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fsmath.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="UniformGrid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CellPointsIterator.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformGrid.h">
+      <Filter>Header Files\Space</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformGridGeometry.h">
+      <Filter>Header Files\Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Vorton.h">
+      <Filter>Header Files\Objects\Sim</Filter>
+    </ClInclude>
+    <ClInclude Include="Supervorton.h">
+      <Filter>Header Files\Objects\Sim</Filter>
+    </ClInclude>
+    <ClInclude Include="VortonOctHeapElement.h">
+      <Filter>Header Files\Space</Filter>
+    </ClInclude>
+    <ClInclude Include="VortonOctHeap.h">
+      <Filter>Header Files\Space</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,14 +185,26 @@
     <ClCompile Include="VertexBufO.cpp">
       <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="UniformGridGeometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UniformGrid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CellPointsIterator.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UniformGridGeometry.cpp">
+      <Filter>Source Files\Space</Filter>
+    </ClCompile>
+    <ClCompile Include="UniformGrid.cpp">
+      <Filter>Source Files\Space</Filter>
+    </ClCompile>
+    <ClCompile Include="Vorton.cpp">
+      <Filter>Source Files\Objects\Sim</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonOctHeapElement.cpp">
+      <Filter>Source Files\Space</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonOctHeap.cpp">
+      <Filter>Source Files\Space</Filter>
+    </ClCompile>
+    <ClCompile Include="Supervorton.cpp">
+      <Filter>Source Files\Objects\Sim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

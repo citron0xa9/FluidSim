@@ -173,6 +173,10 @@
     <ClInclude Include="VertexArrO.h" />
     <ClInclude Include="VertexAttribArray.h" />
     <ClInclude Include="VertexBufO.h" />
+    <ClInclude Include="Supervorton.h" />
+    <ClInclude Include="Vorton.h" />
+    <ClInclude Include="VortonOctHeap.h" />
+    <ClInclude Include="VortonOctHeapElement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferO.cpp" />
@@ -196,6 +200,10 @@
     <ClCompile Include="VertexArrO.cpp" />
     <ClCompile Include="VertexAttribArray.cpp" />
     <ClCompile Include="VertexBufO.cpp" />
+    <ClCompile Include="Supervorton.cpp" />
+    <ClCompile Include="Vorton.cpp" />
+    <ClCompile Include="VortonOctHeap.cpp" />
+    <ClCompile Include="VortonOctHeapElement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag" />
