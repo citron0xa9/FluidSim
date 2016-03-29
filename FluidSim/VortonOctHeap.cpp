@@ -4,6 +4,7 @@
 #include "fsmath.h"
 
 const float VortonOctHeap::m_MAX_VOLUME = 1.0f;
+const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 
 VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons)
 	: m_NullSupervorton()
@@ -12,7 +13,7 @@ VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons)
 		std::runtime_error("VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons): given vorton vector is empty");
 	}
 	calculateBoundingBox(vortons);
-	subdivide(m_MAX_VOLUME);
+	subdivide(m_DEFAULT_DIVISIONS_COUNT);
 	createEmptyOctHeap();
 	initializeLeafs(vortons);
 	initializeParents();
@@ -47,6 +48,16 @@ VortonOctHeapElement & VortonOctHeap::leaftAtPosition(const glm::vec3 & position
 	return atIndex(getLeafIndexForPosition(position));
 }
 
+glm::vec3 VortonOctHeap::getMinCorner() const
+{
+	return m_MinCorner;
+}
+
+glm::vec3 VortonOctHeap::getExtent() const
+{
+	return m_Extent;
+}
+
 void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 {
 	glm::vec3 minCorner = vortons[0].getPosition();
@@ -56,7 +67,7 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 		maxCorner = fsmath::allMax(maxCorner, vorton.getPosition());
 	}
 	m_MinCorner = minCorner;
-	m_Extent = fsmath::allCeil(maxCorner - minCorner);
+	m_Extent = maxCorner - minCorner;
 	m_Extent = fsmath::allNextPowerOf2(m_Extent);
 }
 
@@ -67,6 +78,12 @@ void VortonOctHeap::subdivide(float maxVolume)
 	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
 }
 
+void VortonOctHeap::subdivide(size_t divisions)
+{
+	m_Divisions = divisions;
+	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
+}
+
 void VortonOctHeap::createEmptyOctHeap()
 {
 	//reserve needed heap size to prevent reallocations
@@ -74,8 +91,17 @@ void VortonOctHeap::createEmptyOctHeap()
 	m_Heap.reserve(heapSize);
 
 	//create empty heap
+	size_t currentElementDepth = 0;
+	size_t currentElementDepthStartOffset = 0;
+	glm::vec3 currentElementExtent = m_Extent;
 	for (size_t i = 0; i < heapSize; i++) {
-		m_Heap.push_back(VortonOctHeapElement(i, m_NullSupervorton, *this));
+		if (i >= (currentElementDepthStartOffset + (1 << (currentElementDepth * 3)))) {	//(1 << (currentElementDepth * 3)) = 8^depth = element count in current depth layer
+			//new depth reached
+			currentElementDepthStartOffset = i;
+			currentElementDepth++;
+			currentElementExtent /= 2;
+		}
+		m_Heap.push_back(VortonOctHeapElement(i, m_NullSupervorton, *this, currentElementExtent));
 	}
 }
 

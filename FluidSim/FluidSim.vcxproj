@@ -156,6 +156,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
+    <ClInclude Include="VorticityDistribution.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="GLViewer.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Vorton.h" />
     <ClInclude Include="VortonOctHeap.h" />
     <ClInclude Include="VortonOctHeapElement.h" />
+    <ClInclude Include="VortonSim.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferO.cpp" />
@@ -187,6 +189,7 @@
     <ClCompile Include="GLViewer.cpp" />
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
+    <ClCompile Include="VorticityDistribution.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -204,6 +207,7 @@
     <ClCompile Include="Vorton.cpp" />
     <ClCompile Include="VortonOctHeap.cpp" />
     <ClCompile Include="VortonOctHeapElement.cpp" />
+    <ClCompile Include="VortonSim.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag" />

@@ -129,6 +129,12 @@
     <ClInclude Include="VortonOctHeap.h">
       <Filter>Header Files\Space</Filter>
     </ClInclude>
+    <ClInclude Include="VortonSim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VorticityDistribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FluidSim.cpp">
@@ -205,6 +211,12 @@
     </ClCompile>
     <ClCompile Include="Supervorton.cpp">
       <Filter>Source Files\Objects\Sim</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonSim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VorticityDistribution.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

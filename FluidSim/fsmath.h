@@ -8,18 +8,10 @@
 namespace fsmath {
 	#define MAX_UINT_POWER2 (1 << (sizeof(unsigned int) * 8 - 1))
 
-	inline unsigned int NextPowerOf2(unsigned int x)
+	inline float NextPowerOf2(float x)
 	{
-		if (x > MAX_UINT_POWER2) {
-			std::runtime_error("NextPowerOf2: given value is too large.");
-		}
-
-		unsigned int result = 1;
-		while (x > result) {
-			result <<= 1;
-		}
-
-		return result;
+		float exponent = std::ceil(std::log2f(x));
+		return pow(2, exponent);
 	}
 
 	inline glm::uvec3 allNextPowerOf2(const glm::uvec3 &vec) {
@@ -58,5 +50,9 @@ namespace fsmath {
 			std::ceil(vec.y),
 			std::ceil(vec.z)
 			);
+	}
+
+	inline bool insideBox(const glm::vec3 &point, const glm::vec3 &minCorner, const glm::vec3 &extent) {
+		return !(AnyLess(point, minCorner) || AnyLess(minCorner + extent, point));
 	}
 }

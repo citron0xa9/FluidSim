@@ -33,5 +33,6 @@ FluidSim/Debug/
 FluidSim/x64/
 ipch/
 
-# temorary visual studio file
+# visual studio files
 *.opensdf
+*.opendb

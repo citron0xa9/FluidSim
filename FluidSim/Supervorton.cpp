@@ -33,6 +33,11 @@ void Supervorton::addContainedVorton(const Vorton & vorton)
 	setPosition(position);
 }
 
+std::vector<const Vorton&>& Supervorton::getContainedVortons()
+{
+	return m_ContainedVortons;
+}
+
 Vorton Supervorton::calculateSupervorton(const std::vector<const Vorton&>& containedVortons)
 {
 	if (containedVortons.size() < 1) {

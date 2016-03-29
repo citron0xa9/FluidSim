@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/vec3.hpp>
 #include "Supervorton.h"
+#include "fsmath.h"
 
 class VortonOctHeap
 {
@@ -16,9 +17,13 @@ public:
 	VortonOctHeapElement& atIndex(size_t index);
 	VortonOctHeapElement& leaftAtPosition(const glm::vec3 &position);
 
+	glm::vec3 getMinCorner() const;
+	glm::vec3 getExtent() const;
+
 private:
 	void calculateBoundingBox(const std::vector<Vorton> &vortons);
 	void subdivide(float maxVolume);
+	void subdivide(size_t divisions);
 	void createEmptyOctHeap();
 	size_t calculateNeededHeapSize();
 	void initializeLeafs(const std::vector<Vorton> &vortons);
@@ -29,11 +34,12 @@ private:
 	bool isInsideBoundingBox(const glm::vec3 &position);
 	
 	glm::vec3 m_MinCorner;
-	glm::uvec3 m_Extent;
+	glm::vec3 m_Extent;
 	size_t m_Divisions;
 	glm::vec3 m_ExtentPerLeaf;
 
 	static const float m_MAX_VOLUME;
+	static const size_t m_DEFAULT_DIVISIONS_COUNT;
 
 	std::vector<VortonOctHeapElement> m_Heap;
 	Supervorton m_NullSupervorton;

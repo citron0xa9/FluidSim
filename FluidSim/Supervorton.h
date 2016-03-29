@@ -12,6 +12,8 @@ public:
 
 	void addContainedVorton(const Vorton &vorton);
 
+	std::vector<const Vorton&>& getContainedVortons();
+
 private:
 	Vorton calculateSupervorton(const std::vector<const Vorton&> &containedVortons);
 

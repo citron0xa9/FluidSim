@@ -1,8 +1,8 @@
 
 #include "VortonOctHeapElement.h"
 
-VortonOctHeapElement::VortonOctHeapElement(size_t index, const Supervorton & supervorton, VortonOctHeap &owner)
-	: m_HeapIndex{index}, m_Supervorton{supervorton}, m_Owner{owner}
+VortonOctHeapElement::VortonOctHeapElement(size_t index, const Supervorton & supervorton, VortonOctHeap &owner, const glm::vec3 &extent)
+	: m_HeapIndex{index}, m_Supervorton{supervorton}, m_Owner{owner}, m_Extent{extent}
 {
 }
 
@@ -39,4 +39,60 @@ void VortonOctHeapElement::calculateSupervortonFromChildren()
 		childrenVortons.push_back(it->getSupervorton());
 	}
 	m_Supervorton = Supervorton(childrenVortons);
+}
+
+bool VortonOctHeapElement::hasChildren()
+{
+	auto childrenIterators = getChildren();
+	return !(childrenIterators.first == childrenIterators.second);
+}
+
+glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
+{
+	if (fsmath::insideBox(position, m_Supervorton.getPosition(), m_Extent)) {
+		return calculateVelocityAccurate(position);
+	}
+	else {
+		return calculateVelocityFast(position);
+	}
+}
+
+glm::vec3 VortonOctHeapElement::calculateVelocityAccurate(const glm::vec3 & position)
+{
+	if (hasChildren()) {
+		return calculateVelocityViaChildren(position);
+	}
+	else {
+		if (m_Supervorton.getContainedVortons().empty()) {
+			//no real vortons represented -> vorticity 0 -> doesnt induce velocity
+			return glm::vec3(0);
+		}
+		else {
+			return calculateVelocityViaContainedVortons(position);
+		}
+	}
+}
+
+glm::vec3 VortonOctHeapElement::calculateVelocityFast(const glm::vec3 & position)
+{
+	return m_Supervorton.inducedVelocity(position);
+}
+
+glm::vec3 VortonOctHeapElement::calculateVelocityViaChildren(const glm::vec3 & position)
+{
+	auto childrenIterators = getChildren();
+	glm::vec3 velocity(0);
+	for (; childrenIterators.first != childrenIterators.second; childrenIterators.first++) {
+		velocity += childrenIterators.first->calculateVelocity(position);
+	}
+	return velocity;
+}
+
+glm::vec3 VortonOctHeapElement::calculateVelocityViaContainedVortons(const glm::vec3 & position)
+{
+	glm::vec3 velocity(0);
+	for (const Vorton &vorton : m_Supervorton.getContainedVortons()) {
+		velocity += vorton.inducedVelocity(position);
+	}
+	return velocity;
 }

@@ -1,0 +1,37 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Build Paths usw
+Debug/
+x64/
+FluidSim/Debug/
+FluidSim/x64/
+ipch/
+
+# temorary visual studio file
+*.opensdf

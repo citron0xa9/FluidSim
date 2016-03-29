@@ -19,6 +19,9 @@ Vorton::~Vorton()
 
 glm::vec3 Vorton::inducedVelocity(const glm::vec3 & position) const
 {
+	/*if (m_Vorticity.length < SIGNIFICANT_VORTICITY) {
+		return glm::vec3(0);
+	}*/
 	glm::vec3 distanceVector = position - m_Position;
 	float distanceMagnitude = distanceVector.length();
 	float divisor = (distanceMagnitude < m_Radius) ? pow(m_Radius, 3) : pow(distanceMagnitude, 3);
