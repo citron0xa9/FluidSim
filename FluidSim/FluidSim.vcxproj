@@ -185,6 +185,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CellPointsIterator.cpp" />
     <ClCompile Include="FluidSim.cpp" />
+    <ClCompile Include="fsmath.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GLViewer.cpp" />
     <ClCompile Include="IndexBufO.cpp" />

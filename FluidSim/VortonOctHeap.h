@@ -5,6 +5,8 @@
 #include "Supervorton.h"
 #include "fsmath.h"
 
+class VortonOctHeapElement;
+
 class VortonOctHeap
 {
 	friend class VortonOctHeapElement;
@@ -30,12 +32,15 @@ private:
 	void initializeParents();
 
 	size_t getLeafIndexForPosition(const glm::vec3 &position);
+	size_t getIndexForIndices(const glm::uvec3 &indices);
+	glm::uvec3 getIndicesForIndex(size_t index);
 
 	bool isInsideBoundingBox(const glm::vec3 &position);
 	
 	glm::vec3 m_MinCorner;
 	glm::vec3 m_Extent;
 	size_t m_Divisions;
+	size_t m_LeafsPerDimension;
 	glm::vec3 m_ExtentPerLeaf;
 
 	static const float m_MAX_VOLUME;

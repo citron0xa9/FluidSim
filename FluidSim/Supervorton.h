@@ -7,16 +7,16 @@ class Supervorton : public Vorton
 {
 public:
 	Supervorton();
-	Supervorton(const std::vector<const Vorton&> &containedVortons);
+	Supervorton(const std::vector<Vorton&> &containedVortons);
 	virtual ~Supervorton();
 
-	void addContainedVorton(const Vorton &vorton);
+	void addContainedVorton(Vorton &vorton);
 
-	std::vector<const Vorton&>& getContainedVortons();
+	std::vector<Vorton&>& getContainedVortons();
 
 private:
-	Vorton calculateSupervorton(const std::vector<const Vorton&> &containedVortons);
+	Vorton calculateSupervorton(const std::vector<Vorton&> &containedVortons);
 
-	std::vector<const Vorton&> m_ContainedVortons;
+	std::vector<Vorton&> m_ContainedVortons;
 	float m_VorticityMagnitudeSum;
 };

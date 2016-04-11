@@ -34,7 +34,7 @@ std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeap
 void VortonOctHeapElement::calculateSupervortonFromChildren()
 {
 	auto childrenInterval = getChildren();
-	std::vector<const Vorton&> childrenVortons;
+	std::vector<Vorton&> childrenVortons;
 	for (auto it = childrenInterval.first; it != childrenInterval.second; it++) {
 		childrenVortons.push_back(it->getSupervorton());
 	}
@@ -55,6 +55,22 @@ glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
 	else {
 		return calculateVelocityFast(position);
 	}
+}
+
+std::vector<VortonOctHeapElement&> VortonOctHeapElement::getForwardNeighbors()
+{
+	std::vector<VortonOctHeapElement&> forwardNeighbors;
+	glm::uvec3 ownIndices = m_Owner.getIndicesForIndex(m_HeapIndex);
+	for (int i = 0; i < 3; i++) {
+		if (ownIndices[i] < (m_Owner.m_LeafsPerDimension - 2)) {
+			glm::uvec3 neighborIndicesOffset(0);
+			neighborIndicesOffset[i] = 1;
+			size_t neighborIndex = m_Owner.getIndexForIndices(ownIndices + neighborIndicesOffset);
+			forwardNeighbors.push_back(m_Owner.atIndex(neighborIndex));
+		}
+	}
+
+	return forwardNeighbors;
 }
 
 glm::vec3 VortonOctHeapElement::calculateVelocityAccurate(const glm::vec3 & position)

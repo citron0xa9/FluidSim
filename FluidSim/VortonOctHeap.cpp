@@ -74,14 +74,16 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 void VortonOctHeap::subdivide(float maxVolume)
 {
 	float volume = m_Extent.x * m_Extent.y * m_Extent.z;
-	m_Divisions = std::ceil(std::log2(volume/maxVolume) / std::log2(8));
-	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
+	size_t divisions = std::ceil(std::log2(volume/maxVolume) / std::log2(8));
+	
+	subdivide(divisions);
 }
 
 void VortonOctHeap::subdivide(size_t divisions)
 {
 	m_Divisions = divisions;
 	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
+	m_LeafsPerDimension = 1 << (divisions * 3);	//8^divisions
 }
 
 void VortonOctHeap::createEmptyOctHeap()
@@ -138,8 +140,14 @@ size_t VortonOctHeap::getLeafIndexForPosition(const glm::vec3 & position)
 	if (!isInsideBoundingBox(position)) {
 		std::runtime_error("VortonOctHeap::getLeafIndexForPostion: position outside of bounding box");
 	}
-	//magic, no comments needed ;) TODO: add comments
+
 	glm::uvec3 indices = position / m_ExtentPerLeaf;
+	return getIndexForIndices(indices);
+}
+
+size_t VortonOctHeap::getIndexForIndices(const glm::uvec3 & indices)
+{
+	//magic, no comments needed ;) TODO: add comments
 	size_t index = 0;
 	for (int i = 0; i < m_Divisions; i++) {
 		size_t mask = 1 << i;
@@ -148,7 +156,26 @@ size_t VortonOctHeap::getLeafIndexForPosition(const glm::vec3 & position)
 			index |= onlyBit << (2 * i + j);
 		}
 	}
-	return index;
+	size_t firstLeafIndex = std::floor((m_Heap.size() - 1) / 8) + 1;
+	return firstLeafIndex + index;
+}
+
+glm::uvec3 VortonOctHeap::getIndicesForIndex(size_t index)
+{
+	size_t firstLeafIndex = std::floor((m_Heap.size() - 1) / 8) + 1;
+	assert(index >= firstLeafIndex);
+	index -= firstLeafIndex;
+	//magic, no comments needed ;) TODO: add comments
+	glm::uvec3 indices(0);
+	for (int i = 0; i < m_Divisions; i++) {
+		size_t baseMask = 1 << (i*3);
+		for (int j = 0; j < 3; j++) {
+			size_t currentMask = baseMask << j;
+			size_t onlyBit = index & currentMask;
+			indices[j] |= onlyBit >> (2 * i + j);
+		}
+	}
+	return indices;
 }
 
 

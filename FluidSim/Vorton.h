@@ -18,8 +18,10 @@ public:
 	const glm::vec3 getVorticity() const;
 	const glm::vec3 getPosition() const;
 	float getRadius() const;
-protected:
+
 	void setVorticity(const glm::vec3 &vorticity);
+
+protected:
 	void setPosition(const glm::vec3 &position);
 private:
 	glm::vec3 m_Position;

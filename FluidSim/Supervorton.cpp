@@ -5,7 +5,7 @@ Supervorton::Supervorton() : m_VorticityMagnitudeSum{0}
 {
 }
 
-Supervorton::Supervorton(const std::vector<const Vorton&>& containedVortons) : m_ContainedVortons{containedVortons}, Vorton(calculateSupervorton(containedVortons))
+Supervorton::Supervorton(const std::vector<Vorton&>& containedVortons) : m_ContainedVortons{containedVortons}, Vorton(calculateSupervorton(containedVortons))
 {
 }
 
@@ -13,7 +13,7 @@ Supervorton::~Supervorton()
 {
 }
 
-void Supervorton::addContainedVorton(const Vorton & vorton)
+void Supervorton::addContainedVorton(Vorton & vorton)
 {
 	m_ContainedVortons.push_back(vorton);
 
@@ -33,12 +33,12 @@ void Supervorton::addContainedVorton(const Vorton & vorton)
 	setPosition(position);
 }
 
-std::vector<const Vorton&>& Supervorton::getContainedVortons()
+std::vector<Vorton&>& Supervorton::getContainedVortons()
 {
 	return m_ContainedVortons;
 }
 
-Vorton Supervorton::calculateSupervorton(const std::vector<const Vorton&>& containedVortons)
+Vorton Supervorton::calculateSupervorton(const std::vector<Vorton&>& containedVortons)
 {
 	if (containedVortons.size() < 1) {
 		std::runtime_error("Supervorton::calculateSupervorton: no contained vortons given");

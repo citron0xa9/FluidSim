@@ -1,5 +1,7 @@
 
 #include "VortonSim.h"
+#include <glm/mat3x3.hpp>
+#include "fsmath.h"
 
 const size_t VortonSim::m_VORTONS_PER_DIMENSION = 16;
 
@@ -79,5 +81,64 @@ void VortonSim::CalculateVelocityGrid()
 glm::vec3 VortonSim::CalculateVelocity(const glm::vec3 & position)
 {
 	assert(m_VortonHeapPtr != nullptr);
-	return m_VortonHeapPtr->getRoot().calculateVelocity(position);
+	return (m_VortonHeapPtr->getRoot().calculateVelocity(position));
+}
+
+void VortonSim::StretchAndTiltVortons(float seconds)
+{
+	UniformGrid<glm::mat3x3> velocityJacobianGrid(*m_VelocityGridPtr);
+	fsmath::ComputeJacobian(velocityJacobianGrid, *m_VelocityGridPtr);
+
+	for (auto &vorton : m_Vortons) {
+		glm::mat3x3 velocityJacobian = velocityJacobianGrid.Interpolate(vorton.getPosition());
+
+		glm::vec3 stretchTilt = vorton.getVorticity() * velocityJacobian;
+		glm::vec3 newVorticity = vorton.getVorticity() + 0.5f * stretchTilt * seconds;	//0.5 is fudge factor for stability
+
+		vorton.setVorticity(newVorticity);
+	}
+}
+
+void VortonSim::DiffuseVorticityPSE(float seconds)
+{
+	for (auto leafs = m_VortonHeapPtr->getLeafs(); leafs.first != leafs.second; leafs.second++) {
+		Supervorton &currentSupervorton = leafs.first->getSupervorton();
+		DiffuseVorticityInside(seconds, currentSupervorton.getContainedVortons());
+
+		for (auto &neighbor : leafs.first->getForwardNeighbors()) {
+			Supervorton &neighborSupervorton = neighbor.getSupervorton();
+			DiffuseVorticityBetween(seconds, currentSupervorton.getContainedVortons(), neighborSupervorton.getContainedVortons());
+		}
+
+		//dissipate vorticity
+		for (auto vorton : currentSupervorton.getContainedVortons()) {
+			vorton.setVorticity(vorton.getVorticity() * seconds * m_Viscosity);
+		}
+	}
+}
+
+void VortonSim::DiffuseVorticityInside(float seconds, std::vector<Vorton&>& vortons)
+{
+	for (auto outerIterator = vortons.begin(); outerIterator != vortons.end(); outerIterator++) {
+		for (auto innerIterator = outerIterator + 1; innerIterator < vortons.end(); innerIterator++) {
+			DiffuseVorticityBetween(seconds, *outerIterator, *innerIterator);
+		}
+	}
+}
+
+void VortonSim::DiffuseVorticityBetween(float seconds, std::vector<Vorton&>& firstVortons, std::vector<Vorton&>& secondVortons)
+{
+	for (auto outerIterator = firstVortons.begin(); outerIterator != firstVortons.end(); outerIterator++) {
+		for (auto innerIterator = secondVortons.begin(); innerIterator != secondVortons.end(); innerIterator++) {
+			DiffuseVorticityBetween(seconds, *outerIterator, *innerIterator);
+		}
+	}
+}
+
+void VortonSim::DiffuseVorticityBetween(float seconds, Vorton & first, Vorton & second)
+{
+	glm::vec3 vorticityDifference = first.getVorticity() - second.getVorticity();
+	glm::vec3 exchange = 2 * m_Viscosity * seconds * vorticityDifference;
+	first.setVorticity(first.getVorticity - exchange);
+	second.setVorticity(second.getVorticity() + exchange);
 }

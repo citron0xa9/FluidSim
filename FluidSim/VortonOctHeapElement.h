@@ -2,6 +2,7 @@
 
 #include "Supervorton.h"
 #include "VortonOctHeap.h"
+#include <vector>
 
 class VortonOctHeapElement
 {
@@ -18,6 +19,8 @@ public:
 	bool hasChildren();
 
 	glm::vec3 calculateVelocity(const glm::vec3 &position);
+
+	std::vector<VortonOctHeapElement&> getForwardNeighbors();
 
 private:
 	glm::vec3 calculateVelocityAccurate(const glm::vec3 &position);
