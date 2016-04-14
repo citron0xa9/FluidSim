@@ -1,6 +1,6 @@
 #include "TriangleNetObject.h"
 
-TriangleNetObject::TriangleNetObject(Scene& scene, Material& material, Geometry& geometry, Program& renderProg) : Object{ scene }, m_Material{ material }, m_Geometry{ geometry }, m_RenderProg{renderProg}
+TriangleNetObject::TriangleNetObject(ContainerObject& container, Material& material, Geometry& geometry, Program& renderProg) : DrawableObject{ container }, m_Material{ material }, m_Geometry{ geometry }, m_RenderProg{renderProg}
 {
 
 }

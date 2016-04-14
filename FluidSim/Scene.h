@@ -9,31 +9,31 @@
 #include "Program.h"
 #include "Material.h"
 #include "Camera.h"
+#include "ContainerObject.h"
 
-class Scene
+class Scene : public ContainerObject
 {
 public:
 	Scene();
 	virtual ~Scene();
 
-	void addObject(const Object &obj);
-	void addLightSource(const LightSource &lightSource);
+	void addLightSource(LightSource &lightSource);
 	Geometry& addGeometryFromFile(const std::string &fileName);
 	Material& addMaterial(const Material &material);
 	Program& addProgram(const std::vector<ShaderLightSourceVariable> &lightVars);
 
-	void render();
+	virtual void render();
+
 	void setAspectRatio(float ratio);
 
 	Camera& getCamera();
 
 private:
-	void step(float secondsPassed);
 	void stepLoop();
 
 	Camera m_Camera;
-	std::vector<Object*> m_ObjectPtrs;
-	std::vector<LightSource*> m_LightSources;
+	//std::vector<Object*> m_ObjectPtrs;
+	std::list<LightSource&> m_LightSourceRefs;
 
 	std::list<Geometry*> m_GeometriePtrs;
 	std::list<Material> m_Materials;

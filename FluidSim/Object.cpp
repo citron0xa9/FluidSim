@@ -1,9 +1,20 @@
+
 #include "Object.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-Object::Object(Scene & scene) : m_Scene{scene}
+const glm::vec3 Object::m_xAxis = glm::vec3(1, 0, 0);
+const glm::vec3 Object::m_yAxis = glm::vec3(0, 1, 0);
+const glm::vec3 Object::m_zAxis = glm::vec3(0, 0, 1);
+const glm::vec3 Object::m_ForwardVector = -m_zAxis;
+const glm::vec3 Object::m_LeftVector = -m_xAxis;
+const glm::vec3 Object::m_BackwardVector = -m_ForwardVector;
+const glm::vec3 Object::m_RightVector = -m_LeftVector;
+
+Object::Object(ContainerObject &container) : m_ContainerObj{container}
 {
+	
 }
+
 
 Object::~Object()
 {
@@ -16,92 +27,25 @@ void Object::translate(const glm::vec3 & delta)
 
 void Object::rotateLocalX(float degrees)
 {
-	rotate(degrees, xAxis());
+	rotate(degrees, m_xAxis);
 }
 
 void Object::rotateLocalY(float degrees)
 {
-	rotate(degrees, yAxis());
+	rotate(degrees, m_yAxis);
 }
 
-void Object::addForwardVelocity(float velocity)
+glm::vec3 Object::getPosition() const
 {
-	addLocalVelocity(forwardVector()*velocity);
+	return glm::vec3(m_TranslationTransform[3]);
 }
 
-void Object::addBackwardVelocity(float velocity)
+void Object::setPosition(const glm::vec3 & position)
 {
-	addLocalVelocity(backwardVector()*velocity);
-}
-
-void Object::addLeftVelocity(float velocity)
-{
-	addLocalVelocity(leftVector()*velocity);
-}
-
-void Object::addRightVelocity(float velocity)
-{
-	addLocalVelocity(rightVector()*velocity);
-}
-
-void Object::step(float secondsPassed)
-{
-	updatePosition(secondsPassed);
-}
-
-glm::vec3 Object::xAxis()
-{
-	return glm::vec3(1, 0, 0);
-}
-
-glm::vec3 Object::yAxis()
-{
-	return glm::vec3(0, 1, 0);
-}
-
-glm::vec3 Object::zAxis()
-{
-	return glm::vec3(0, 0, 1);
-}
-
-inline glm::vec3 Object::forwardVector()
-{
-	return -zAxis();
-}
-
-inline glm::vec3 Object::leftVector()
-{
-	return -xAxis();
-}
-
-inline glm::vec3 Object::backwardVector()
-{
-	return -forwardVector();
-}
-
-inline glm::vec3 Object::rightVector()
-{
-	return -leftVector();
-}
-
-glm::vec3 Object::origin()
-{
-	return glm::vec3(0, 0, 0);
+	m_TranslationTransform[3] = glm::vec4(position, 1.0);
 }
 
 void Object::rotate(float degrees, const glm::vec3 & axis)
 {
 	m_RotationTransform *= glm::rotate(glm::mat4x4(1.0), degrees, axis);
-}
-
-void Object::addLocalVelocity(const glm::vec3 & velocity)
-{
-	m_LocalVelocity += velocity;
-}
-
-void Object::updatePosition(float secondsPassed)
-{
-	glm::vec3 globalVelocity = glm::vec3(m_RotationTransform*glm::vec4(m_LocalVelocity, 1.0));
-	glm::vec3 translationDelta = globalVelocity*secondsPassed;
-	translate(translationDelta);
 }

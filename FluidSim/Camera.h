@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Object.h"
+#include "MovableObject.h"
 #include <glm/trigonometric.hpp>
 
-class Camera : public Object
+class Camera : public MovableObject
 {
 public:
 	Camera(Scene &scene, float fovy = glm::radians(35.0f), float aspectRatio = 4.0f/3.0f, float near = 0.1f, float far = 100.0f);
@@ -15,12 +15,9 @@ public:
 	void setAspectRatio(float ratio);
 	void setFovY(float f);
 
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
-
 	virtual void translate(const glm::vec3 &delta) override;
 
 	glm::vec3 getLookDirection() const;
-	glm::vec3 getPosition() const;
 
 protected:
 	virtual void rotate(float degrees, const glm::vec3 &axis) override;

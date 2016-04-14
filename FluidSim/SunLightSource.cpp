@@ -2,7 +2,7 @@
 #include "Program.h"
 
 
-SunLightSource::SunLightSource(GLfloat intensity, glm::vec3 direction) : LightSource{ intensity }, m_Direction{direction}
+SunLightSource::SunLightSource(Scene &scene, GLfloat intensity, glm::vec3 direction) : LightSource{ scene, intensity }, m_Direction{direction}
 {
 }
 
@@ -27,7 +27,7 @@ void SunLightSource::loadIntoProgram(Program &program) const
 	glUniform3fv(directionUniformLocation, 1, &m_Direction[0]);
 }
 
-LightSource* SunLightSource::clone() const
+Object* SunLightSource::copy() const
 {
 	return new SunLightSource(*this);
 }

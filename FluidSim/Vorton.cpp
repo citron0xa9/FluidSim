@@ -1,17 +1,16 @@
 
 #include "Vorton.h"
 
-
-Vorton::Vorton() : m_Vorticity{0}
-{
-}
-
-Vorton::Vorton(const glm::vec3 &position, const glm::vec3 &vorticity, float radius)
-	: m_Position(position), m_Vorticity(vorticity), m_Radius(radius), m_Velocity(0)
+Vorton::Vorton(const TriangleNetObject &triangleNetObject, const glm::vec3 &position, const glm::vec3 &vorticity, float radius)
+	: TriangleNetObject(triangleNetObject), m_Position(position), m_Vorticity(vorticity), m_Radius(radius), m_Velocity(0)
 {
 
 }
 
+
+Vorton::Vorton(const TriangleNetObject & triangleNetObj) : TriangleNetObject(triangleNetObj), m_Vorticity{ 0 }
+{
+}
 
 Vorton::~Vorton()
 {
@@ -28,14 +27,9 @@ glm::vec3 Vorton::inducedVelocity(const glm::vec3 & position) const
 	return glm::cross(m_Vorticity, distanceVector) / divisor;
 }
 
-const glm::vec3 Vorton::getVorticity() const
+glm::vec3 Vorton::getVorticity() const
 {
 	return m_Vorticity;
-}
-
-const glm::vec3 Vorton::getPosition() const
-{
-	return m_Position;
 }
 
 float Vorton::getRadius() const
@@ -48,7 +42,14 @@ void Vorton::setVorticity(const glm::vec3 & vorticity)
 	m_Vorticity = vorticity;
 }
 
-void Vorton::setPosition(const glm::vec3 & position)
+void Vorton::setIsRendered(bool isRendered)
 {
-	m_Position = position;
+	m_IsRendered = isRendered;
+}
+
+void Vorton::render(const glm::mat4x4 & viewProjectTransform) const
+{
+	if (m_IsRendered) {
+		TriangleNetObject::render(viewProjectTransform);
+	}
 }

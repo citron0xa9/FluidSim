@@ -149,19 +149,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActiveObject.h" />
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CellPointsIterator.h" />
+    <ClInclude Include="ContainerObject.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="VorticityDistribution.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="GLViewer.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="Object.h" />
+    <ClInclude Include="MovableObject.h" />
     <ClInclude Include="fsmath.h" />
     <ClInclude Include="TriangleNetObject.h" />
     <ClInclude Include="Program.h" />
@@ -181,19 +185,23 @@
     <ClInclude Include="VortonSim.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActiveObject.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CellPointsIterator.cpp" />
+    <ClCompile Include="ContainerObject.cpp" />
+    <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="FluidSim.cpp" />
     <ClCompile Include="fsmath.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GLViewer.cpp" />
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="TriangleNetObject.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="Scene.cpp" />

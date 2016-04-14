@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Object.h"
+#include "DrawableObject.h"
 #include "Program.h"
 #include "Geometry.h"
 #include "Material.h"
 
-class TriangleNetObject : public Object
+class TriangleNetObject : public DrawableObject
 {
 public:
-	TriangleNetObject(Scene& scene, Material& material, Geometry& geometry, Program& renderProg);
+	TriangleNetObject(ContainerObject& container, Material& material, Geometry& geometry, Program& renderProg);
 	virtual ~TriangleNetObject();
 
 	virtual Object* copy() const override;

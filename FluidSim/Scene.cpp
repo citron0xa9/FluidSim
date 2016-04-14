@@ -18,12 +18,6 @@ Scene::~Scene()
 	for (auto &elem : m_ProgramPtrs) {
 		delete elem.second;
 	}
-	for (auto &elem : m_LightSources) {
-		delete elem;
-	}
-	for (auto &elem : m_ObjectPtrs) {
-		delete elem;
-	}
 }
 
 void Scene::stepLoop()
@@ -35,15 +29,10 @@ void Scene::stepLoop()
 	}
 }
 
-void Scene::addObject(const Object &obj)
+void Scene::addLightSource(LightSource &lightSource)
 {
-	m_ObjectPtrs.push_back(obj.copy());
-}
-
-void Scene::addLightSource(const LightSource &lightSource)
-{
-	m_LightSources.push_back(lightSource.clone());
-	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSources); });
+	m_LightSourceRefs.push_back(lightSource);
+	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSourceRefs); });
 }
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
@@ -72,8 +61,10 @@ void Scene::render()
 
 	glm::vec3 camPosition = m_Camera.getPosition();
 	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&camPosition](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraPosition(camPosition); });
-	std::for_each(m_ObjectPtrs.begin(), m_ObjectPtrs.end(), [&viewProjectTransform](const Object *obj){obj->render(viewProjectTransform); });
+	
+	render(viewProjectTransform);
 }
+
 
 void Scene::setAspectRatio(float ratio)
 {
@@ -83,12 +74,4 @@ void Scene::setAspectRatio(float ratio)
 Camera& Scene::getCamera()
 {
 	return m_Camera;
-}
-
-void Scene::step(float secondsPassed)
-{
-	m_Camera.step(secondsPassed);
-	for (auto & obj : m_ObjectPtrs) {
-		obj->step(secondsPassed);
-	}
 }

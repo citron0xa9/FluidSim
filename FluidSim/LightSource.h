@@ -2,6 +2,8 @@
 
 #include <string>
 #include <gl/glew.h>
+#include "Object.h"
+#include "Scene.h"
 
 class Program;
 
@@ -15,13 +17,15 @@ struct ShaderLightSourceVariable {
 	ShaderLightSourceVariable(const char *cstrName, LightSourceType t) : name( cstrName ), type( t ) {}
 };
 
-class LightSource
+class LightSource : public Object
 {
 public:
-	LightSource(GLfloat intensity);
+	LightSource(Scene &scene, GLfloat intensity);
 	virtual ~LightSource();
 	virtual void loadIntoProgram(Program &program) const = 0;
-	virtual LightSource* clone() const = 0;
+
+	virtual void registerContainerObjectHooks() override;
+	void registerSceneHooks(Scene &scene);
 
 protected:
 	GLfloat m_Intensity;

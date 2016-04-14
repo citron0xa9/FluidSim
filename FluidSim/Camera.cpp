@@ -4,7 +4,7 @@
 
 
 Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far) :
-	Object{ scene },
+	MovableObject{ scene },
 	m_FovY{ fovy }, m_AspectRatio{ aspectRatio }, m_NearClippingPlane{ near }, m_FarClippingPlane{ far }
 {
 	calculateViewPerspectiveTransform();
@@ -29,12 +29,12 @@ void Camera::calculateViewPerspectiveTransform()
 
 inline glm::vec3 Camera::localLookDirection()
 {
-	return forwardVector();
+	return m_ForwardVector;
 }
 
 inline glm::vec3 Camera::upVector()
 {
-	return yAxis();
+	return m_yAxis;
 }
 
 void Camera::calculatePerspectiveTransform()
@@ -44,7 +44,7 @@ void Camera::calculatePerspectiveTransform()
 
 void Camera::calculateViewTransform()
 {
-	glm::vec3 position = glm::vec3(m_TranslationTransform*glm::vec4(origin(), 1.0));
+	glm::vec3 position = getPosition();
 	glm::vec3 lookAt = position + glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(), 1.0));
 	m_ViewTransform = glm::lookAt(position, lookAt, upVector());
 }
@@ -81,11 +81,6 @@ void Camera::translate(const glm::vec3 & delta)
 glm::vec3 Camera::getLookDirection() const
 {
 	return glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(),1.0));
-}
-
-glm::vec3 Camera::getPosition() const
-{
-	return glm::vec3(m_TranslationTransform*glm::vec4(origin(), 1.0));
 }
 
 void Camera::rotate(float degrees, const glm::vec3 & axis)

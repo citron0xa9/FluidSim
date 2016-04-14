@@ -2,53 +2,41 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
-
-class Scene;
+#include "ContainerObject.h"
 
 class Object
 {
 public:
-	Object(Scene &scene);
+	Object(ContainerObject &container);
 	virtual ~Object();
 
 	virtual Object* copy() const = 0;
-
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const = 0;
+	virtual void registerContainerObjectHooks() = 0;
 
 	virtual void translate(const glm::vec3 &delta);
 	void rotateLocalX(float degrees);
 	void rotateLocalY(float degrees);
 
-	void addForwardVelocity(float velocity);
-	void addBackwardVelocity(float velocity);
-	void addLeftVelocity(float velocity);
-	void addRightVelocity(float velocity);
-
-	void step(float secondsPassed);
-
+	glm::vec3 getPosition() const;
+	void setPosition(const glm::vec3 &position);
 protected:
-	static glm::vec3 xAxis();
-	static glm::vec3 yAxis();
-	static glm::vec3 zAxis();
+	static const glm::vec3 m_xAxis;
+	static const glm::vec3 m_yAxis;
+	static const glm::vec3 m_zAxis;
 
-	static glm::vec3 forwardVector();
-	static glm::vec3 leftVector();
-	static glm::vec3 backwardVector();
-	static glm::vec3 rightVector();
+	static const glm::vec3 m_ForwardVector;
+	static const glm::vec3 m_LeftVector;
+	static const glm::vec3 m_BackwardVector;
+	static const glm::vec3 m_RightVector;
 
-	static glm::vec3 origin();
 
 	virtual void rotate(float degrees, const glm::vec3 &axis);
 
 	glm::mat4x4 m_RotationTransform;
 	glm::mat4x4 m_TranslationTransform;
 
+	ContainerObject &m_ContainerObj;
 private:
-
-	void addLocalVelocity(const glm::vec3 &velocity);
-	void updatePosition(float secondsPassed);
-
-	Scene &m_Scene;
-	glm::vec3 m_LocalVelocity;
+	
 };
 
