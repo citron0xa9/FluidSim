@@ -8,16 +8,18 @@ public:
 	virtual ~VorticityDistribution();
 
 	virtual glm::vec3 getVorticityAtPosition(const glm::vec3 &position) const = 0;
-	glm::vec3 getDomainSize() const;
 	glm::vec3 getMinCorner() const;
+
+	glm::vec3 getDomainSize() const;
 
 protected:
 	virtual glm::vec3 calculateDomainSize() = 0;
 	glm::vec3 getCenter() const;
+	glm::vec3 m_DomainSize;
 
 private:
 	glm::vec3 m_Center;
-	glm::vec3 m_DomainSize;
+	
 };
 
 class JetRingVorticityDistribution : public VorticityDistribution
@@ -29,9 +31,10 @@ public:
 	virtual glm::vec3 getVorticityAtPosition(const glm::vec3 &position) const override;
 
 protected:
-	virtual glm::vec3 calculateDomainSize() override;
 
 private:
+	glm::vec3 calculateDomainSize();
+
 	float m_RadiusSlug;
 	float m_RadiusOuter;
 	float m_Thickness;

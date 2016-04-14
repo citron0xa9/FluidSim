@@ -11,10 +11,10 @@ VortonOctHeapElement::~VortonOctHeapElement()
 {
 }
 
-void VortonOctHeapElement::setSupervorton(const Supervorton & supervorton)
+/*void VortonOctHeapElement::setSupervorton(const Supervorton & supervorton)
 {
 	m_Supervorton = supervorton;
-}
+}*/
 
 Supervorton & VortonOctHeapElement::getSupervorton()
 {
@@ -34,11 +34,11 @@ std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeap
 void VortonOctHeapElement::calculateSupervortonFromChildren()
 {
 	auto childrenInterval = getChildren();
-	std::vector<Vorton&> childrenVortons;
+	std::vector<Vorton*> childrenVortons;
 	for (auto it = childrenInterval.first; it != childrenInterval.second; it++) {
-		childrenVortons.push_back(it->getSupervorton());
+		childrenVortons.push_back(&(it->getSupervorton()));
 	}
-	m_Supervorton = Supervorton(childrenVortons);
+	m_Supervorton.setContainedVortonPtrs(childrenVortons);
 }
 
 bool VortonOctHeapElement::hasChildren()
@@ -57,16 +57,16 @@ glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
 	}
 }
 
-std::vector<VortonOctHeapElement&> VortonOctHeapElement::getForwardNeighbors()
+std::vector<VortonOctHeapElement*> VortonOctHeapElement::getForwardNeighbors()
 {
-	std::vector<VortonOctHeapElement&> forwardNeighbors;
+	std::vector<VortonOctHeapElement*> forwardNeighbors;
 	glm::uvec3 ownIndices = m_Owner.getIndicesForIndex(m_HeapIndex);
 	for (int i = 0; i < 3; i++) {
 		if (ownIndices[i] < (m_Owner.m_LeafsPerDimension - 2)) {
 			glm::uvec3 neighborIndicesOffset(0);
 			neighborIndicesOffset[i] = 1;
 			size_t neighborIndex = m_Owner.getIndexForIndices(ownIndices + neighborIndicesOffset);
-			forwardNeighbors.push_back(m_Owner.atIndex(neighborIndex));
+			forwardNeighbors.push_back(&(m_Owner.atIndex(neighborIndex)));
 		}
 	}
 
@@ -79,7 +79,7 @@ glm::vec3 VortonOctHeapElement::calculateVelocityAccurate(const glm::vec3 & posi
 		return calculateVelocityViaChildren(position);
 	}
 	else {
-		if (m_Supervorton.getContainedVortons().empty()) {
+		if (m_Supervorton.getContainedVortonPtrs().empty()) {
 			//no real vortons represented -> vorticity 0 -> doesnt induce velocity
 			return glm::vec3(0);
 		}
@@ -107,8 +107,8 @@ glm::vec3 VortonOctHeapElement::calculateVelocityViaChildren(const glm::vec3 & p
 glm::vec3 VortonOctHeapElement::calculateVelocityViaContainedVortons(const glm::vec3 & position)
 {
 	glm::vec3 velocity(0);
-	for (const Vorton &vorton : m_Supervorton.getContainedVortons()) {
-		velocity += vorton.inducedVelocity(position);
+	for (const Vorton *vortonPtr : m_Supervorton.getContainedVortonPtrs()) {
+		velocity += vortonPtr->inducedVelocity(position);
 	}
 	return velocity;
 }

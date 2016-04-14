@@ -35,7 +35,7 @@ public:
 	static void unuse();
 
 	void loadMaterial(const Material &material);
-	void loadLights(const std::vector<LightSource*> &lights);
+	void loadLights(const std::list<LightSource*> &lights);
 
 	ShaderLightSourceVariable popFreeLightSourceVariable(const LightSourceType &lightSrcType);
 	GLint getUniformLocation(const GLchar *name);

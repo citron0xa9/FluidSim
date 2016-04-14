@@ -136,7 +136,7 @@ GLuint Program::getNormalIndex() const
 	return 1;
 }
 
-void Program::loadLights(const std::vector<LightSource*> &lights)
+void Program::loadLights(const std::list<LightSource*> &lights)
 {
 	std::for_each(lights.begin(), lights.end(), [this](const LightSource *light){light->loadIntoProgram(*this); });
 }

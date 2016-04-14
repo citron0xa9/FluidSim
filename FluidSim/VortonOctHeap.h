@@ -11,7 +11,7 @@ class VortonOctHeap
 {
 	friend class VortonOctHeapElement;
 public:
-	VortonOctHeap(const std::vector<Vorton> &vortons);
+	VortonOctHeap(std::vector<Vorton> &vortons);
 	~VortonOctHeap();
 
 	VortonOctHeapElement& getRoot();
@@ -28,7 +28,7 @@ private:
 	void subdivide(size_t divisions);
 	void createEmptyOctHeap();
 	size_t calculateNeededHeapSize();
-	void initializeLeafs(const std::vector<Vorton> &vortons);
+	void initializeLeafs(std::vector<Vorton> &vortons);
 	void initializeParents();
 
 	size_t getLeafIndexForPosition(const glm::vec3 &position);

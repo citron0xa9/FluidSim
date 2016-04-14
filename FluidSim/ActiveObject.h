@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ContainerObject.h"
+#include "Object.h"
 
-class ActiveObject : public Object
+class ActiveObject : public virtual Object
 {
 public:
 	ActiveObject(ContainerObject &container);

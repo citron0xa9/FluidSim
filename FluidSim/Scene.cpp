@@ -31,8 +31,8 @@ void Scene::stepLoop()
 
 void Scene::addLightSource(LightSource &lightSource)
 {
-	m_LightSourceRefs.push_back(lightSource);
-	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSourceRefs); });
+	m_LightSourcePtrs.push_back(&lightSource);
+	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSourcePtrs); });
 }
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
@@ -62,7 +62,7 @@ void Scene::render()
 	glm::vec3 camPosition = m_Camera.getPosition();
 	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&camPosition](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraPosition(camPosition); });
 	
-	render(viewProjectTransform);
+	ContainerObject::render(viewProjectTransform);
 }
 
 

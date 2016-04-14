@@ -33,7 +33,7 @@ private:
 
 	Camera m_Camera;
 	//std::vector<Object*> m_ObjectPtrs;
-	std::list<LightSource&> m_LightSourceRefs;
+	std::list<LightSource*> m_LightSourcePtrs;
 
 	std::list<Geometry*> m_GeometriePtrs;
 	std::list<Material> m_Materials;

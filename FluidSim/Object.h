@@ -16,9 +16,14 @@ public:
 	virtual void translate(const glm::vec3 &delta);
 	void rotateLocalX(float degrees);
 	void rotateLocalY(float degrees);
+	void scale(const glm::vec3 &scaleVector);
 
 	glm::vec3 getPosition() const;
 	void setPosition(const glm::vec3 &position);
+
+	void setContainerObject(ContainerObject &containerObject);
+
+	//ContainerObject& getContainerObject();
 protected:
 	static const glm::vec3 m_xAxis;
 	static const glm::vec3 m_yAxis;
@@ -34,8 +39,9 @@ protected:
 
 	glm::mat4x4 m_RotationTransform;
 	glm::mat4x4 m_TranslationTransform;
+	glm::mat4x4 m_ScaleTransform;
 
-	ContainerObject &m_ContainerObj;
+	ContainerObject *m_ContainerObjPtr;
 private:
 	
 };

@@ -6,9 +6,11 @@
 const float VortonOctHeap::m_MAX_VOLUME = 1.0f;
 const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 
-VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons)
-	: m_NullSupervorton()
+VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
+	: m_NullSupervorton(vortons.back())
 {
+	m_NullSupervorton.setVorticity(glm::vec3(0));
+
 	if (vortons.empty()) {
 		std::runtime_error("VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons): given vorton vector is empty");
 	}
@@ -117,7 +119,7 @@ size_t VortonOctHeap::calculateNeededHeapSize()
 	return heapSize;
 }
 
-void VortonOctHeap::initializeLeafs(const std::vector<Vorton>& vortons)
+void VortonOctHeap::initializeLeafs(std::vector<Vorton>& vortons)
 {
 	for (auto& vorton : vortons) {
 		VortonOctHeapElement &responsibleLeaf = leaftAtPosition(vorton.getPosition());

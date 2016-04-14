@@ -7,7 +7,7 @@ void fsmath::ComputeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 	const glm::vec3 doubleCellExtent = 2.0f * velocityGrid.GetCellExtent();
 
 	const glm::uvec3 pointsAmountMinus1 = velocityGrid.GetPointsAmount() - glm::uvec3(1);
-	
+
 	const size_t yOffsetDistance = velocityGrid.GetPointsAmount().x;
 	const size_t zOffsetDistance = velocityGrid.GetPointsAmount().y * yOffsetDistance;
 
@@ -17,7 +17,7 @@ void fsmath::ComputeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 		for (size_t yIndex = 1; yIndex < pointsAmountMinus1.y; yIndex++) {
 			for (size_t xIndex = 1; xIndex < pointsAmountMinus1.x; xIndex++) {
 				glm::mat3x3 &currentMatrix = jacobianGrid.AtOffset(offset);
-				
+
 				//calculate d/dx, d/dy, d/dz.
 				//use centered derivation
 
@@ -39,7 +39,7 @@ void fsmath::ComputeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 	for (size_t zIndex = 0; zIndex < velocityGrid.GetPointsAmount().z; zIndex++) {
 		for (size_t yIndex = 0; yIndex < velocityGrid.GetPointsAmount().y; yIndex++) {
 			ComputeFiniteDifference(jacobianGrid, velocityGrid, 0, yIndex, zIndex, offset, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
-			ComputeFiniteDifference(jacobianGrid, velocityGrid, pointsAmountMinus1.x, yIndex, zIndex, offset+yOffsetDistance-1, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
+			ComputeFiniteDifference(jacobianGrid, velocityGrid, pointsAmountMinus1.x, yIndex, zIndex, offset + yOffsetDistance - 1, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
 			offset += yOffsetDistance;
 		}
 	}
@@ -49,7 +49,7 @@ void fsmath::ComputeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 	for (size_t zIndex = 0; zIndex < velocityGrid.GetPointsAmount().z; zIndex++) {
 		for (size_t xIndex = 0; xIndex < velocityGrid.GetPointsAmount().x; xIndex++) {
 			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, 0, zIndex, offset, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
-			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, pointsAmountMinus1.y, zIndex, offset+zOffsetDistance-yOffsetDistance, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
+			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, pointsAmountMinus1.y, zIndex, offset + zOffsetDistance - yOffsetDistance, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
 			offset++;
 		}
 		offset = offset - yOffsetDistance + zOffsetDistance;
@@ -57,11 +57,11 @@ void fsmath::ComputeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 
 	//+/- Z boundary
 	offset = 0;
-	const size_t gridCapacity = velocityGrid.GetGridCapacity();
-	for (size_t yOffset = 0; yOffset < velocityGrid.GetPointsAmount().y; yIndex++) {
+	const size_t gridCapacity = velocityGrid.GetGridPointCapacity();
+	for (size_t yIndex = 0; yIndex < velocityGrid.GetPointsAmount().y; yIndex++) {
 		for (size_t xIndex = 0; xIndex < velocityGrid.GetPointsAmount().x; xIndex++) {
 			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, yIndex, 0, offset, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
-			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, yIndex, pointsAmountMinus1.z, offset+gridCapacity-zOffsetDistance, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
+			ComputeFiniteDifference(jacobianGrid, velocityGrid, xIndex, yIndex, pointsAmountMinus1.z, offset + gridCapacity - zOffsetDistance, doubleCellExtent, pointsAmountMinus1, yOffsetDistance, zOffsetDistance);
 			offset++;
 		}
 	}

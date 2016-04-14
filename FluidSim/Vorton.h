@@ -7,7 +7,7 @@
 #include <cmath>
 
 const float DEFAULT_VORTON_RADIUS = FLT_EPSILON * 100;
-const float SIGNIFICANT_VORTICITY = expf(0.5 * (logf(FLT_EPSILON) + logf(FLT_MIN)));
+const float SIGNIFICANT_VORTICITY = expf(0.5f * (logf(FLT_EPSILON) + logf(FLT_MIN)));
 
 class Vorton : public TriangleNetObject
 {
@@ -24,17 +24,15 @@ public:
 
 	void setVorticity(const glm::vec3 &vorticity);
 
-	void setIsRendered(bool isRendered);
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
+	virtual Object* copy() const override;
+
 
 protected:
 	
 private:
-	glm::vec3 m_Position;
+
 	glm::vec3 m_Vorticity;
 	float m_Radius;
 	glm::vec3 m_Velocity;
-
-	bool m_IsRendered;
 };
 

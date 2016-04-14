@@ -1,11 +1,16 @@
 
 #include "Supervorton.h"
 
-Supervorton::Supervorton() : m_VorticityMagnitudeSum{0}
+Supervorton::Supervorton(const Supervorton & superVorton) : Vorton(superVorton), Object(superVorton)
 {
 }
 
-Supervorton::Supervorton(const std::vector<Vorton&>& containedVortons) : m_ContainedVortons{containedVortons}, Vorton(calculateSupervorton(containedVortons))
+Supervorton::Supervorton(const Vorton & vorton) : Vorton(vorton), Object(vorton)
+{
+}
+
+Supervorton::Supervorton(const std::vector<Vorton*>& containedVortonPtrs)
+	: Vorton{ calculateSupervorton(containedVortonPtrs) }, Object(*containedVortonPtrs.back()), m_ContainedVortonPtrs{ containedVortonPtrs }
 {
 }
 
@@ -15,7 +20,7 @@ Supervorton::~Supervorton()
 
 void Supervorton::addContainedVorton(Vorton & vorton)
 {
-	m_ContainedVortons.push_back(vorton);
+	m_ContainedVortonPtrs.push_back(&vorton);
 
 	glm::vec3 position = getPosition();
 	glm::vec3 vorticity = getVorticity();
@@ -33,28 +38,36 @@ void Supervorton::addContainedVorton(Vorton & vorton)
 	setPosition(position);
 }
 
-std::vector<Vorton&>& Supervorton::getContainedVortons()
+std::vector<Vorton*>& Supervorton::getContainedVortonPtrs()
 {
-	return m_ContainedVortons;
+	return m_ContainedVortonPtrs;
 }
 
-Vorton Supervorton::calculateSupervorton(const std::vector<Vorton&>& containedVortons)
+void Supervorton::setContainedVortonPtrs(const std::vector<Vorton*>& containedVortons)
 {
-	if (containedVortons.size() < 1) {
+	m_ContainedVortonPtrs = containedVortons;
+	Vorton &resultingVorton = calculateSupervorton(containedVortons);
+	setVorticity(resultingVorton.getVorticity());
+	setPosition(resultingVorton.getPosition());
+}
+
+Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVortonPtrs)
+{
+	if (containedVortonPtrs.size() < 1) {
 		std::runtime_error("Supervorton::calculateSupervorton: no contained vortons given");
 	}
-	glm::vec3 position;
-	glm::vec3 vorticity;
+	glm::vec3 position(0);
+	glm::vec3 vorticity(0);
 	m_VorticityMagnitudeSum = 0;
-	for (auto vorton : containedVortons) {
+	for (auto vortonPtr : containedVortonPtrs) {
 
-		float vorticityMagnitude = static_cast<float>(vorton.getVorticity().length());
+		float vorticityMagnitude = static_cast<float>(vortonPtr->getVorticity().length());
 		m_VorticityMagnitudeSum += vorticityMagnitude;
 
-		position += vorticityMagnitude * vorton.getPosition();
-		vorticity += vorton.getVorticity();
+		position += vorticityMagnitude * vortonPtr->getPosition();
+		vorticity += vortonPtr->getVorticity();
 
 	}
 	position /= m_VorticityMagnitudeSum;
-	return Vorton(position, vorticity, containedVortons[0].getRadius());
+	return Vorton(*containedVortonPtrs.back(), position, vorticity, containedVortonPtrs[0]->getRadius());
 }

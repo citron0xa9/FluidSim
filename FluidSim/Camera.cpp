@@ -1,10 +1,11 @@
 #include "Camera.h"
+#include "Scene.h"
 #include <iostream>
 #include <glm/gtx/transform.hpp>
 
 
 Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far) :
-	MovableObject{ scene },
+	MovableObject{ scene }, Object{ scene },
 	m_FovY{ fovy }, m_AspectRatio{ aspectRatio }, m_NearClippingPlane{ near }, m_FarClippingPlane{ far }
 {
 	calculateViewPerspectiveTransform();
@@ -63,10 +64,6 @@ glm::mat4x4 Camera::getViewPerspectiveTransform() const
 void Camera::setFovY(float f) {
 	m_FovY = f;
 	calculateViewPerspectiveTransform();
-}
-
-void Camera::render(const glm::mat4x4 & viewProjectTransform) const
-{
 }
 
 void Camera::translate(const glm::vec3 & delta)

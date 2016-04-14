@@ -3,9 +3,9 @@
 #include <string>
 #include <gl/glew.h>
 #include "Object.h"
-#include "Scene.h"
 
 class Program;
+class Scene;
 
 enum class LightSourceType {
 	SUNLIGHT

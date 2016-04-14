@@ -14,6 +14,8 @@
 #include "Debug.h"
 #include "SunLightSource.h"
 #include "TriangleNetObject.h"
+#include "VortonSim.h"
+#include "VorticityDistribution.h"
 
 #include <glm/geometric.hpp>
 
@@ -99,7 +101,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	/*
 	 * Setup scene
 	*/
-	SunLightSource light{ 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
+	SunLightSource light{m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
 
 	Material sphereMaterial{ glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.2f), 10 };
@@ -130,22 +132,25 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	prog.link();
 	prog.detachAllShaders();
 
-	m_Scene.addLightSource(light);
+	m_Scene.addObject(light);
 
 	//setup geometry
 	m_Scene.setAspectRatio(static_cast<float>(width) / height);
-	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere2.obj");
+	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere.obj");
 	geomSphere.setupAttribArrays(prog);
 
 	Geometry &geomCube = m_Scene.addGeometryFromFile("objects\\cube.obj");
 	geomCube.setupAttribArrays(prog);
 
 	//create and add object to scene
-	TriangleNetObject sphere{ m_Scene, sphereMatRef, geomSphere, prog };
-	m_Scene.addObject(sphere);
+	TriangleNetObject tracerPrototype{ m_Scene, sphereMatRef, geomSphere, prog };
+	//tracerPrototype.scale(glm::vec3(0.1));
+
+	VortonSim simulation(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, tracerPrototype, tracerPrototype);
+	//m_Scene.addObject(simulation);
 
 	TriangleNetObject cube{ m_Scene, cubeMatRef, geomCube, prog };
-	cube.translate(glm::vec3(-3.0, 0.0, 0.0));
+	cube.translate(glm::vec3(0.0, 0.0, 0.0));
 	m_Scene.addObject(cube);
 
 	m_Scene.getCamera().translate(glm::vec3(0, 0, 3));

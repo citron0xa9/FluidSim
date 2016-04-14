@@ -2,7 +2,7 @@
 
 #include "Object.h"
 
-class DrawableObject : public Object
+class DrawableObject : public virtual Object
 {
 public:
 	DrawableObject(ContainerObject &container);

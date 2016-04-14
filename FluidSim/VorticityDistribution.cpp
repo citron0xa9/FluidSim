@@ -4,7 +4,7 @@
 #include <glm/gtc/constants.hpp>
 
 VorticityDistribution::VorticityDistribution(const glm::vec3 & center)
-	: m_Center{center}, m_DomainSize{calculateDomainSize()}
+	: m_Center{center}
 {
 }
 
@@ -12,14 +12,14 @@ VorticityDistribution::~VorticityDistribution()
 {
 }
 
-glm::vec3 VorticityDistribution::getDomainSize() const
-{
-	return m_DomainSize;
-}
-
 glm::vec3 VorticityDistribution::getMinCorner() const
 {
 	return (m_Center - (m_DomainSize / 2.0f));
+}
+
+glm::vec3 VorticityDistribution::getDomainSize() const
+{
+	return m_DomainSize;
 }
 
 glm::vec3 VorticityDistribution::getCenter() const
@@ -32,8 +32,9 @@ glm::vec3 VorticityDistribution::getCenter() const
 
 
 JetRingVorticityDistribution::JetRingVorticityDistribution(const glm::vec3 & center, float radiusSlug, float thickness, const glm::vec3 & direction)
-	: VorticityDistribution{center}, m_RadiusSlug{radiusSlug}, m_Thickness{thickness}, m_RadiusOuter{radiusSlug+thickness}, m_Direction{direction}
+	: VorticityDistribution{ center }, m_RadiusSlug{ radiusSlug }, m_Thickness{ thickness }, m_RadiusOuter{ radiusSlug + thickness }, m_Direction{ direction }
 {
+	m_DomainSize = calculateDomainSize();
 }
 
 JetRingVorticityDistribution::~JetRingVorticityDistribution()
