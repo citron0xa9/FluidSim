@@ -36,6 +36,12 @@ void ContainerObject::addObject(const Object & object)
 	m_ObjectPtrs.back()->registerContainerObjectHooks();
 }
 
+void ContainerObject::addObjectPtr(Object * objPtr)
+{
+	m_ObjectPtrs.push_back(objPtr);
+	m_ObjectPtrs.back()->registerContainerObjectHooks();
+}
+
 void ContainerObject::addActiveObject(ActiveObject & object)
 {
 	m_ActiveObjectPtrs.push_back(&object);

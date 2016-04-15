@@ -20,7 +20,7 @@ Program& TriangleNetObject::getProgram() const
 	return m_RenderProg;
 }
 
-void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform) const
+void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
 {
 	if (m_RenderProg.getLoadedMaterialId() != m_Material.getId()) {
 		m_RenderProg.loadMaterial(m_Material);

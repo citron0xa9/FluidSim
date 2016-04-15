@@ -4,6 +4,7 @@
 #include "ActiveObject.h"
 
 #include <vector>
+#include <memory>
 #include <glm/vec3.hpp>
 #include "VorticityDistribution.h"
 #include "VortonOctHeapElement.h"
@@ -14,12 +15,12 @@
 class VortonSim : public ContainerObject, public ActiveObject, public DrawableObject
 {
 public:
-	VortonSim(const VortonSim &sim);
-	VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype, const TriangleNetObject &tracerPrototype);
+	
+	VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype);
 	~VortonSim();
 
 	virtual void step(float secondsPassed) override;
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
+	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 	virtual void registerContainerObjectHooks() override;
 
 	void Update(float seconds);
@@ -30,8 +31,11 @@ public:
 	virtual Object* copy() const override;
 
 private:
+	VortonSim(const VortonSim &sim) = delete;
+
 	void initializeVortons(const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype);
-	void initializeTracers(const VorticityDistribution &initialVorticity, const TriangleNetObject &tracerPrototype);
+	void initializeTracers(const VorticityDistribution &initialVorticity);
+	void setupTracerRenderProgram();
 
 	void CreateOctHeap();
 
@@ -48,9 +52,16 @@ private:
 	void advectVortons(float secondsPassed);
 	void advectTracers(float secondsPassed);
 
+	void renderTracers(const glm::mat4x4 &viewProjectTransform);
+
 	float m_Viscosity;
 	float m_Density;
 	std::vector<Vorton> m_Vortons;
+	std::vector<Object> m_Tracers;
+	std::vector<GLfloat> m_TracerVerticesRAM;
+	VertexBufO m_TracerVerticesBuf;
+	VertexArrO m_TracerVao;
+
 	VortonOctHeap *m_VortonHeapPtr;
 	UniformGrid<glm::vec3> *m_VelocityGridPtr;
 
@@ -59,5 +70,7 @@ private:
 
 	bool m_VortonsRendered;
 	bool m_TracersRendered;
+
+	Program m_TracerRenderProg;
 };
 

@@ -20,6 +20,16 @@ Object::~Object()
 {
 }
 
+Object * Object::copy() const
+{
+	return new Object(*this);
+}
+
+void Object::registerContainerObjectHooks()
+{
+	
+}
+
 void Object::translate(const glm::vec3 & delta)
 {
 	m_TranslationTransform *= glm::translate(glm::mat4x4(1.0), delta);

@@ -10,8 +10,8 @@ public:
 	Object(ContainerObject &container);
 	virtual ~Object();
 
-	virtual Object* copy() const = 0;
-	virtual void registerContainerObjectHooks() = 0;
+	virtual Object* copy() const;
+	virtual void registerContainerObjectHooks();
 
 	virtual void translate(const glm::vec3 &delta);
 	void rotateLocalX(float degrees);

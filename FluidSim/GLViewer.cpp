@@ -96,6 +96,8 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
 	DEBUG(cullMsg);
 
+	//glPointSize(8);
+
 	//setupTriangle();
 
 	/*
@@ -144,14 +146,15 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	//create and add object to scene
 	TriangleNetObject tracerPrototype{ m_Scene, sphereMatRef, geomSphere, prog };
-	//tracerPrototype.scale(glm::vec3(0.1));
+	//m_Scene.addObject(tracerPrototype);
+	tracerPrototype.scale(glm::vec3(0.01));
 
-	VortonSim simulation(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, tracerPrototype, tracerPrototype);
-	//m_Scene.addObject(simulation);
+	m_Scene.addObjectPtr(new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, tracerPrototype));
 
 	TriangleNetObject cube{ m_Scene, cubeMatRef, geomCube, prog };
-	cube.translate(glm::vec3(0.0, 0.0, 0.0));
-	m_Scene.addObject(cube);
+	cube.translate(glm::vec3(-2.0, -2.0, -2.0));
+	cube.scale(glm::vec3(0.5));
+	//m_Scene.addObject(cube);
 
 	m_Scene.getCamera().translate(glm::vec3(0, 0, 3));
 

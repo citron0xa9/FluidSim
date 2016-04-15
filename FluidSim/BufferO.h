@@ -18,6 +18,13 @@ public:
 		}
 		glBufferData(m_bufferType, v.size()*sizeof(T), v.data(), usage);
 	}
+	template <typename T> void pushDataSubset(const std::vector<T>& v, size_t startIndex, size_t endIndex, bool bindBefore)
+	{
+		if (bindBefore) {
+			bind();
+		}
+		glBufferSubData(m_bufferType, startIndex*sizeof(T), (startIndex-endIndex)*sizeof(T), v.data());
+	}
 
 	GLuint getId() const;
 protected:

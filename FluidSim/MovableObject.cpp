@@ -1,7 +1,7 @@
 #include "MovableObject.h"
 
 
-MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}
+MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}
 {
 }
 

@@ -3,6 +3,7 @@
 
 Scene::Scene() : m_Camera{*this}, m_Alive{true}
 {
+	m_Camera.registerContainerObjectHooks();
 	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
 }
 
