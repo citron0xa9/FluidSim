@@ -28,6 +28,8 @@ public:
 
 	Camera& getCamera();
 
+	void startStepping();
+
 private:
 	void stepLoop();
 

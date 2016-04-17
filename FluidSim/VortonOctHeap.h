@@ -35,6 +35,8 @@ private:
 	size_t getIndexForIndices(const glm::uvec3 &indices);
 	glm::uvec3 getIndicesForIndex(size_t index);
 
+	size_t getFirstLeafIndex() const;
+
 	bool isInsideBoundingBox(const glm::vec3 &position);
 	
 	glm::vec3 m_MinCorner;

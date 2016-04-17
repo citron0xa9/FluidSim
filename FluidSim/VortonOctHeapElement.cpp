@@ -24,9 +24,12 @@ Supervorton & VortonOctHeapElement::getSupervorton()
 std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> VortonOctHeapElement::getChildren()
 {
 	size_t startIndex = m_HeapIndex * 8 + 1;
-	size_t endIndex = m_HeapIndex * 8 + 8;
-	if (endIndex > (m_Owner.m_Heap.size() - 1)) {
-		endIndex = m_Owner.m_Heap.size() - 1;
+	size_t endIndex = m_HeapIndex * 8 + 9;
+	if (endIndex > (m_Owner.m_Heap.size())) {
+		endIndex = m_Owner.m_Heap.size();
+	}
+	if (startIndex > endIndex) {
+		startIndex = endIndex;
 	}
 	return std::make_pair(m_Owner.m_Heap.begin() + startIndex, m_Owner.m_Heap.begin() + endIndex);
 }
@@ -49,7 +52,7 @@ bool VortonOctHeapElement::hasChildren()
 
 glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
 {
-	if (fsmath::insideBox(position, m_Supervorton.getPosition(), m_Extent)) {
+	if (fsmath::insideBox(position, m_Supervorton.getPosition() - (m_Extent / 2.0f), m_Extent)) {
 		return calculateVelocityAccurate(position);
 	}
 	else {
@@ -96,9 +99,8 @@ glm::vec3 VortonOctHeapElement::calculateVelocityFast(const glm::vec3 & position
 
 glm::vec3 VortonOctHeapElement::calculateVelocityViaChildren(const glm::vec3 & position)
 {
-	auto childrenIterators = getChildren();
 	glm::vec3 velocity(0);
-	for (; childrenIterators.first != childrenIterators.second; childrenIterators.first++) {
+	for (auto childrenIterators = getChildren(); childrenIterators.first != childrenIterators.second; childrenIterators.first++) {
 		velocity += childrenIterators.first->calculateVelocity(position);
 	}
 	return velocity;

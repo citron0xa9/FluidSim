@@ -22,7 +22,7 @@ glm::vec3 Vorton::inducedVelocity(const glm::vec3 & position) const
 		return glm::vec3(0);
 	}*/
 	glm::vec3 distanceVector = position - getPosition();
-	float distanceMagnitude = static_cast<float>(distanceVector.length());
+	float distanceMagnitude = static_cast<float>(glm::length(distanceVector));
 	float divisor = (distanceMagnitude < m_Radius) ? pow(m_Radius, 3) : pow(distanceMagnitude, 3);
 	return glm::cross(m_Vorticity, distanceVector) / divisor;
 }

@@ -159,6 +159,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	m_Scene.getCamera().translate(glm::vec3(0, 0, 3));
 
 	//m_Scene.render();
+	m_Scene.startStepping();
 }
 
 GLViewer::~GLViewer()

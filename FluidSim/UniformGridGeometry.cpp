@@ -30,7 +30,8 @@ void UniformGridGeometry::DefineShape(size_t numElements, const glm::vec3 & minC
 
 void UniformGridGeometry::CalculateSpacing()
 {
-	m_CellExtent = GetGridExtent() / glm::vec3(GetCellsAmount());
+	glm::uvec3 cellAmount = GetCellsAmount();
+	m_CellExtent = GetGridExtent() / glm::vec3(cellAmount);
 	m_CellsPerExtent = glm::vec3(1) / m_CellExtent;
 }
 

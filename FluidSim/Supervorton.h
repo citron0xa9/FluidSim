@@ -6,9 +6,9 @@
 class Supervorton : public Vorton
 {
 public:
-	Supervorton(const Supervorton &superVorton);
-	Supervorton(const Vorton &vorton);
-	Supervorton(const std::vector<Vorton*> &containedVortonPtrs);
+	//Supervorton(const Supervorton &superVorton);
+	Supervorton(Vorton &vorton);
+	//Supervorton(const std::vector<Vorton*> &containedVortonPtrs);
 	virtual ~Supervorton();
 
 	void addContainedVorton(Vorton &vorton);

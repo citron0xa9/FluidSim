@@ -4,7 +4,6 @@
 Scene::Scene() : m_Camera{*this}, m_Alive{true}
 {
 	m_Camera.registerContainerObjectHooks();
-	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
 }
 
 
@@ -75,4 +74,9 @@ void Scene::setAspectRatio(float ratio)
 Camera& Scene::getCamera()
 {
 	return m_Camera;
+}
+
+void Scene::startStepping()
+{
+	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
 }
