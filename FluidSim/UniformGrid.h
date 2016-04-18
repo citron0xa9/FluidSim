@@ -32,7 +32,7 @@ public:
 
 	std::pair<ItemT&, ItemT&> MinMaxElement() { return std::minmax_element(m_Points.begin(), m_Points.end()); }
 
-	ItemT& Interpolate(const glm::vec3 &position) const;
+	ItemT Interpolate(const glm::vec3 &position) const;
 
 private:
 	//Deny copy construction
@@ -53,14 +53,14 @@ private:
 #include "fsmath.h"
 
 template<class ItemT>
-inline ItemT & UniformGrid<ItemT>::Interpolate(const glm::vec3 & position) const
+inline ItemT UniformGrid<ItemT>::Interpolate(const glm::vec3 & position) const
 {
 	if (fsmath::AnyLess(position, GetMinCorner()) || fsmath::AnyLess(GetMinCorner() + GetGridExtent(), position)) {
 		std::runtime_error("UniformGrid::Interpolate: given position is outside of grid");
 	}
 
 	glm::uvec3 responsiblePointIndices = GetResponsiblePointIndices(position);
-	glm::vec3 relativePositionNormalized = position / GetCellExtent() - glm::vec3(responsiblePointIndices);
+	glm::vec3 relativePositionNormalized = (position - GetMinCorner()) / GetCellExtent() - glm::vec3(responsiblePointIndices);
 	glm::vec3 oneMinusRelativePositionNormalized = glm::vec3(1) - relativePositionNormalized;
 
 	std::vector<size_t> cellPointsOffsets = CellPointsOffsets(OffsetForIndices(responsiblePointIndices));

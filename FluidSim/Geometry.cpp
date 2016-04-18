@@ -29,8 +29,10 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ 
 	}
 
 	//push data to gpu
+	m_Vao.bind();
 	m_VertexData.pushData(m_vertexDataRAM, GL_STATIC_DRAW, true);
 	m_Ibo.pushData(m_indicesRAM, GL_STATIC_DRAW, true);
+	m_Vao.unbind();
 
 	m_numberOfElements = static_cast<GLsizei>(m_indicesRAM.size());
 }
@@ -41,6 +43,7 @@ void Geometry::setupAttribArrays(Program &prog)
 	m_Vao.addVertexAttribArray(m_VertexData, false, true, prog.getNormalIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<const GLvoid*>(sizeof(GLfloat)*3) );
 	m_Vao.enableVertexAttribArray(false, prog.getVertexPosIndex());
 	m_Vao.enableVertexAttribArray(false, prog.getNormalIndex());
+	m_Vao.unbind();
 }
 
 void Geometry::parseObjFile(const std::string filePath, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData)
@@ -168,11 +171,9 @@ Geometry::~Geometry()
 
 void Geometry::render()
 {
-	m_VertexData.bind();
 	m_Vao.bind();
-	m_Ibo.bind();
-
 	glDrawElements(GL_TRIANGLES, m_numberOfElements, GL_UNSIGNED_SHORT, nullptr);
+	m_Vao.unbind();
 }
 
 void Geometry::debugRender(const glm::mat4x4 &mvpTransform) {

@@ -156,7 +156,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	cube.scale(glm::vec3(0.5));
 	//m_Scene.addObject(cube);
 
-	m_Scene.getCamera().translate(glm::vec3(0, 0, 3));
+	m_Scene.getCamera().translate(glm::vec3(0, 4, 8));
 
 	//m_Scene.render();
 	m_Scene.startStepping();
@@ -243,16 +243,16 @@ void GLViewer::KeyboardFunction(unsigned char key, int x, int y)
 	if ((viewer->m_KeysPressedState.count(key) == 0) || !(viewer->m_KeysPressedState[key])) {
 		switch (key) {
 		case 'w':
-			viewer->m_Scene.getCamera().addForwardVelocity(2.0);
+			viewer->m_Scene.getCamera().addForwardVelocity(4.0);
 			break;
 		case 'a':
-			viewer->m_Scene.getCamera().addLeftVelocity(2.0);
+			viewer->m_Scene.getCamera().addLeftVelocity(4.0);
 			break;
 		case 'd':
-			viewer->m_Scene.getCamera().addRightVelocity(2.0);
+			viewer->m_Scene.getCamera().addRightVelocity(4.0);
 			break;
 		case 's':
-			viewer->m_Scene.getCamera().addBackwardVelocity(2.0);
+			viewer->m_Scene.getCamera().addBackwardVelocity(4.0);
 			break;
 		}
 	}
@@ -267,16 +267,16 @@ void GLViewer::KeyboardFunctionUp(unsigned char key, int x, int y)
 	}
 	switch (key) {
 	case 'w':
-		viewer->m_Scene.getCamera().addForwardVelocity(-2.0);
+		viewer->m_Scene.getCamera().addForwardVelocity(-4.0);
 		break;
 	case 'a':
-		viewer->m_Scene.getCamera().addLeftVelocity(-2.0);
+		viewer->m_Scene.getCamera().addLeftVelocity(-4.0);
 		break;
 	case 'd':
-		viewer->m_Scene.getCamera().addRightVelocity(-2.0);
+		viewer->m_Scene.getCamera().addRightVelocity(-4.0);
 		break;
 	case 's':
-		viewer->m_Scene.getCamera().addBackwardVelocity(-2.0);
+		viewer->m_Scene.getCamera().addBackwardVelocity(-4.0);
 		break;
 	}
 	viewer->m_KeysPressedState[key] = false;

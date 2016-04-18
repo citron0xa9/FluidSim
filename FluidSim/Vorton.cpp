@@ -23,8 +23,8 @@ glm::vec3 Vorton::inducedVelocity(const glm::vec3 & position) const
 	}*/
 	glm::vec3 distanceVector = position - getPosition();
 	float distanceMagnitude = static_cast<float>(glm::length(distanceVector));
-	float divisor = (distanceMagnitude < m_Radius) ? pow(m_Radius, 3) : pow(distanceMagnitude, 3);
-	return glm::cross(m_Vorticity, distanceVector) / divisor;
+	float divisor = (distanceMagnitude < m_Radius) ? (pow(m_Radius, 2) * distanceMagnitude) : pow(distanceMagnitude, 3);
+	return glm::cross(ONE_OVER_FOUR_PI * 8.0f * pow(m_Radius, 3) * m_Vorticity, distanceVector / divisor);
 }
 
 glm::vec3 Vorton::getVorticity() const
@@ -35,6 +35,11 @@ glm::vec3 Vorton::getVorticity() const
 float Vorton::getRadius() const
 {
 	return m_Radius;
+}
+
+void Vorton::setRadius(float radius)
+{
+	m_Radius = radius;
 }
 
 void Vorton::setVorticity(const glm::vec3 & vorticity)

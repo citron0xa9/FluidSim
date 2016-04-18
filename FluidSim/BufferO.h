@@ -23,7 +23,7 @@ public:
 		if (bindBefore) {
 			bind();
 		}
-		glBufferSubData(m_bufferType, startIndex*sizeof(T), (startIndex-endIndex)*sizeof(T), v.data());
+		glBufferSubData(m_bufferType, startIndex*sizeof(T), (endIndex-startIndex)*sizeof(T), v.data());
 	}
 
 	GLuint getId() const;

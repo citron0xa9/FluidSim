@@ -54,6 +54,8 @@ private:
 
 	void renderTracers(const glm::mat4x4 &viewProjectTransform);
 
+	std::pair<glm::vec3, glm::vec3> getVelocityGridDimensions();
+
 	float m_Viscosity;
 	float m_Density;
 	std::vector<Vorton> m_Vortons;

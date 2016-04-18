@@ -46,8 +46,7 @@ void VortonOctHeapElement::calculateSupervortonFromChildren()
 
 bool VortonOctHeapElement::hasChildren()
 {
-	auto childrenIterators = getChildren();
-	return !(childrenIterators.first == childrenIterators.second);
+	return (((m_HeapIndex*8)+1) < m_Owner.m_Heap.size());
 }
 
 glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
