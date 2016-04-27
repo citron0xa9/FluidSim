@@ -25,7 +25,5 @@ protected:
 	std::list<Object*> m_ObjectPtrs;
 	std::list<ActiveObject*> m_ActiveObjectPtrs;
 	std::list<DrawableObject*> m_DrawableObjectPtrs;
-private:
-	
 };
 

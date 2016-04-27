@@ -6,15 +6,13 @@
 class Supervorton : public Vorton
 {
 public:
-	//Supervorton(const Supervorton &superVorton);
-	Supervorton(Vorton &vorton);
-	//Supervorton(const std::vector<Vorton*> &containedVortonPtrs);
+	Supervorton(TriangleNetObject &object);
 	virtual ~Supervorton();
 
 	void addContainedVorton(Vorton &vorton);
 
-	std::vector<Vorton*>& getContainedVortonPtrs();
-	void setContainedVortonPtrs(const std::vector<Vorton*> &containedVortons);
+	std::vector<Vorton*>& containedVortonPtrs();
+	void containedVortonPtrs(const std::vector<Vorton*> &containedVortons);
 
 private:
 	Vorton calculateSupervorton(const std::vector<Vorton*> &containedVortonPtrs);

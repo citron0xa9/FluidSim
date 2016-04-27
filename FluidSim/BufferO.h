@@ -26,7 +26,7 @@ public:
 		glBufferSubData(m_bufferType, startIndex*sizeof(T), (endIndex-startIndex)*sizeof(T), v.data());
 	}
 
-	GLuint getId() const;
+	GLuint id() const;
 protected:
 	BufferO(GLenum bufferType);	//protected because of m_boundId of childs / unbind has to be performed, if neccessary, by childs
 	virtual ~BufferO();

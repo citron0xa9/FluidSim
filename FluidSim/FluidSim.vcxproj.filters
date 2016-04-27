@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Objects\Sim">
       <UniqueIdentifier>{c44076a1-e9a6-40c2-9a04-0a4f644ca367}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{7091a5e0-c807-4401-8e8b-bfb6bdafdcb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -105,9 +108,6 @@
     <ClInclude Include="fsmath.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CellPointsIterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UniformGrid.h">
       <Filter>Header Files\Space</Filter>
     </ClInclude>
@@ -139,13 +139,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ActiveObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="ContainerObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawableObject.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -227,9 +227,6 @@
     <ClCompile Include="VorticityDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fsmath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MovableObject.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -239,11 +236,14 @@
     <ClCompile Include="ActiveObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DrawableObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ContainerObject.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fsmath.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawableObject.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,7 +25,7 @@ void Material::loadIntoProgram(const MaterialUniformLocations &uniLoc, Program &
 	glUniform1i(uniLoc.specularExponent, m_SpecularExponent);
 }
 
-unsigned int Material::getId() const
+unsigned int Material::id() const
 {
 	return m_Id;
 }

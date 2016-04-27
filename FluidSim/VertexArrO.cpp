@@ -33,7 +33,7 @@ VertexArrO::~VertexArrO()
 	glDeleteVertexArrays(1, &m_Id);
 }
 
-void VertexArrO::bind()
+void VertexArrO::bind() const
 {
 	glBindVertexArray(m_Id);
 }

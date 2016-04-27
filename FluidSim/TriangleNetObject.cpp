@@ -1,6 +1,7 @@
 #include "TriangleNetObject.h"
 
-TriangleNetObject::TriangleNetObject(ContainerObject& container, Material& material, Geometry& geometry, Program& renderProg) : DrawableObject{ container }, Object(container), m_Material{ material }, m_Geometry{ geometry }, m_RenderProg{renderProg}
+TriangleNetObject::TriangleNetObject(ContainerObject& container, Material *materialPtr, Geometry *geometryPtr, Program *renderProgPtr)
+	: DrawableObject{ container }, Object(container), m_MaterialPtr{ materialPtr }, m_GeometryPtr{ geometryPtr }, m_ProgramPtr{renderProgPtr}
 {
 
 }
@@ -15,21 +16,48 @@ Object * TriangleNetObject::copy() const
 	return new TriangleNetObject{ *this };
 }
 
-Program& TriangleNetObject::getProgram() const
+const Program& TriangleNetObject::program() const
 {
-	return m_RenderProg;
+	return *m_ProgramPtr;
 }
 
-void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
+void TriangleNetObject::program(Program * programPtr)
 {
-	if (m_RenderProg.getLoadedMaterialId() != m_Material.getId()) {
-		m_RenderProg.loadMaterial(m_Material);
-	}
-	glm::mat4x4 modelTransform = m_TranslationTransform*m_ScaleTransform*m_RotationTransform;
-	m_RenderProg.loadModelViewProjectTransform(viewProjectTransform*modelTransform);
-	m_RenderProg.loadModelTransform(modelTransform);
-	m_RenderProg.use();
+	m_ProgramPtr = programPtr;
+}
 
-	m_Geometry.render();
-	//m_Geometry.debugRender(viewProjectTransform*m_ModelTransform);
+const Material & TriangleNetObject::material() const
+{
+	return *m_MaterialPtr;
+}
+
+void TriangleNetObject::material(Material * materialPtr)
+{
+	m_MaterialPtr = materialPtr;
+}
+
+const Geometry & TriangleNetObject::geometry() const
+{
+	return *m_GeometryPtr;
+}
+
+void TriangleNetObject::geometry(Geometry * geometryPtr)
+{
+	m_GeometryPtr = geometryPtr;
+}
+
+void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform) const
+{
+	if (m_ProgramPtr == nullptr || m_GeometryPtr == nullptr || m_MaterialPtr == nullptr) {
+		throw std::runtime_error("TriangleNetObject: Can't render because needed Pointer is missing");
+	}
+	if (m_ProgramPtr->loadedMaterialId() != m_MaterialPtr->id()) {
+		m_ProgramPtr->loadMaterial(*m_MaterialPtr);
+	}
+	glm::mat4x4 modelTransform = m_TranslationTransform * m_ScaleTransform * m_RotationTransform;
+	m_ProgramPtr->loadModelViewProjectTransform(viewProjectTransform*modelTransform);
+	m_ProgramPtr->loadModelTransform(modelTransform);
+	m_ProgramPtr->use();
+
+	m_GeometryPtr->render();
 }

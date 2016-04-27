@@ -51,13 +51,13 @@ Material& Scene::addMaterial(const Material &material)
 Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVars)
 {
 	Program *newProg = new Program{ lightVars };
-	return *((*((m_ProgramPtrs.insert(std::make_pair(newProg->getId(), newProg))).first)).second);
+	return *((*((m_ProgramPtrs.insert(std::make_pair(newProg->id(), newProg))).first)).second);
 }
 
 void Scene::render()
 {
 	//call render on each object
-	glm::mat4x4 viewProjectTransform = m_Camera.getViewPerspectiveTransform();
+	glm::mat4x4 viewProjectTransform = m_Camera.viewPerspectiveTransform();
 
 	glm::vec3 camPosition = m_Camera.getPosition();
 	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&camPosition](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraPosition(camPosition); });
@@ -66,9 +66,9 @@ void Scene::render()
 }
 
 
-void Scene::setAspectRatio(float ratio)
+void Scene::aspectRatio(float ratio)
 {
-	m_Camera.setAspectRatio(ratio);
+	m_Camera.aspectRatio(ratio);
 }
 
 Camera& Scene::getCamera()

@@ -12,7 +12,7 @@
 namespace fsmath {
 #define MAX_UINT_POWER2 (1 << (sizeof(unsigned int) * 8 - 1))
 
-	inline float NextPowerOf2(float x)
+	inline float nextPowerOf2(float x)
 	{
 		float exponent = std::ceil(std::log2f(x));
 		return static_cast<float>(pow(2, exponent));
@@ -20,13 +20,13 @@ namespace fsmath {
 
 	inline glm::uvec3 allNextPowerOf2(const glm::vec3 &vec) {
 		return glm::vec3(
-			NextPowerOf2(vec.x),
-			NextPowerOf2(vec.y),
-			NextPowerOf2(vec.z)
+			nextPowerOf2(vec.x),
+			nextPowerOf2(vec.y),
+			nextPowerOf2(vec.z)
 			);
 	}
 
-	inline bool AnyLess(const glm::vec3 &v1, const glm::vec3 &v2) {
+	inline bool anyLess(const glm::vec3 &v1, const glm::vec3 &v2) {
 		return ((v1.x < v2.x)
 			|| (v1.y < v2.y)
 			|| (v1.z < v2.z));
@@ -57,50 +57,50 @@ namespace fsmath {
 	}
 
 	inline bool insideBox(const glm::vec3 &point, const glm::vec3 &minCorner, const glm::vec3 &extent) {
-		return !(AnyLess(point, minCorner) || AnyLess(minCorner + extent, point));
+		return !(anyLess(point, minCorner) || anyLess(minCorner + extent, point));
 	}
 
-	void ComputeJacobian(UniformGrid<glm::mat3x3> &jacobianGrid, UniformGrid<glm::vec3> &velocityGrid);
+	void computeJacobian(UniformGrid<glm::mat3x3> &jacobianGrid, UniformGrid<glm::vec3> &velocityGrid);
 
-	inline void ComputeFiniteDifference(UniformGrid<glm::mat3x3> &jacobianGrid, UniformGrid<glm::vec3> &velocityGrid,
+	inline void computeFiniteDifference(UniformGrid<glm::mat3x3> &jacobianGrid, UniformGrid<glm::vec3> &velocityGrid,
 		const size_t xIndex, const size_t yIndex, const size_t zIndex, const size_t offset, const glm::vec3 &doubleCellExtent,
 		const glm::uvec3 &pointsAmountMinus1, const size_t yOffsetDistance, const size_t zOffsetDistance)
 
 	{
 
-		glm::mat3x3 &currentMatrix = jacobianGrid.AtOffset(offset);
+		glm::mat3x3 &currentMatrix = jacobianGrid.atOffset(offset);
 
 
 		if (xIndex == 0) {
-			currentMatrix[0] = (velocityGrid.AtOffset(offset + 1) - velocityGrid.AtOffset(offset)) / velocityGrid.GetCellExtent();
+			currentMatrix[0] = (velocityGrid.atOffset(offset + 1) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
 		}
 		else if (xIndex == pointsAmountMinus1.x) {
-			currentMatrix[0] = (velocityGrid.AtOffset(offset) - velocityGrid.AtOffset(offset - 1)) / velocityGrid.GetCellExtent();
+			currentMatrix[0] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - 1)) / velocityGrid.cellExtent();
 		}
 		else {
-			currentMatrix[0] = (velocityGrid.AtOffset(offset + 1) - velocityGrid.AtOffset(offset - 1)) / doubleCellExtent;
+			currentMatrix[0] = (velocityGrid.atOffset(offset + 1) - velocityGrid.atOffset(offset - 1)) / doubleCellExtent;
 		}
 
 
 		if (yIndex == 0) {
-			currentMatrix[1] = (velocityGrid.AtOffset(offset + yOffsetDistance) - velocityGrid.AtOffset(offset)) / velocityGrid.GetCellExtent();
+			currentMatrix[1] = (velocityGrid.atOffset(offset + yOffsetDistance) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
 		}
 		else if (yIndex == pointsAmountMinus1.y) {
-			currentMatrix[1] = (velocityGrid.AtOffset(offset) - velocityGrid.AtOffset(offset - yOffsetDistance)) / velocityGrid.GetCellExtent();
+			currentMatrix[1] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - yOffsetDistance)) / velocityGrid.cellExtent();
 		}
 		else {
-			currentMatrix[1] = (velocityGrid.AtOffset(offset + yOffsetDistance) - velocityGrid.AtOffset(offset - yOffsetDistance)) / doubleCellExtent;
+			currentMatrix[1] = (velocityGrid.atOffset(offset + yOffsetDistance) - velocityGrid.atOffset(offset - yOffsetDistance)) / doubleCellExtent;
 		}
 
 
 		if (zIndex == 0) {
-			currentMatrix[2] = (velocityGrid.AtOffset(offset + zOffsetDistance) - velocityGrid.AtOffset(offset)) / velocityGrid.GetCellExtent();
+			currentMatrix[2] = (velocityGrid.atOffset(offset + zOffsetDistance) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
 		}
 		else if (zIndex == pointsAmountMinus1.z) {
-			currentMatrix[2] = (velocityGrid.AtOffset(offset) - velocityGrid.AtOffset(offset - zOffsetDistance)) / velocityGrid.GetCellExtent();
+			currentMatrix[2] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - zOffsetDistance)) / velocityGrid.cellExtent();
 		}
 		else {
-			currentMatrix[2] = (velocityGrid.AtOffset(offset + zOffsetDistance) - velocityGrid.AtOffset(offset - zOffsetDistance)) / doubleCellExtent;
+			currentMatrix[2] = (velocityGrid.atOffset(offset + zOffsetDistance) - velocityGrid.atOffset(offset - zOffsetDistance)) / doubleCellExtent;
 		}
 
 	}

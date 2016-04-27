@@ -10,17 +10,16 @@ public:
 	VortonOctHeapElement(size_t index, const Supervorton &supervorton, VortonOctHeap &owner, const glm::vec3 &extent);
 	~VortonOctHeapElement();
 
-	//void setSupervorton(const Supervorton &supervorton);
-	Supervorton& getSupervorton();
+	Supervorton& supervorton();
 
-	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> getChildren();
+	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> children();
 	void calculateSupervortonFromChildren();
 
 	bool hasChildren();
 
 	glm::vec3 calculateVelocity(const glm::vec3 &position);
 
-	std::vector<VortonOctHeapElement*> getForwardNeighbors();
+	std::vector<VortonOctHeapElement*> forwardNeighbors();
 
 private:
 	glm::vec3 calculateVelocityAccurate(const glm::vec3 &position);

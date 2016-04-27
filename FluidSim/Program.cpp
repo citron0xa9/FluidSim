@@ -28,8 +28,8 @@ Program::~Program()
 
 void Program::attachShader(Shader* shader)
 {
-	glAttachShader(m_Id, shader->getId());
-	m_AttachedShaders.insert(std::make_pair(shader->getId(), shader));
+	glAttachShader(m_Id, shader->id());
+	m_AttachedShaders.insert(std::make_pair(shader->id(), shader));
 }
 
 void Program::detachAllShaders()
@@ -76,7 +76,7 @@ void Program::link()
 	}
 }
 
-void Program::use()
+void Program::use() const
 {
 	glUseProgram(m_Id);
 	m_usedProgramId = m_Id;
@@ -99,10 +99,10 @@ void Program::loadMaterial(const Material& material)
 
 	material.loadIntoProgram(uniLoc, *this);
 
-	m_loadedMaterialId = material.getId();
+	m_loadedMaterialId = material.id();
 }
 
-int Program::getLoadedMaterialId() const
+int Program::loadedMaterialId() const
 {
 	return m_loadedMaterialId;
 }
@@ -121,17 +121,17 @@ ShaderLightSourceVariable Program::popFreeLightSourceVariable(const LightSourceT
 	return returnValue;
 }
 
-GLint Program::getUniformLocation(const GLchar *name)
+GLint Program::uniformLocation(const GLchar *name) const
 {
 	return glGetUniformLocation(m_Id, name);
 }
 
-GLuint Program::getVertexPosIndex() const
+GLuint Program::vertexPositionIndex() const
 {
 	return 0;
 }
 
-GLuint Program::getNormalIndex() const
+GLuint Program::normalIndex() const
 {
 	return 1;
 }
@@ -141,7 +141,7 @@ void Program::loadLights(const std::list<LightSource*> &lights)
 	std::for_each(lights.begin(), lights.end(), [this](const LightSource *light){light->loadIntoProgram(*this); });
 }
 
-GLuint Program::getId() const
+GLuint Program::id() const
 {
 	return m_Id;
 }

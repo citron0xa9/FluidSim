@@ -3,6 +3,8 @@
 #include <iostream>
 #include <glm/gtx/transform.hpp>
 
+glm::vec3 Camera::m_LocalLookDirection = m_ForwardVector;
+glm::vec3 Camera::m_UpVector = m_yAxis;
 
 Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far) :
 	MovableObject{ scene }, Object{ scene },
@@ -28,16 +30,6 @@ void Camera::calculateViewPerspectiveTransform()
 	m_ViewPerspectiveTransform = m_PerspectiveTransform * m_ViewTransform;
 }
 
-inline glm::vec3 Camera::localLookDirection()
-{
-	return m_ForwardVector;
-}
-
-inline glm::vec3 Camera::upVector()
-{
-	return m_yAxis;
-}
-
 void Camera::calculatePerspectiveTransform()
 {
 	m_PerspectiveTransform = glm::perspective(m_FovY, m_AspectRatio, m_NearClippingPlane, m_FarClippingPlane);
@@ -46,22 +38,22 @@ void Camera::calculatePerspectiveTransform()
 void Camera::calculateViewTransform()
 {
 	glm::vec3 position = getPosition();
-	glm::vec3 lookAt = position + glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(), 1.0));
-	m_ViewTransform = glm::lookAt(position, lookAt, upVector());
+	glm::vec3 lookAt = position + glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection, 1.0));
+	m_ViewTransform = glm::lookAt(position, lookAt, m_UpVector);
 }
 
-void Camera::setAspectRatio(float ratio)
+void Camera::aspectRatio(float ratio)
 {
 	m_AspectRatio = ratio;
 	calculateViewPerspectiveTransform();
 }
 
-glm::mat4x4 Camera::getViewPerspectiveTransform() const
+glm::mat4x4 Camera::viewPerspectiveTransform() const
 {
 	return m_ViewPerspectiveTransform;
 }
 
-void Camera::setFovY(float f) {
+void Camera::fovY(float f) {
 	m_FovY = f;
 	calculateViewPerspectiveTransform();
 }
@@ -75,9 +67,9 @@ void Camera::translate(const glm::vec3 & delta)
 	calculateViewPerspectiveTransform();
 }
 
-glm::vec3 Camera::getLookDirection() const
+glm::vec3 Camera::lookDirection() const
 {
-	return glm::vec3(m_RotationTransform*glm::vec4(localLookDirection(),1.0));
+	return glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection,1.0));
 }
 
 void Camera::rotate(float degrees, const glm::vec3 & axis)

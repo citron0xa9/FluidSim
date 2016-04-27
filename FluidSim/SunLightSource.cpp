@@ -15,8 +15,8 @@ void SunLightSource::loadIntoProgram(Program &program) const
 {
 	auto freeSunLightSourceVariable = program.popFreeLightSourceVariable(LightSourceType::SUNLIGHT);
 
-	GLint intensityUniformLocation = program.getUniformLocation((freeSunLightSourceVariable.name + "_Intensity").c_str());
-	GLint directionUniformLocation = program.getUniformLocation((freeSunLightSourceVariable.name + "_Direction").c_str());
+	GLint intensityUniformLocation = program.uniformLocation((freeSunLightSourceVariable.name + "_Intensity").c_str());
+	GLint directionUniformLocation = program.uniformLocation((freeSunLightSourceVariable.name + "_Direction").c_str());
 
 	if ((intensityUniformLocation == -1) || (directionUniformLocation == -1)) {
 		throw std::logic_error("SunLightSource::loadIntoProgram: one uniform location of free variable is -1");

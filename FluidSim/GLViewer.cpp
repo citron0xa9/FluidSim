@@ -96,21 +96,14 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
 	DEBUG(cullMsg);
 
-	//glPointSize(8);
-
-	//setupTriangle();
-
 	/*
 	 * Setup scene
 	*/
 	SunLightSource light{m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
 
-	Material sphereMaterial{ glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.2f), 10 };
+	Material sphereMaterial{ glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.2f), 10 };
 	Material &sphereMatRef = m_Scene.addMaterial(sphereMaterial);
-
-	Material cubeMaterial{ glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.1f), 10 };
-	Material &cubeMatRef = m_Scene.addMaterial(cubeMaterial);
 
 	/*
 	* setup scene: setup program
@@ -121,10 +114,10 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	Program &prog = m_Scene.addProgram(lightSrcVars);
 
 	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.setSourcePath("shaders\\basic3D.vert");
+	vertexShader.loadSourceFromFile("shaders\\basic3D.vert");
 
 	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.setSourcePath("shaders\\basic3D_phong.frag");
+	fragmentShader.loadSourceFromFile("shaders\\basic3D_phong.frag");
 
 	prog.attachShader(&vertexShader);
 	prog.attachShader(&fragmentShader);
@@ -137,39 +130,22 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	m_Scene.addObject(light);
 
 	//setup geometry
-	m_Scene.setAspectRatio(static_cast<float>(width) / height);
+	m_Scene.aspectRatio(static_cast<float>(width) / height);
 	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere.obj");
 	geomSphere.setupAttribArrays(prog);
 
-	Geometry &geomCube = m_Scene.addGeometryFromFile("objects\\cube.obj");
-	geomCube.setupAttribArrays(prog);
-
 	//create and add object to scene
-	TriangleNetObject tracerPrototype{ m_Scene, sphereMatRef, geomSphere, prog };
-	//m_Scene.addObject(tracerPrototype);
-	tracerPrototype.scale(glm::vec3(0.01));
+	TriangleNetObject vortonPrototype{ m_Scene, &sphereMatRef, &geomSphere, &prog };
+	vortonPrototype.scale(glm::vec3(0.01));
 
-	m_Scene.addObjectPtr(new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, tracerPrototype));
-
-	TriangleNetObject cube{ m_Scene, cubeMatRef, geomCube, prog };
-	cube.translate(glm::vec3(-2.0, -2.0, -2.0));
-	cube.scale(glm::vec3(0.5));
-	//m_Scene.addObject(cube);
-
-	m_Scene.getCamera().translate(glm::vec3(0, 4, 8));
-
-	//m_Scene.render();
+	m_Scene.addObjectPtr(new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, vortonPrototype));
+	m_Scene.getCamera().translate(glm::vec3(0, 6, 12));
 	m_Scene.startStepping();
 }
 
 GLViewer::~GLViewer()
 {
-	try {
-		//cleanupTriangle();
-	}
-	catch (const std::exception& ex) {
-		ERROR_MSG("In destructor: " << ex.what());
-	}
+	
 }
 
 void GLViewer::ResizeFunction(int width, int height) {
@@ -178,7 +154,7 @@ void GLViewer::ResizeFunction(int width, int height) {
 	if (viewer == nullptr) {
 		throw std::runtime_error("ResizeFunction: Instance of GLViewer doesn't exist");
 	}
-	viewer->m_Scene.setAspectRatio(static_cast<float>(width) / height);
+	viewer->m_Scene.aspectRatio(static_cast<float>(width) / height);
 	viewer->setWidth(width);
 	viewer->setHeight(height);
 }

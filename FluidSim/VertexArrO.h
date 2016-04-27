@@ -11,7 +11,7 @@ public:
 	VertexArrO(bool ShouldBind = true);
 	virtual ~VertexArrO();
 
-	void bind();
+	void bind() const;
 	static void unbind();
 
 	void addVertexAttribArray(const VertexBufO& baseVbo, bool bindVaoBefore, bool bindVboBefore, GLuint index, GLint componentsPerAttrib, GLenum componentType, GLboolean normalized, GLsizei stride, const GLvoid *offset);

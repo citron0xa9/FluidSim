@@ -20,20 +20,15 @@ public:
 
 	virtual ~Vorton();
 
-	glm::vec3 inducedVelocity(const glm::vec3 &position) const;
-	glm::vec3 getVorticity() const;
-	float getRadius() const;
-	void setRadius(float radius);
-
-	void setVorticity(const glm::vec3 &vorticity);
+	glm::vec3 vorticity() const;
+	void vorticity(const glm::vec3 &vorticity);
+	float radius() const;
+	void radius(float radius);
 
 	virtual Object* copy() const override;
+	glm::vec3 inducedVelocity(const glm::vec3 &position) const;
 
-
-protected:
-	
 private:
-
 	glm::vec3 m_Vorticity;
 	float m_Radius;
 	glm::vec3 m_Velocity;

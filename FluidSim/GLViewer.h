@@ -34,20 +34,9 @@ public:
 	Scene& getScene();
 private:
 	GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]);
-	GLViewer(const GLViewer& v) {
-		assert(0);	//shouldn't be called
-	}
+	GLViewer(const GLViewer& v) = delete;
 
-	void setupTriangle();
-	void drawTriangle();
-
-	void cleanupTriangle();
 	static void cleanup();
-
-	VertexArrO *m_TriangleVao;
-	VertexBufO *m_TrianglePosVbo;
-	VertexBufO *m_TriangleColorVbo;
-	Program *m_TriangleProg;
 
 	static void ResizeFunction(int width, int height);
 	static void RenderFunction(void);

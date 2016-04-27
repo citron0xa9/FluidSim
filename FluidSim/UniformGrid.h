@@ -9,43 +9,40 @@ template <class ItemT>
 class UniformGrid : public UniformGridGeometry
 {
 public:
-	//UniformGrid() {}
+	UniformGrid(const UniformGrid &that) = delete;
 	UniformGrid(size_t numElements, const glm::vec3 &minCorner, const glm::vec3 &maxCorner, bool bPowerOf2)
 		: UniformGridGeometry(numElements, minCorner, maxCorner, bPowerOf2)
 	{
-		Init();
+		init();
 	}
 
-	explicit UniformGrid(const UniformGridGeometry &that) : UniformGridGeometry(that) { Init(); }
+	explicit UniformGrid(const UniformGridGeometry &that) : UniformGridGeometry(that) { init(); }
 	virtual ~UniformGrid() {}
 
 
-	ItemT& AtPosition(const glm::vec3 &position) { return PrivateAtPosition(position); }
-	const ItemT& AtPosition(const glm::vec3 &position) const { return PrivateAtPosition(position); }
+	ItemT& atPosition(const glm::vec3 &position) { return privateAtPosition(position); }
+	const ItemT& atPosition(const glm::vec3 &position) const { return privateAtPosition(position); }
 
-	ItemT& AtIndices(const glm::uvec3 &indices) { return PrivateAtIndices(indices); }
-	const ItemT& AtIndices(const glm::uvec3 &indices) const { return PrivateAtIndices(indices); }
+	ItemT& atIndices(const glm::uvec3 &indices) { return privateAtIndices(indices); }
+	const ItemT& atIndices(const glm::uvec3 &indices) const { return privateAtIndices(indices); }
 
-	ItemT& AtOffset(size_t offset) { return m_Points[offset]; }
-	const ItemT& AtOffset(size_t offset) const { return m_Points[offset]; }
+	ItemT& atOffset(size_t offset) { return m_Points[offset]; }
+	const ItemT& atOffset(size_t offset) const { return m_Points[offset]; }
 
 
-	std::pair<ItemT&, ItemT&> MinMaxElement() { return std::minmax_element(m_Points.begin(), m_Points.end()); }
+	std::pair<ItemT&, ItemT&> minMaxElement() { return std::minmax_element(m_Points.begin(), m_Points.end()); }
 
-	ItemT Interpolate(const glm::vec3 &position) const;
+	ItemT interpolate(const glm::vec3 &position) const;
 
 private:
-	//Deny copy construction
-	UniformGrid(const UniformGrid &that) : UniformGridGeometry(that) {}
+	void init() { m_Points.resize(gridPointCapacity()); }
 
-	void Init() { m_Points.resize(GetGridPointCapacity()); }
+	ItemT& privateAtPosition(const glm::vec3 &position);
+	ItemT& privateAtIndices(const glm::uvec3 &indices);
+	glm::uvec3 getResponsiblePointIndices(const glm::vec3 &position) const;
+	size_t offsetForIndices(const glm::uvec3 &indices) const;
 
-	ItemT& PrivateAtPosition(const glm::vec3 &position);
-	ItemT& PrivateAtIndices(const glm::uvec3 &indices);
-	glm::uvec3 GetResponsiblePointIndices(const glm::vec3 &position) const;
-	size_t OffsetForIndices(const glm::uvec3 &indices) const;
-
-	std::vector<size_t> CellPointsOffsets(size_t startOffset) const;
+	std::vector<size_t> cellPointsOffsets(size_t startOffset) const;
 
 	std::vector<ItemT> m_Points;
 };
@@ -53,67 +50,67 @@ private:
 #include "fsmath.h"
 
 template<class ItemT>
-inline ItemT UniformGrid<ItemT>::Interpolate(const glm::vec3 & position) const
+inline ItemT UniformGrid<ItemT>::interpolate(const glm::vec3 & position) const
 {
-	if (fsmath::AnyLess(position, GetMinCorner()) || fsmath::AnyLess(GetMinCorner() + GetGridExtent(), position)) {
+	if (fsmath::anyLess(position, minCorner()) || fsmath::anyLess(minCorner() + gridExtent(), position)) {
 		std::runtime_error("UniformGrid::Interpolate: given position is outside of grid");
 	}
 
-	glm::uvec3 responsiblePointIndices = GetResponsiblePointIndices(position);
-	glm::vec3 relativePositionNormalized = (position - GetMinCorner()) / GetCellExtent() - glm::vec3(responsiblePointIndices);
+	glm::uvec3 responsiblePointIndices = getResponsiblePointIndices(position);
+	glm::vec3 relativePositionNormalized = (position - minCorner()) / cellExtent() - glm::vec3(responsiblePointIndices);
 	glm::vec3 oneMinusRelativePositionNormalized = glm::vec3(1) - relativePositionNormalized;
 
-	std::vector<size_t> cellPointsOffsets = CellPointsOffsets(OffsetForIndices(responsiblePointIndices));
+	std::vector<size_t> cellPointsOffsets = cellPointsOffsets(offsetForIndices(responsiblePointIndices));
 
-	return (oneMinusRelativePositionNormalized.x* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* AtOffset(cellPointsOffsets[0])
-		+ relativePositionNormalized.x			* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* AtOffset(cellPointsOffsets[1])
-		+ oneMinusRelativePositionNormalized.x	* relativePositionNormalized.y			* oneMinusRelativePositionNormalized.z	* AtOffset(cellPointsOffsets[2])
-		+ relativePositionNormalized.x			* relativePositionNormalized.y			* oneMinusRelativePositionNormalized.z	* AtOffset(cellPointsOffsets[3])
-		+ oneMinusRelativePositionNormalized.x	* oneMinusRelativePositionNormalized.y	* relativePositionNormalized.z			* AtOffset(cellPointsOffsets[4])
-		+ relativePositionNormalized.x			* oneMinusRelativePositionNormalized.y	* relativePositionNormalized.z			* AtOffset(cellPointsOffsets[5])
-		+ oneMinusRelativePositionNormalized.x	* relativePositionNormalized.y			* relativePositionNormalized.z			* AtOffset(cellPointsOffsets[6])
-		+ relativePositionNormalized.x			* relativePositionNormalized.y			* relativePositionNormalized.z			* AtOffset(cellPointsOffsets[7]));
+	return (oneMinusRelativePositionNormalized.x* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[0])
+		+ relativePositionNormalized.x			* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[1])
+		+ oneMinusRelativePositionNormalized.x	* relativePositionNormalized.y			* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[2])
+		+ relativePositionNormalized.x			* relativePositionNormalized.y			* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[3])
+		+ oneMinusRelativePositionNormalized.x	* oneMinusRelativePositionNormalized.y	* relativePositionNormalized.z			* atOffset(cellPointsOffsets[4])
+		+ relativePositionNormalized.x			* oneMinusRelativePositionNormalized.y	* relativePositionNormalized.z			* atOffset(cellPointsOffsets[5])
+		+ oneMinusRelativePositionNormalized.x	* relativePositionNormalized.y			* relativePositionNormalized.z			* atOffset(cellPointsOffsets[6])
+		+ relativePositionNormalized.x			* relativePositionNormalized.y			* relativePositionNormalized.z			* atOffset(cellPointsOffsets[7]));
 }
 
 template<class ItemT>
-inline ItemT& UniformGrid<ItemT>::PrivateAtPosition(const glm::vec3 &position)
+inline ItemT& UniformGrid<ItemT>::privateAtPosition(const glm::vec3 &position)
 {
-	glm::uvec3 indices = GetResponsiblePointIndices(position);
-	return PrivateAtIndices(indices);
+	glm::uvec3 indices = getResponsiblePointIndices(position);
+	return privateAtIndices(indices);
 }
 
 template<class ItemT>
-inline ItemT& UniformGrid<ItemT>::PrivateAtIndices(const glm::uvec3 &indices)
+inline ItemT& UniformGrid<ItemT>::privateAtIndices(const glm::uvec3 &indices)
 {
-	return m_Points[OffsetForIndices(indices)];
+	return m_Points[offsetForIndices(indices)];
 }
 
 template<class ItemT>
-inline glm::uvec3 UniformGrid<ItemT>::GetResponsiblePointIndices(const glm::vec3 & position) const
+inline glm::uvec3 UniformGrid<ItemT>::getResponsiblePointIndices(const glm::vec3 & position) const
 {
-	glm::vec3 relativePosition = position - GetMinCorner();
-	return (relativePosition * GetCellsPerExtent());
+	glm::vec3 relativePosition = position - minCorner();
+	return (relativePosition * cellsPerExtent());
 }
 
 template<class ItemT>
-inline size_t UniformGrid<ItemT>::OffsetForIndices(const glm::uvec3 & indices) const
+inline size_t UniformGrid<ItemT>::offsetForIndices(const glm::uvec3 & indices) const
 {
-	return (indices.x + GetPointsAmount().x * (indices.y + GetPointsAmount().y * indices.z));
+	return (indices.x + pointsAmount().x * (indices.y + pointsAmount().y * indices.z));
 }
 
 template<class ItemT>
-inline std::vector<size_t> UniformGrid<ItemT>::CellPointsOffsets(size_t startOffset) const
+inline std::vector<size_t> UniformGrid<ItemT>::cellPointsOffsets(size_t startOffset) const
 {
-	size_t xyPointsAmount = GetPointsAmount().x * GetPointsAmount().y;
+	size_t xyPointsAmount = pointsAmount().x * pointsAmount().y;
 
 	return {
 		startOffset,
 		startOffset + 1,
-		startOffset + GetPointsAmount().x,
-		startOffset + GetPointsAmount().x + 1,
+		startOffset + pointsAmount().x,
+		startOffset + pointsAmount().x + 1,
 		startOffset + xyPointsAmount,
 		startOffset + xyPointsAmount + 1,
-		startOffset + xyPointsAmount + GetPointsAmount().x,
-		startOffset + xyPointsAmount + GetPointsAmount().x + 1
+		startOffset + xyPointsAmount + pointsAmount().x,
+		startOffset + xyPointsAmount + pointsAmount().x + 1
 	};
 }

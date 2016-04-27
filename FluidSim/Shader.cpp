@@ -15,13 +15,13 @@ Shader::~Shader()
 	glDeleteShader(m_Id);
 }
 
-void Shader::setSource(const std::string& src)
+void Shader::loadSourceFromString(const std::string& src)
 {
 	const GLchar *cStr = src.c_str();
 	glShaderSource(m_Id, 1, &cStr, NULL);
 }
 
-void Shader::setSourcePath(const std::string& path)
+void Shader::loadSourceFromFile(const std::string& path)
 {
 	std::ifstream srcFile;
 	std::string srcStr;
@@ -45,7 +45,7 @@ void Shader::setSourcePath(const std::string& path)
 	}
 	srcFile.close();
 
-	setSource(srcStr);
+	loadSourceFromString(srcStr);
 }
 
 void Shader::compile() {
@@ -84,7 +84,7 @@ void Shader::compile() {
 	}
 }
 
-GLuint Shader::getId() const
+GLuint Shader::id() const
 {
 	return m_Id;
 }

@@ -39,10 +39,10 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ 
 
 void Geometry::setupAttribArrays(Program &prog)
 {
-	m_Vao.addVertexAttribArray(m_VertexData, true, true, prog.getVertexPosIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
-	m_Vao.addVertexAttribArray(m_VertexData, false, true, prog.getNormalIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<const GLvoid*>(sizeof(GLfloat)*3) );
-	m_Vao.enableVertexAttribArray(false, prog.getVertexPosIndex());
-	m_Vao.enableVertexAttribArray(false, prog.getNormalIndex());
+	m_Vao.addVertexAttribArray(m_VertexData, true, true, prog.vertexPositionIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
+	m_Vao.addVertexAttribArray(m_VertexData, false, true, prog.normalIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<const GLvoid*>(sizeof(GLfloat)*3) );
+	m_Vao.enableVertexAttribArray(false, prog.vertexPositionIndex());
+	m_Vao.enableVertexAttribArray(false, prog.normalIndex());
 	m_Vao.unbind();
 }
 
@@ -169,14 +169,15 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::render()
+void Geometry::render() const
 {
 	m_Vao.bind();
 	glDrawElements(GL_TRIANGLES, m_numberOfElements, GL_UNSIGNED_SHORT, nullptr);
 	m_Vao.unbind();
 }
 
-void Geometry::debugRender(const glm::mat4x4 &mvpTransform) {
+void Geometry::debugRender(const glm::mat4x4 &mvpTransform) const
+{
 	DEBUG("\n==================================\nDEBUG RENDER: MODE: GL_TRIANGLES, going to render " << m_indicesRAM.size() / 3 << " triangles");
 	for (int i = 0; i < m_indicesRAM.size(); i+=3) {
 		DEBUG("+++++++++++++++++++++");
@@ -186,7 +187,7 @@ void Geometry::debugRender(const glm::mat4x4 &mvpTransform) {
 	}
 }
 
-void Geometry::debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex)
+void Geometry::debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex) const
 {
 	DEBUG("\tLocalSpace:");
 	for (int i = 0; i < 3; i++) {

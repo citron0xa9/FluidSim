@@ -1,21 +1,9 @@
 
 #include "Supervorton.h"
 
-/*Supervorton::Supervorton(const Supervorton & superVorton) : Vorton(superVorton), Object(superVorton)
+Supervorton::Supervorton(TriangleNetObject & object) : Vorton(object), Object(object), m_VorticityMagnitudeSum{0}
 {
-}*/
-
-Supervorton::Supervorton(Vorton & vorton) : Vorton(vorton), Object(vorton)
-{
-	setVorticity(glm::vec3(0));
-	setPosition(glm::vec3(0));
-	m_VorticityMagnitudeSum = 0;
 }
-
-/*Supervorton::Supervorton(const std::vector<Vorton*>& containedVortonPtrs)
-	: Vorton{ calculateSupervorton(containedVortonPtrs) }, Object(*containedVortonPtrs.back()), m_ContainedVortonPtrs{ containedVortonPtrs }
-{
-}*/
 
 Supervorton::~Supervorton()
 {
@@ -26,33 +14,33 @@ void Supervorton::addContainedVorton(Vorton & vorton)
 	m_ContainedVortonPtrs.push_back(&vorton);
 
 	glm::vec3 position = getPosition();
-	glm::vec3 vorticity = getVorticity();
-	float vorticityMagnitude = static_cast<float>(glm::length(vorton.getVorticity()));
+	glm::vec3 vorticity = vorticity();
+	float vorticityMagnitude = static_cast<float>(glm::length(vorton.vorticity()));
 
 	position *= m_VorticityMagnitudeSum;
 	position += vorticityMagnitude * vorton.getPosition();
 
 	m_VorticityMagnitudeSum += vorticityMagnitude;
 
-	vorticity += vorton.getVorticity();
+	vorticity += vorton.vorticity();
 	if (m_VorticityMagnitudeSum != 0) {
 		position /= m_VorticityMagnitudeSum;
 
-		setVorticity(vorticity);
+		vorticity(vorticity);
 		setPosition(position);
 	}
 }
 
-std::vector<Vorton*>& Supervorton::getContainedVortonPtrs()
+std::vector<Vorton*>& Supervorton::containedVortonPtrs()
 {
 	return m_ContainedVortonPtrs;
 }
 
-void Supervorton::setContainedVortonPtrs(const std::vector<Vorton*>& containedVortons)
+void Supervorton::containedVortonPtrs(const std::vector<Vorton*>& containedVortons)
 {
 	m_ContainedVortonPtrs = containedVortons;
 	Vorton &resultingVorton = calculateSupervorton(containedVortons);
-	setVorticity(resultingVorton.getVorticity());
+	vorticity(resultingVorton.vorticity());
 	setPosition(resultingVorton.getPosition());
 }
 
@@ -66,11 +54,11 @@ Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVo
 	m_VorticityMagnitudeSum = 0;
 	for (auto vortonPtr : containedVortonPtrs) {
 
-		float vorticityMagnitude = static_cast<float>(glm::length(vortonPtr->getVorticity()));
+		float vorticityMagnitude = static_cast<float>(glm::length(vortonPtr->vorticity()));
 		m_VorticityMagnitudeSum += vorticityMagnitude;
 
 		position += vorticityMagnitude * vortonPtr->getPosition();
-		vorticity += vortonPtr->getVorticity();
+		vorticity += vortonPtr->vorticity();
 
 	}
 	if (m_VorticityMagnitudeSum > 0) {
@@ -79,5 +67,5 @@ Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVo
 	else {
 		position = containedVortonPtrs[0]->getPosition();
 	}
-	return Vorton(*containedVortonPtrs.back(), position, vorticity, containedVortonPtrs[0]->getRadius());
+	return Vorton(*containedVortonPtrs.back(), position, vorticity, containedVortonPtrs[0]->radius());
 }

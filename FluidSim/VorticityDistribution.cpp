@@ -12,7 +12,7 @@ VorticityDistribution::~VorticityDistribution()
 {
 }
 
-glm::vec3 VorticityDistribution::getMinCorner() const
+glm::vec3 VorticityDistribution::minCorner() const
 {
 	return (m_Center - (m_DomainSize / 2.0f));
 }

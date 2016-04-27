@@ -21,9 +21,9 @@ public:
 	virtual ~Geometry();
 
 	void setupAttribArrays(Program &prog);
-	void render();
+	void render() const;
 
-	void debugRender(const glm::mat4x4 &mvpTransform);
+	void debugRender(const glm::mat4x4 &mvpTransform) const;
 private:
 	VertexBufO m_VertexData;
 	IndexBufO m_Ibo;
@@ -39,6 +39,6 @@ private:
 	void parseFace(std::istringstream& lineStream, std::vector<GLfloat>& vboData, std::vector<GLushort>& iboData,
 		std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals, GLushort *nextVboIndex, std::list<IndexCombination>& combinations);
 
-	void debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex);
+	void debugRenderTriangle(const glm::mat4x4 &mvpTransform, int startIndex) const;
 };
 

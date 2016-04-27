@@ -8,7 +8,7 @@ public:
 	DrawableObject(ContainerObject &container);
 	virtual ~DrawableObject();
 
-	virtual void render(const glm::mat4x4 &viewProjectTransform) = 0;
+	virtual void render(const glm::mat4x4 &viewProjectTransform) const = 0;
 
 	virtual void registerContainerObjectHooks() override;
 };

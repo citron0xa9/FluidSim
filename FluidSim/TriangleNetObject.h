@@ -8,19 +8,25 @@
 class TriangleNetObject : public DrawableObject
 {
 public:
-	TriangleNetObject(ContainerObject& container, Material& material, Geometry& geometry, Program& renderProg);
+	TriangleNetObject(ContainerObject& container, Material *materialPtr = nullptr, Geometry *geometryPtr = nullptr, Program *renderProgPtr = nullptr);
 	virtual ~TriangleNetObject();
 
 	virtual Object* copy() const override;
 
-	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
+	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
 
-	Program& getProgram() const;
+	const Program& program() const;
+	void program(Program *programPtr);
+
+	const Material& material() const;
+	void material(Material *materialPtr);
+
+	const Geometry& geometry() const;
+	void geometry(Geometry *geometryPtr);
 
 private:
-
-	Material& m_Material;
-	Geometry& m_Geometry;
-	Program& m_RenderProg;
+	Material *m_MaterialPtr;
+	Geometry *m_GeometryPtr;
+	Program *m_ProgramPtr;
 };
 

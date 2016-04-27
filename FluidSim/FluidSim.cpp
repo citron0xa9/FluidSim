@@ -28,7 +28,7 @@ void cli() {
 			else if (cmd == "setCameraFovY") {
 				float f;
 				std::cin >> f;
-				inst->getScene().getCamera().setFovY(f);
+				inst->getScene().getCamera().fovY(f);
 			}
 			else if (cmd == "exit") {
 				break;

@@ -8,7 +8,7 @@ public:
 	virtual ~VorticityDistribution();
 
 	virtual glm::vec3 getVorticityAtPosition(const glm::vec3 &position) const = 0;
-	glm::vec3 getMinCorner() const;
+	glm::vec3 minCorner() const;
 
 	glm::vec3 getDomainSize() const;
 

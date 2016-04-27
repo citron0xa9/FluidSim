@@ -11,13 +11,13 @@ public:
 
 	virtual Object* copy() const override;
 
-	glm::mat4x4 getViewPerspectiveTransform() const;
-	void setAspectRatio(float ratio);
-	void setFovY(float f);
+	glm::mat4x4 viewPerspectiveTransform() const;
+	void aspectRatio(float ratio);
+	void fovY(float f);
 
 	virtual void translate(const glm::vec3 &delta) override;
 
-	glm::vec3 getLookDirection() const;
+	glm::vec3 lookDirection() const;
 
 protected:
 	virtual void rotate(float degrees, const glm::vec3 &axis) override;
@@ -27,8 +27,8 @@ private:
 	void calculateViewTransform();
 	void calculateViewPerspectiveTransform();
 
-	static glm::vec3 localLookDirection();
-	static glm::vec3 upVector();
+	static glm::vec3 m_LocalLookDirection;
+	static glm::vec3 m_UpVector;
 
 	float m_FovY;
 	float m_AspectRatio;

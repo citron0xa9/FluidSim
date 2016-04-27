@@ -16,7 +16,7 @@ VertexBufO::~VertexBufO()
 	//take care of unbinding if this vbo is still bound
 	GLint bufferBinding;
 	glGetIntegerv(m_BUFFER_BINDING, &bufferBinding);
-	if (bufferBinding == getId()) {
+	if (bufferBinding == id()) {
 		DEBUG("Destroying bound VBO -> unbinding VBO");
 		unbind();
 	}

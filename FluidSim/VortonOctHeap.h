@@ -14,13 +14,13 @@ public:
 	VortonOctHeap(std::vector<Vorton> &vortons);
 	~VortonOctHeap();
 
-	VortonOctHeapElement& getRoot();
-	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> getLeafs();
+	VortonOctHeapElement& root();
+	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> leafs();
 	VortonOctHeapElement& atIndex(size_t index);
 	VortonOctHeapElement& leaftAtPosition(const glm::vec3 &position);
 
-	glm::vec3 getMinCorner() const;
-	glm::vec3 getExtent() const;
+	glm::vec3 minCorner() const;
+	glm::vec3 extent() const;
 
 private:
 	void calculateBoundingBox(const std::vector<Vorton> &vortons);
@@ -31,11 +31,11 @@ private:
 	void initializeLeafs(std::vector<Vorton> &vortons);
 	void initializeParents();
 
-	size_t getLeafIndexForPosition(const glm::vec3 &position);
-	size_t getIndexForIndices(const glm::uvec3 &indices);
-	glm::uvec3 getIndicesForIndex(size_t index);
+	size_t leafIndexForPosition(const glm::vec3 &position);
+	size_t indexForIndices(const glm::uvec3 &indices);
+	glm::uvec3 indicesForIndex(size_t index);
 
-	size_t getFirstLeafIndex() const;
+	size_t firstLeafIndex() const;
 
 	bool isInsideBoundingBox(const glm::vec3 &position);
 	
@@ -55,7 +55,7 @@ private:
 inline bool VortonOctHeap::isInsideBoundingBox(const glm::vec3 & position)
 {
 	return (
-		(!fsmath::AnyLess(position, m_MinCorner))
-		&& (!fsmath::AnyLess(m_MinCorner + glm::vec3(m_Extent), position))
+		(!fsmath::anyLess(position, m_MinCorner))
+		&& (!fsmath::anyLess(m_MinCorner + glm::vec3(m_Extent), position))
 		);
 }

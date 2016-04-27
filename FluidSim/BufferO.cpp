@@ -28,7 +28,7 @@ void BufferO::unbindStatic(GLenum bufferType)
 	glBindBuffer(bufferType, 0);
 }
 
-GLuint BufferO::getId() const
+GLuint BufferO::id() const
 {
 	return m_Id;
 }

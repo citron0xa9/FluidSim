@@ -24,7 +24,7 @@ public:
 
 	virtual void render();
 
-	void setAspectRatio(float ratio);
+	void aspectRatio(float ratio);
 
 	Camera& getCamera();
 

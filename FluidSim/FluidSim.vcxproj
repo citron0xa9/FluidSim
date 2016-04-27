@@ -156,7 +156,6 @@
     <ClInclude Include="ActiveObject.h" />
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CellPointsIterator.h" />
     <ClInclude Include="ContainerObject.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DrawableObject.h" />

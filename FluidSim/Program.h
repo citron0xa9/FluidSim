@@ -31,20 +31,20 @@ public:
 
 	void link();
 
-	void use();
+	void use() const;
 	static void unuse();
 
 	void loadMaterial(const Material &material);
 	void loadLights(const std::list<LightSource*> &lights);
 
 	ShaderLightSourceVariable popFreeLightSourceVariable(const LightSourceType &lightSrcType);
-	GLint getUniformLocation(const GLchar *name);
-	GLuint getVertexPosIndex() const;
-	GLuint getNormalIndex() const;
+	GLint uniformLocation(const GLchar *name) const;
+	GLuint vertexPositionIndex() const;
+	GLuint normalIndex() const;
 
-	GLuint getId() const;
+	GLuint id() const;
 
-	int getLoadedMaterialId() const;
+	int loadedMaterialId() const;
 
 	void loadModelViewProjectTransform(const glm::mat4x4 &transform);
 	void loadModelTransform(const glm::mat4x4 &transform);
