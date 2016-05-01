@@ -13,7 +13,7 @@ public:
 	ContainerObject();
 	virtual ~ContainerObject();
 
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const;
+	virtual void render(const glm::mat4x4 &viewProjectTransform);
 	virtual void step(float secondsPassed);
 
 	void addObject(const Object &object);

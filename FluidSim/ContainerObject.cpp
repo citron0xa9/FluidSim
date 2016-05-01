@@ -16,7 +16,7 @@ ContainerObject::~ContainerObject()
 	}
 }
 
-void ContainerObject::render(const glm::mat4x4 &viewProjectTransform) const
+void ContainerObject::render(const glm::mat4x4 &viewProjectTransform)
 {
 	for (auto object : m_DrawableObjectPtrs) {
 		object->render(viewProjectTransform);

@@ -51,7 +51,7 @@ bool VortonOctHeapElement::hasChildren()
 
 glm::vec3 VortonOctHeapElement::calculateVelocity(const glm::vec3 & position)
 {
-	if (fsmath::insideBox(position, m_Supervorton.getPosition() - (m_Extent / 2.0f), m_Extent)) {
+	if (fsmath::insideBox(position, m_Supervorton.position() - (m_Extent / 2.0f), m_Extent)) {
 		return calculateVelocityAccurate(position);
 	}
 	else {

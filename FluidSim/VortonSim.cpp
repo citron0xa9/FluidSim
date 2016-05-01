@@ -2,27 +2,10 @@
 #include "VortonSim.h"
 #include <glm/mat3x3.hpp>
 #include "fsmath.h"
+#include "Log.h"
 
 const size_t VortonSim::m_VORTONS_PER_DIMENSION = 16;
 const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
-
-#if 0
-VortonSim::VortonSim(const VortonSim & sim)
-	: ActiveObject( sim ), DrawableObject( sim ), Object( sim ), ContainerObject(),	//dont copy container data
-	//copy first part of sim data
-	m_Viscosity{ sim.m_Viscosity }, m_Density{ sim.m_Density }, m_Vortons{ sim.m_Vortons }, m_Tracers{ sim.m_Tracers }, m_VortonsRendered {sim.m_VortonsRendered},
-	m_TracersRendered{sim.m_TracersRendered}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr}, m_TracerRenderProgPtr{ sim.m_TracerRenderProgPtr }
-{
-	//copy container data
-	//copy objects
-	for (auto objectPtr : sim.m_ObjectPtrs) {
-		Object *copiedObject = objectPtr->copy();
-		m_ObjectPtrs.push_back(copiedObject);
-		copiedObject->setContainerObject(*this);
-		copiedObject->registerContainerObjectHooks();
-	}
-}
-#endif
 
 VortonSim::VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype)
 	: ActiveObject{ container }, DrawableObject{ container }, Object{ container }, m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
@@ -30,6 +13,17 @@ VortonSim::VortonSim(ContainerObject &container, float viscosity, float density,
 {
 	initializeVortons(initialVorticity, vorticityMagnitude, vortonPrototype);
 	initializeTracers(initialVorticity);
+	setupTracerRenderProgram();
+}
+
+VortonSim::VortonSim(const VortonSim & original)
+	: ActiveObject{*original.m_ContainerObjectPtr}, DrawableObject{ *original.m_ContainerObjectPtr }, Object{original},
+	m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
+	m_VortonsRendered{original.m_VortonsRendered}, m_TracersRendered{original.m_TracersRendered}, m_TracerVerticesBuf{false}, m_TracerVao{false},
+	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}
+{
+	initializeVortons(original);
+	initializeTracers(original);
 	setupTracerRenderProgram();
 }
 
@@ -46,7 +40,7 @@ VortonSim::~VortonSim()
 void VortonSim::step(float secondsPassed)
 {
 	ContainerObject::step(secondsPassed);
-	Update(secondsPassed);
+	update(secondsPassed);
 }
 
 void VortonSim::render(const glm::mat4x4 & viewProjectTransform)
@@ -69,40 +63,41 @@ void VortonSim::registerContainerObjectHooks()
 	DrawableObject::registerContainerObjectHooks();
 }
 
-void VortonSim::Update(float seconds)
+void VortonSim::update(float seconds)
 {
-	CreateOctHeap();
+	createOctHeap();
 	
-	CalculateVelocityGrid();
+	calculateVelocityGrid();
 
-	StretchAndTiltVortons(seconds);
+	stretchAndTiltVortons(seconds);
 
-	DiffuseVorticityPSE(seconds);
+	diffuseVorticityPSE(seconds);
 
 	advectVortons(seconds);
 	advectTracers(seconds);
 }
 
-void VortonSim::setVortonsRendered(bool areRendered)
+void VortonSim::vortonsRendered(bool areRendered)
 {
 	m_VortonsRendered = areRendered;
 }
 
-void VortonSim::setTracersRendered(bool areRendered)
+void VortonSim::tracersRendered(bool areRendered)
 {
 	m_TracersRendered = areRendered;
 }
 
 Object * VortonSim::copy() const
 {
-	return nullptr;
+	WARNING("VortonsSim::copy used");
+	return new VortonSim(*this);
 }
 
 void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype)
 {
 	glm::vec3 minCorner = initialVorticity.minCorner();
 	//glm::vec3 maxCorner = minCorner + initialVorticity.getDomainSize();
-	glm::vec3 vortonDistance = initialVorticity.getDomainSize() / static_cast<float>(m_VORTONS_PER_DIMENSION);
+	glm::vec3 vortonDistance = initialVorticity.domainSize() / static_cast<float>(m_VORTONS_PER_DIMENSION);
 	float vortonRadius = std::cbrt(vortonDistance.x * vortonDistance.y * vortonDistance.z) * 0.5f;
 
 	for (int xIndex = 0; xIndex < m_VORTONS_PER_DIMENSION; xIndex++) {
@@ -113,8 +108,8 @@ void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity
 					vortonDistance.y * yIndex,
 					vortonDistance.z * zIndex);
 				position += minCorner;
-				Vorton vorton(vortonPrototype, position, initialVorticity.getVorticityAtPosition(position) * vorticityMagnitude);
-				vorton.setContainerObject(*this);
+				Vorton vorton(vortonPrototype, position, initialVorticity.vorticityAtPosition(position) * vorticityMagnitude);
+				vorton.containedIn(*this);
 				vorton.radius(vortonRadius);
 				if (glm::length(vorton.vorticity()) > SIGNIFICANT_VORTICITY) {
 					m_Vortons.push_back(vorton);
@@ -124,11 +119,20 @@ void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity
 	}	
 }
 
+void VortonSim::initializeVortons(const VortonSim & original)
+{
+	for (auto & originalVorton : original.m_Vortons) {
+		Vorton vorton(originalVorton);
+		vorton.containedIn(*this);
+		m_Vortons.push_back(vorton);
+	}
+}
+
 void VortonSim::initializeTracers(const VorticityDistribution & initialVorticity)
 {
 	glm::vec3 minCorner = initialVorticity.minCorner();
 	//glm::vec3 maxCorner = minCorner + initialVorticity.getDomainSize();
-	glm::vec3 tracerDistance = initialVorticity.getDomainSize() / static_cast<float>(m_TRACERS_PER_DIMENSION);
+	glm::vec3 tracerDistance = initialVorticity.domainSize() / static_cast<float>(m_TRACERS_PER_DIMENSION);
 
 	for (int xIndex = 0; xIndex < m_TRACERS_PER_DIMENSION; xIndex++) {
 		for (int yIndex = 0; yIndex < m_TRACERS_PER_DIMENSION; yIndex++) {
@@ -139,13 +143,30 @@ void VortonSim::initializeTracers(const VorticityDistribution & initialVorticity
 					tracerDistance.z * zIndex);
 				position += minCorner;
 				m_Tracers.emplace_back(*this);
-				m_Tracers.back().setPosition(position);
+				m_Tracers.back().position(position);
 				for (int i = 0; i < 3; i++) {
 					m_TracerVerticesRAM.push_back(position[i]);
 				}
 			}
 		}
 	}
+	m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
+	m_TracerVao.addVertexAttribArray(m_TracerVerticesBuf, true, false, m_TracerRenderProg.vertexPositionIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
+	m_TracerVao.enableVertexAttribArray(false, m_TracerRenderProg.vertexPositionIndex());
+	m_TracerVao.unbind();
+}
+
+void VortonSim::initializeTracers(const VortonSim & original)
+{
+	for (auto & originalTracer : original.m_Tracers) {
+		glm::vec3 position = originalTracer.position();
+		m_Tracers.emplace_back(*this);
+		m_Tracers.back().position(position);
+		for (int i = 0; i < 3; i++) {
+			m_TracerVerticesRAM.push_back(position[i]);
+		}
+	}
+
 	m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
 	m_TracerVao.addVertexAttribArray(m_TracerVerticesBuf, true, false, m_TracerRenderProg.vertexPositionIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
 	m_TracerVao.enableVertexAttribArray(false, m_TracerRenderProg.vertexPositionIndex());
@@ -169,7 +190,7 @@ void VortonSim::setupTracerRenderProgram()
 	m_TracerRenderProg.detachAllShaders();
 }
 
-void VortonSim::CreateOctHeap()
+void VortonSim::createOctHeap()
 {
 	if (m_VortonHeapPtr != nullptr) {
 		delete m_VortonHeapPtr;
@@ -177,16 +198,16 @@ void VortonSim::CreateOctHeap()
 	m_VortonHeapPtr = new VortonOctHeap(m_Vortons);
 }
 
-void VortonSim::CalculateVelocityGrid()
+void VortonSim::calculateVelocityGrid()
 {
 	size_t numPoints = m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION;
 	if (m_VelocityGridPtr != nullptr) {
 		delete m_VelocityGridPtr;
 	}
 
-	auto gridDimensions = getVelocityGridDimensions();
+	auto gridDimensions = velocityGridDimensions();
 
-	m_VelocityGridPtr = new UniformGrid<glm::vec3>(numPoints, gridDimensions.first, gridDimensions.second, false);
+	m_VelocityGridPtr = new UniformGrid<glm::vec3>(numPoints, gridDimensions.first, gridDimensions.second);
 	
 	//loop over every point in uniform grid
 	size_t velocityGridOffset = 0;
@@ -195,7 +216,7 @@ void VortonSim::CalculateVelocityGrid()
 	for (size_t zIndex = 0; zIndex < m_VelocityGridPtr->pointsAmount().z; zIndex++) {
 		for (size_t yIndex = 0; yIndex < m_VelocityGridPtr->pointsAmount().y; yIndex++) {
 			for (size_t xIndex = 0; xIndex < m_VelocityGridPtr->pointsAmount().x; xIndex++) {
-				m_VelocityGridPtr->atOffset(velocityGridOffset) = CalculateVelocity(currentGridPosition);
+				m_VelocityGridPtr->atOffset(velocityGridOffset) = calculateVelocity(currentGridPosition);
 				velocityGridOffset++;
 				currentGridPosition.x += m_VelocityGridPtr->cellExtent().x;
 			}
@@ -207,19 +228,19 @@ void VortonSim::CalculateVelocityGrid()
 	}
 }
 
-glm::vec3 VortonSim::CalculateVelocity(const glm::vec3 & position)
+glm::vec3 VortonSim::calculateVelocity(const glm::vec3 & position)
 {
 	assert(m_VortonHeapPtr != nullptr);
 	return (m_VortonHeapPtr->root().calculateVelocity(position));
 }
 
-void VortonSim::StretchAndTiltVortons(float seconds)
+void VortonSim::stretchAndTiltVortons(float seconds)
 {
 	UniformGrid<glm::mat3x3> velocityJacobianGrid(*m_VelocityGridPtr);
 	fsmath::computeJacobian(velocityJacobianGrid, *m_VelocityGridPtr);
 
 	for (auto &vorton : m_Vortons) {
-		glm::mat3x3 velocityJacobian = velocityJacobianGrid.interpolate(vorton.getPosition());
+		glm::mat3x3 velocityJacobian = velocityJacobianGrid.interpolate(vorton.position());
 
 		glm::vec3 stretchTilt = vorton.vorticity() * velocityJacobian;
 		glm::vec3 newVorticity = vorton.vorticity() + 0.5f * stretchTilt * seconds;	//0.5 is fudge factor for stability
@@ -228,15 +249,15 @@ void VortonSim::StretchAndTiltVortons(float seconds)
 	}
 }
 
-void VortonSim::DiffuseVorticityPSE(float seconds)
+void VortonSim::diffuseVorticityPSE(float seconds)
 {
 	for (auto leafs = m_VortonHeapPtr->leafs(); leafs.first != leafs.second; leafs.first++) {
 		Supervorton &currentSupervorton = leafs.first->supervorton();
-		DiffuseVorticityInside(seconds, currentSupervorton.containedVortonPtrs());
+		diffuseVorticityInside(seconds, currentSupervorton.containedVortonPtrs());
 
 		for (auto neighborPtr : leafs.first->forwardNeighbors()) {
 			Supervorton &neighborSupervorton = neighborPtr->supervorton();
-			DiffuseVorticityBetween(seconds, currentSupervorton.containedVortonPtrs(), neighborSupervorton.containedVortonPtrs());
+			diffuseVorticityBetween(seconds, currentSupervorton.containedVortonPtrs(), neighborSupervorton.containedVortonPtrs());
 		}
 
 		//dissipate vorticity
@@ -246,25 +267,25 @@ void VortonSim::DiffuseVorticityPSE(float seconds)
 	}
 }
 
-void VortonSim::DiffuseVorticityInside(float seconds, std::vector<Vorton*>& vortonPtrs)
+void VortonSim::diffuseVorticityInside(float seconds, std::vector<Vorton*>& vortonPtrs)
 {
 	for (auto outerIterator = vortonPtrs.begin(); outerIterator != vortonPtrs.end(); outerIterator++) {
 		for (auto innerIterator = outerIterator + 1; innerIterator < vortonPtrs.end(); innerIterator++) {
-			DiffuseVorticityBetween(seconds, **outerIterator, **innerIterator);
+			diffuseVorticityBetween(seconds, **outerIterator, **innerIterator);
 		}
 	}
 }
 
-void VortonSim::DiffuseVorticityBetween(float seconds, std::vector<Vorton*>& firstVortonPtrs, std::vector<Vorton*>& secondVortonPtrs)
+void VortonSim::diffuseVorticityBetween(float seconds, std::vector<Vorton*>& firstVortonPtrs, std::vector<Vorton*>& secondVortonPtrs)
 {
 	for (auto outerIterator = firstVortonPtrs.begin(); outerIterator != firstVortonPtrs.end(); outerIterator++) {
 		for (auto innerIterator = secondVortonPtrs.begin(); innerIterator != secondVortonPtrs.end(); innerIterator++) {
-			DiffuseVorticityBetween(seconds, **outerIterator, **innerIterator);
+			diffuseVorticityBetween(seconds, **outerIterator, **innerIterator);
 		}
 	}
 }
 
-void VortonSim::DiffuseVorticityBetween(float seconds, Vorton & first, Vorton & second)
+void VortonSim::diffuseVorticityBetween(float seconds, Vorton & first, Vorton & second)
 {
 	glm::vec3 vorticityDifference = first.vorticity() - second.vorticity();
 	glm::vec3 exchange = 2 * m_Viscosity * seconds * vorticityDifference;
@@ -275,7 +296,7 @@ void VortonSim::DiffuseVorticityBetween(float seconds, Vorton & first, Vorton & 
 void VortonSim::advectVortons(float secondsPassed)
 {
 	for (auto &vorton : m_Vortons) {
-		glm::vec3 positionChange = m_VelocityGridPtr->interpolate(vorton.getPosition()) * secondsPassed;
+		glm::vec3 positionChange = m_VelocityGridPtr->interpolate(vorton.position()) * secondsPassed;
 		vorton.translate(positionChange);
 	}
 }
@@ -284,14 +305,14 @@ void VortonSim::advectTracers(float secondsPassed)
 {
 
 	for (int i = 0; i < m_Tracers.size(); i++) {
-		glm::vec3 positionChange = m_VelocityGridPtr->interpolate(m_Tracers[i].getPosition()) * secondsPassed;
+		glm::vec3 positionChange = m_VelocityGridPtr->interpolate(m_Tracers[i].position()) * secondsPassed;
 		m_Tracers[i].translate(positionChange);
 
 		//update m_TracerVericesRAM
-		glm::vec3 tracerPosition = m_Tracers[i].getPosition();
+		glm::vec3 tracerPosition = m_Tracers[i].position();
 		size_t iterationCounter = 0;
 		for (int j = i*3; j < (i*3+3); j++) {
-			m_TracerVerticesRAM[j] = tracerPosition[iterationCounter++];
+			m_TracerVerticesRAM[j] = static_cast<GLfloat>(tracerPosition[iterationCounter++]);
 		}
 	}
 	/*m_TracerVao.bind();
@@ -307,25 +328,25 @@ void VortonSim::renderTracers(const glm::mat4x4 & viewProjectTransform)
 
 	m_TracerRenderProg.loadModelViewProjectTransform(viewProjectTransform);
 	m_TracerRenderProg.use();
-	glDrawArrays(GL_POINTS, 0, m_Tracers.size());
+	glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(m_Tracers.size()));
 	m_TracerVao.unbind();
 	
 }
 
-std::pair<glm::vec3, glm::vec3> VortonSim::getVelocityGridDimensions()
+std::pair<glm::vec3, glm::vec3> VortonSim::velocityGridDimensions()
 {
 	//find min corner and max corner
 	glm::vec3 minCorner = m_VortonHeapPtr->minCorner();
 	glm::vec3 maxCorner = minCorner + m_VortonHeapPtr->extent();
 
 	for (auto & tracer : m_Tracers) {
-		minCorner = fsmath::allMin(tracer.getPosition(), minCorner);
-		maxCorner = fsmath::allMax(tracer.getPosition(), maxCorner);
+		minCorner = fsmath::allMin(tracer.position(), minCorner);
+		maxCorner = fsmath::allMax(tracer.position(), maxCorner);
 	}
 
 	for (auto & vorton : m_Vortons) {
-		minCorner = fsmath::allMin(vorton.getPosition(), minCorner);
-		maxCorner = fsmath::allMax(vorton.getPosition(), maxCorner);
+		minCorner = fsmath::allMin(vorton.position(), minCorner);
+		maxCorner = fsmath::allMax(vorton.position(), maxCorner);
 	}
 
 	//return dimensions as minCorner, maxCorner

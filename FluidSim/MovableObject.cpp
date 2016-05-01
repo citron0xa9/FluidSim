@@ -1,7 +1,7 @@
 #include "MovableObject.h"
 
 
-MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}
+MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}, m_MovementVelocityFactor{4.0f}
 {
 }
 
@@ -9,24 +9,44 @@ MovableObject::~MovableObject()
 {
 }
 
-void MovableObject::addForwardVelocity(float velocity)
+void MovableObject::startMoveForward()
 {
-	addLocalVelocity(m_ForwardVector*velocity);
+	m_LocalVelocity += m_MovementVelocityFactor * m_ForwardVector;
 }
 
-void MovableObject::addBackwardVelocity(float velocity)
+void MovableObject::startMoveLeft()
 {
-	addLocalVelocity(m_BackwardVector*velocity);
+	m_LocalVelocity += m_MovementVelocityFactor * m_LeftVector;
 }
 
-void MovableObject::addLeftVelocity(float velocity)
+void MovableObject::startMoveRight()
 {
-	addLocalVelocity(m_LeftVector*velocity);
+	m_LocalVelocity += m_MovementVelocityFactor * m_RightVector;
 }
 
-void MovableObject::addRightVelocity(float velocity)
+void MovableObject::startMoveBack()
 {
-	addLocalVelocity(m_RightVector*velocity);
+	m_LocalVelocity += m_MovementVelocityFactor * m_BackwardVector;
+}
+
+void MovableObject::stopMoveForward()
+{
+	m_LocalVelocity -= m_MovementVelocityFactor * m_ForwardVector;
+}
+
+void MovableObject::stopMoveLeft()
+{
+	m_LocalVelocity -= m_MovementVelocityFactor * m_LeftVector;
+}
+
+void MovableObject::stopMoveRight()
+{
+	m_LocalVelocity -= m_MovementVelocityFactor * m_RightVector;
+}
+
+void MovableObject::stopMoveBack()
+{
+	m_LocalVelocity -= m_MovementVelocityFactor * m_BackwardVector;
 }
 
 void MovableObject::step(float secondsPassed)

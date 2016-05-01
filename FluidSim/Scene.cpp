@@ -1,5 +1,8 @@
 #include "Scene.h"
 #include <chrono>
+#include "Log.h"
+
+const unsigned int Scene::m_STEP_TIME_MS = 15;
 
 Scene::Scene() : m_Camera{*this}, m_Alive{true}
 {
@@ -15,24 +18,41 @@ Scene::~Scene()
 	for (auto geometryPtr : m_GeometriePtrs) {
 		delete geometryPtr;
 	}
-	for (auto &elem : m_ProgramPtrs) {
-		delete elem.second;
+	for (auto &programPtr : m_ProgramPtrs) {
+		delete programPtr;
 	}
 }
 
 void Scene::stepLoop()
 {
-	int stepTimeMilliseconds = 15;
+	static const unsigned int runningBehindThresholdFactor = 10;
+
+	auto timeBeforeLastStep = std::chrono::steady_clock::now();
 	while (m_Alive) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(stepTimeMilliseconds));
-		step(stepTimeMilliseconds / 1000.0f);
+
+		float secondsPassed = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - timeBeforeLastStep).count()) / 1000.0f;
+		if ((secondsPassed*1000) > (runningBehindThresholdFactor * m_STEP_TIME_MS)) {
+			WARNING(std::string("stepLoop: Step takes to long! (took ") + std::to_string(secondsPassed) + std::string(" seconds)"));
+			secondsPassed = m_STEP_TIME_MS / 1000.0f;
+		}
+
+		int leftMilliseconds = m_STEP_TIME_MS - static_cast<unsigned int>(secondsPassed * 1000);
+		if (leftMilliseconds > 0) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(m_STEP_TIME_MS));
+			secondsPassed = m_STEP_TIME_MS / 1000.0f;
+		}
+
+		timeBeforeLastStep = std::chrono::steady_clock::now();
+		step(secondsPassed);
 	}
 }
 
 void Scene::addLightSource(LightSource &lightSource)
 {
 	m_LightSourcePtrs.push_back(&lightSource);
-	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [this](std::pair<const GLuint, Program*> &elem){(elem.second)->loadLights(m_LightSourcePtrs); });
+	for (auto programPtr : m_ProgramPtrs) {
+		programPtr->loadLights(m_LightSourcePtrs);
+	}
 }
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
@@ -51,16 +71,18 @@ Material& Scene::addMaterial(const Material &material)
 Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVars)
 {
 	Program *newProg = new Program{ lightVars };
-	return *((*((m_ProgramPtrs.insert(std::make_pair(newProg->id(), newProg))).first)).second);
+	m_ProgramPtrs.push_back(newProg);
+	return *m_ProgramPtrs.back();
 }
 
 void Scene::render()
 {
-	//call render on each object
 	glm::mat4x4 viewProjectTransform = m_Camera.viewPerspectiveTransform();
+	glm::vec3 cameraPosition = m_Camera.position();
 
-	glm::vec3 camPosition = m_Camera.getPosition();
-	std::for_each(m_ProgramPtrs.begin(), m_ProgramPtrs.end(), [&camPosition](std::pair<const GLuint, Program*> &elem){(elem.second)->loadCameraPosition(camPosition); });
+	for (auto programPtr : m_ProgramPtrs) {
+		programPtr->loadCameraPosition(cameraPosition);
+	}
 	
 	ContainerObject::render(viewProjectTransform);
 }
@@ -71,7 +93,7 @@ void Scene::aspectRatio(float ratio)
 	m_Camera.aspectRatio(ratio);
 }
 
-Camera& Scene::getCamera()
+Camera& Scene::camera()
 {
 	return m_Camera;
 }

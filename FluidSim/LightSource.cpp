@@ -15,7 +15,7 @@ LightSource::~LightSource()
 
 void LightSource::registerContainerObjectHooks()
 {
-	registerSceneHooks(static_cast<Scene&>(*m_ContainerObjPtr));
+	registerSceneHooks(static_cast<Scene&>(*m_ContainerObjectPtr));
 }
 
 void LightSource::registerSceneHooks(Scene & scene)

@@ -14,7 +14,7 @@ void cli() {
 		try {
 			std::string cmd;
 			std::cin >> cmd;
-			GLViewer *inst = GLViewer::getInstance();
+			GLViewer *inst = GLViewer::instance();
 			if (inst == nullptr) {
 				throw std::runtime_error("Command entered but no instance of glviewer available");
 			}
@@ -28,7 +28,7 @@ void cli() {
 			else if (cmd == "setCameraFovY") {
 				float f;
 				std::cin >> f;
-				inst->getScene().getCamera().fovY(f);
+				inst->scene().camera().fovY(f);
 			}
 			else if (cmd == "exit") {
 				break;

@@ -17,12 +17,12 @@ glm::vec3 VorticityDistribution::minCorner() const
 	return (m_Center - (m_DomainSize / 2.0f));
 }
 
-glm::vec3 VorticityDistribution::getDomainSize() const
+glm::vec3 VorticityDistribution::domainSize() const
 {
 	return m_DomainSize;
 }
 
-glm::vec3 VorticityDistribution::getCenter() const
+glm::vec3 VorticityDistribution::center() const
 {
 	return m_Center;
 }
@@ -41,12 +41,12 @@ JetRingVorticityDistribution::~JetRingVorticityDistribution()
 {
 }
 
-glm::vec3 JetRingVorticityDistribution::getVorticityAtPosition(const glm::vec3 & position) const
+glm::vec3 JetRingVorticityDistribution::vorticityAtPosition(const glm::vec3 & position) const
 {
-	glm::vec3 centerToPositionVec = position - getCenter();
+	glm::vec3 centerToPositionVec = position - center();
 	float projectionOnAxis = glm::dot(centerToPositionVec, m_Direction);
 
-	glm::vec3 closestPointOnAxis = getCenter() + m_Direction * projectionOnAxis;  // closest point on axis to vorton position
+	glm::vec3 closestPointOnAxis = center() + m_Direction * projectionOnAxis;  // closest point on axis to vorton position
 	glm::vec3 outwardDirection = position - closestPointOnAxis;							// direction radially outward from annulus core
 	float outwardDirectionLen = glm::length(outwardDirection);						// distance from axis
 

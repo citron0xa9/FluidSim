@@ -13,5 +13,5 @@ ActiveObject::~ActiveObject()
 
 void ActiveObject::registerContainerObjectHooks()
 {
-	m_ContainerObjPtr->addActiveObject(*this);
+	m_ContainerObjectPtr->addActiveObject(*this);
 }

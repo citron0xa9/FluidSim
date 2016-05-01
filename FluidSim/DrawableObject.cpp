@@ -13,5 +13,5 @@ DrawableObject::~DrawableObject()
 
 void DrawableObject::registerContainerObjectHooks()
 {
-	m_ContainerObjPtr->addDrawableObject(*this);
+	m_ContainerObjectPtr->addDrawableObject(*this);
 }

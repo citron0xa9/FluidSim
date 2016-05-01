@@ -46,7 +46,7 @@ void TriangleNetObject::geometry(Geometry * geometryPtr)
 	m_GeometryPtr = geometryPtr;
 }
 
-void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform) const
+void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
 {
 	if (m_ProgramPtr == nullptr || m_GeometryPtr == nullptr || m_MaterialPtr == nullptr) {
 		throw std::runtime_error("TriangleNetObject: Can't render because needed Pointer is missing");

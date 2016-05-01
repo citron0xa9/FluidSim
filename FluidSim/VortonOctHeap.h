@@ -35,7 +35,7 @@ private:
 	size_t indexForIndices(const glm::uvec3 &indices);
 	glm::uvec3 indicesForIndex(size_t index);
 
-	size_t firstLeafIndex() const;
+	size_t calculateFirstLeafIndex() const;
 
 	bool isInsideBoundingBox(const glm::vec3 &position);
 	

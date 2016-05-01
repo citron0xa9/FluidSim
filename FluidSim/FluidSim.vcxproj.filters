@@ -126,9 +126,6 @@
     <ClInclude Include="VortonOctHeap.h">
       <Filter>Header Files\Space</Filter>
     </ClInclude>
-    <ClInclude Include="VortonSim.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VorticityDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -146,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="DrawableObject.h">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="VortonSim.h">
+      <Filter>Header Files\Objects\Sim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,9 +200,6 @@
     <ClCompile Include="VertexBufO.cpp">
       <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="CellPointsIterator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UniformGridGeometry.cpp">
       <Filter>Source Files\Space</Filter>
     </ClCompile>
@@ -221,28 +218,28 @@
     <ClCompile Include="Supervorton.cpp">
       <Filter>Source Files\Objects\Sim</Filter>
     </ClCompile>
-    <ClCompile Include="VortonSim.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VorticityDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MovableObject.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ActiveObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContainerObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fsmath.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
     <ClCompile Include="DrawableObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonSim.cpp">
+      <Filter>Source Files\Objects\Sim</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ActiveObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -253,5 +250,6 @@
     <None Include="shaders\basic.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

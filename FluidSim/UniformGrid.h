@@ -10,8 +10,8 @@ class UniformGrid : public UniformGridGeometry
 {
 public:
 	UniformGrid(const UniformGrid &that) = delete;
-	UniformGrid(size_t numElements, const glm::vec3 &minCorner, const glm::vec3 &maxCorner, bool bPowerOf2)
-		: UniformGridGeometry(numElements, minCorner, maxCorner, bPowerOf2)
+	UniformGrid(size_t numElements, const glm::vec3 &minCorner, const glm::vec3 &maxCorner)
+		: UniformGridGeometry(numElements, minCorner, maxCorner)
 	{
 		init();
 	}
@@ -42,7 +42,7 @@ private:
 	glm::uvec3 getResponsiblePointIndices(const glm::vec3 &position) const;
 	size_t offsetForIndices(const glm::uvec3 &indices) const;
 
-	std::vector<size_t> cellPointsOffsets(size_t startOffset) const;
+	std::vector<size_t> calculateCellPointsOffsets(size_t startOffset) const;
 
 	std::vector<ItemT> m_Points;
 };
@@ -60,7 +60,7 @@ inline ItemT UniformGrid<ItemT>::interpolate(const glm::vec3 & position) const
 	glm::vec3 relativePositionNormalized = (position - minCorner()) / cellExtent() - glm::vec3(responsiblePointIndices);
 	glm::vec3 oneMinusRelativePositionNormalized = glm::vec3(1) - relativePositionNormalized;
 
-	std::vector<size_t> cellPointsOffsets = cellPointsOffsets(offsetForIndices(responsiblePointIndices));
+	std::vector<size_t> cellPointsOffsets = calculateCellPointsOffsets(offsetForIndices(responsiblePointIndices));
 
 	return (oneMinusRelativePositionNormalized.x* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[0])
 		+ relativePositionNormalized.x			* oneMinusRelativePositionNormalized.y	* oneMinusRelativePositionNormalized.z	* atOffset(cellPointsOffsets[1])
@@ -99,7 +99,7 @@ inline size_t UniformGrid<ItemT>::offsetForIndices(const glm::uvec3 & indices) c
 }
 
 template<class ItemT>
-inline std::vector<size_t> UniformGrid<ItemT>::cellPointsOffsets(size_t startOffset) const
+inline std::vector<size_t> UniformGrid<ItemT>::calculateCellPointsOffsets(size_t startOffset) const
 {
 	size_t xyPointsAmount = pointsAmount().x * pointsAmount().y;
 

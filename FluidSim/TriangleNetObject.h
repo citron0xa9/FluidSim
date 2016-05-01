@@ -13,7 +13,7 @@ public:
 
 	virtual Object* copy() const override;
 
-	virtual void render(const glm::mat4x4 &viewProjectTransform) const override;
+	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 
 	const Program& program() const;
 	void program(Program *programPtr);

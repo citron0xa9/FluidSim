@@ -12,40 +12,40 @@ class GLViewer {
 public:
 	static void initInstance(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]);
 	static void deleteInstance();
-	static GLViewer* getInstance();
+	static GLViewer* instance();
 
 	virtual ~GLViewer();
 	static void MainLoop(void);
 
-	void setWidth(int width);
-	int getWidth() const;
+	void width(int width);
+	int width() const;
 
-	void setHeight(int height);
-	int getHeight() const;
+	void height(int height);
+	int height() const;
 
-	std::string getTitlePrefix() const;
+	std::string titlePrefix() const;
 
-	void setTitle(const std::string& title);
+	void title(const std::string& title);
 
-	void setFrameCount(const unsigned int count);
-	unsigned int getFrameCount() const;
+	void frameCount(const unsigned int count);
+	unsigned int frameCount() const;
 	void incrementFrameCount();
 
-	Scene& getScene();
+	Scene& scene();
 private:
 	GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]);
 	GLViewer(const GLViewer& v) = delete;
 
 	static void cleanup();
 
-	static void ResizeFunction(int width, int height);
-	static void RenderFunction(void);
-	static void IdleFunction(void);
-	static void Timer_FPS(int value);
-	static void KeyboardFunction(unsigned char key, int x, int y);
-	static void KeyboardFunctionUp(unsigned char key, int x, int y);
-	static void MouseFunction(int button, int state, int x, int y);
-	static void MouseMotionFunction(int x, int y);
+	static void resizeFunction(int width, int height);
+	static void renderFunction(void);
+	static void idleFunction(void);
+	static void timerFPS(int value);
+	static void keyboardFunction(unsigned char key, int x, int y);
+	static void keyboardFunctionUp(unsigned char key, int x, int y);
+	static void mouseFunction(int button, int state, int x, int y);
+	static void mouseMotionFunction(int x, int y);
 
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;
 
@@ -62,5 +62,6 @@ private:
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;
+	static const float m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION;
 };
 

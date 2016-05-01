@@ -20,7 +20,7 @@ public:
 	glm::vec3 lookDirection() const;
 
 protected:
-	virtual void rotate(float degrees, const glm::vec3 &axis) override;
+	virtual void rotate(float radians, const glm::vec3 &axis) override;
 
 private:
 	void calculatePerspectiveTransform();

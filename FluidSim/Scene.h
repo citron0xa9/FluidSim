@@ -26,7 +26,7 @@ public:
 
 	void aspectRatio(float ratio);
 
-	Camera& getCamera();
+	Camera& camera();
 
 	void startStepping();
 
@@ -34,14 +34,15 @@ private:
 	void stepLoop();
 
 	Camera m_Camera;
-	//std::vector<Object*> m_ObjectPtrs;
 	std::list<LightSource*> m_LightSourcePtrs;
 
 	std::list<Geometry*> m_GeometriePtrs;
 	std::list<Material> m_Materials;
-	std::unordered_map<GLuint, Program*> m_ProgramPtrs;
+	std::list<Program*> m_ProgramPtrs;
 
 	std::thread m_StepLoopThread;
 	bool m_Alive;
+
+	static const unsigned int m_STEP_TIME_MS;
 };
 

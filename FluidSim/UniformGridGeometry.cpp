@@ -7,9 +7,9 @@
 //{
 //}
 
-UniformGridGeometry::UniformGridGeometry(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner, bool bPowerOf2)
+UniformGridGeometry::UniformGridGeometry(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner)
 {
-	defineShape(numElements, minCorner, maxCorner, bPowerOf2);
+	defineShape(numElements, minCorner, maxCorner);
 }
 
 
@@ -17,12 +17,12 @@ UniformGridGeometry::~UniformGridGeometry()
 {
 }
 
-void UniformGridGeometry::defineShape(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner, bool bPowerOf2)
+void UniformGridGeometry::defineShape(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner)
 {
 	m_MinCorner = minCorner;
 	calculateGridExtent(minCorner, maxCorner);
 
-	calculatePointsAmount(numElements, bPowerOf2);
+	calculatePointsAmount(numElements);
 
 	//compute final spacing using the calculated number of points
 	calculateSpacing();
@@ -35,7 +35,7 @@ void UniformGridGeometry::calculateSpacing()
 	m_CellsPerExtent = glm::vec3(1) / m_CellExtent;
 }
 
-void UniformGridGeometry::calculatePointsAmount(size_t numElements, bool bPowerOf2)
+void UniformGridGeometry::calculatePointsAmount(size_t numElements)
 {
 	const float volume = m_GridExtent.x * m_GridExtent.y * m_GridExtent.z;
 	const float cellLength = std::cbrt(volume / numElements);  //first calculate temporary uniform length, cbrt = cubic root
@@ -46,13 +46,6 @@ void UniformGridGeometry::calculatePointsAmount(size_t numElements, bool bPowerO
 		std::ceil(m_GridExtent.z / cellLength));
 
 	//adjust number of cells
-	if (bPowerOf2)
-	{   // Choose number of gridcells to be powers of 2.
-		// This will simplify subdivision in a NestedGrid.
-		numCells.x = fsmath::nextPowerOf2(numCells.x);
-		numCells.y = fsmath::nextPowerOf2(numCells.y);
-		numCells.z = fsmath::nextPowerOf2(numCells.z);
-	}
 	while (numCells.x * numCells.y * numCells.z >= numElements * 8)
 	{   // Grid capacity is excessive.
 		// This can occur when the trial numCells is below 0.5 in which case the integer arithmetic loses the subtlety.

@@ -9,6 +9,7 @@ const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
 	: m_NullSupervorton(vortons.back())
 {
+	m_NullSupervorton.radius(vortons.back().radius());
 	if (vortons.empty()) {
 		std::runtime_error("VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons): given vorton vector is empty");
 	}
@@ -32,7 +33,7 @@ VortonOctHeapElement & VortonOctHeap::root()
 std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> VortonOctHeap::leafs()
 {
 	assert(!m_Heap.empty());
-	std::vector<VortonOctHeapElement>::iterator begin = m_Heap.begin() + firstLeafIndex();
+	std::vector<VortonOctHeapElement>::iterator begin = m_Heap.begin() + calculateFirstLeafIndex();
 	return std::make_pair(begin, m_Heap.end());
 }
 
@@ -59,11 +60,11 @@ glm::vec3 VortonOctHeap::extent() const
 
 void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 {
-	glm::vec3 minCorner = vortons[0].getPosition();
-	glm::vec3 maxCorner = vortons[0].getPosition();
+	glm::vec3 minCorner = vortons[0].position();
+	glm::vec3 maxCorner = vortons[0].position();
 	for (auto& vorton : vortons) {
-		minCorner = fsmath::allMin(minCorner, vorton.getPosition());
-		maxCorner = fsmath::allMax(maxCorner, vorton.getPosition());
+		minCorner = fsmath::allMin(minCorner, vorton.position());
+		maxCorner = fsmath::allMax(maxCorner, vorton.position());
 	}
 	m_MinCorner = minCorner;
 	m_Extent = maxCorner - minCorner;
@@ -73,7 +74,7 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 void VortonOctHeap::subdivide(float maxVolume)
 {
 	float volume = m_Extent.x * m_Extent.y * m_Extent.z;
-	size_t divisions = std::ceil(std::log2(volume/maxVolume) / std::log2(8));
+	size_t divisions = static_cast<size_t>(std::ceil(std::log2(volume/maxVolume) / std::log2(8)));
 	
 	subdivide(divisions);
 }
@@ -82,7 +83,7 @@ void VortonOctHeap::subdivide(size_t divisions)
 {
 	m_Divisions = divisions;
 	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
-	m_LeafsPerDimension = 1 << (divisions);	//2^divisions
+	m_LeafsPerDimension = static_cast<size_t>(1) << (divisions);	//2^divisions
 }
 
 void VortonOctHeap::createEmptyOctHeap()
@@ -99,16 +100,16 @@ void VortonOctHeap::createEmptyOctHeap()
 	size_t elementsPerDimension = 1;
 	size_t elementsPerDimensionSquared = 1;
 	for (size_t i = 0; i < heapSize; i++) {
-		if (i >= (currentElementDepthStartOffset + (1 << (currentElementDepth * 3)))) {	//(1 << (currentElementDepth * 3)) = 8^depth = element count in current depth layer
+		if (i >= (currentElementDepthStartOffset + (static_cast<size_t>(1) << (currentElementDepth * 3)))) {	//(1 << (currentElementDepth * 3)) = 8^depth = element count in current depth layer
 			//new depth reached
 			currentElementDepthStartOffset = i;
 			currentElementDepth++;
 			currentElementExtent /= 2;
 			currentElementCenter = m_MinCorner + (currentElementExtent / 2.0f);
-			elementsPerDimension = (1 << currentElementDepth);
+			elementsPerDimension = (static_cast<size_t>(1) << currentElementDepth);
 			elementsPerDimensionSquared = elementsPerDimension * elementsPerDimension;
 		}
-		m_NullSupervorton.setPosition(currentElementCenter);
+		m_NullSupervorton.position(currentElementCenter);
 		m_Heap.push_back(VortonOctHeapElement(i, m_NullSupervorton, *this, currentElementExtent));
 
 		//increase currentElementMinCorner
@@ -133,7 +134,7 @@ size_t VortonOctHeap::calculateNeededHeapSize()
 {
 	size_t heapSize = 0;
 	for (int exponent = 0; exponent <= m_Divisions; exponent++) {
-		heapSize += std::pow(8, exponent);
+		heapSize += static_cast<size_t>(std::pow(8, exponent));
 	}
 
 	return heapSize;
@@ -142,7 +143,7 @@ size_t VortonOctHeap::calculateNeededHeapSize()
 void VortonOctHeap::initializeLeafs(std::vector<Vorton>& vortons)
 {
 	for (auto& vorton : vortons) {
-		VortonOctHeapElement &responsibleLeaf = leaftAtPosition(vorton.getPosition());
+		VortonOctHeapElement &responsibleLeaf = leaftAtPosition(vorton.position());
 		responsibleLeaf.supervorton().addContainedVorton(vorton);
 	}
 }
@@ -150,7 +151,7 @@ void VortonOctHeap::initializeLeafs(std::vector<Vorton>& vortons)
 void VortonOctHeap::initializeParents()
 {
 	assert(!m_Heap.empty());
-	size_t childrenAmount = m_Heap.size() - firstLeafIndex();
+	size_t childrenAmount = m_Heap.size() - calculateFirstLeafIndex();
 	for (auto it = m_Heap.rbegin() + childrenAmount; it != m_Heap.rend(); it++) {
 		it->calculateSupervortonFromChildren();
 	}
@@ -177,12 +178,12 @@ size_t VortonOctHeap::indexForIndices(const glm::uvec3 & indices)
 			index |= onlyBit << (2 * i + j);
 		}
 	}
-	return firstLeafIndex() + index;
+	return calculateFirstLeafIndex() + index;
 }
 
 glm::uvec3 VortonOctHeap::indicesForIndex(size_t index)
 {
-	size_t firstLeafIndex = firstLeafIndex();
+	size_t firstLeafIndex = calculateFirstLeafIndex();
 	assert(index >= firstLeafIndex);
 	index -= firstLeafIndex;
 	//magic, no comments needed ;) TODO: add comments
@@ -198,9 +199,9 @@ glm::uvec3 VortonOctHeap::indicesForIndex(size_t index)
 	return indices;
 }
 
-size_t VortonOctHeap::firstLeafIndex() const
+size_t VortonOctHeap::calculateFirstLeafIndex() const
 {
-	return std::floor((m_Heap.size() - 1) / 8);
+	return static_cast<size_t>(std::floor((m_Heap.size() - 1) / 8));
 }
 
 

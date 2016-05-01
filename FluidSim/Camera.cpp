@@ -3,8 +3,6 @@
 #include <iostream>
 #include <glm/gtx/transform.hpp>
 
-glm::vec3 Camera::m_LocalLookDirection = m_ForwardVector;
-glm::vec3 Camera::m_UpVector = m_yAxis;
 
 Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far) :
 	MovableObject{ scene }, Object{ scene },
@@ -37,9 +35,9 @@ void Camera::calculatePerspectiveTransform()
 
 void Camera::calculateViewTransform()
 {
-	glm::vec3 position = getPosition();
-	glm::vec3 lookAt = position + glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection, 1.0));
-	m_ViewTransform = glm::lookAt(position, lookAt, m_UpVector);
+	glm::vec3 currentPosition = position();
+	glm::vec3 lookAt = currentPosition + glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection, 1.0));
+	m_ViewTransform = glm::lookAt(currentPosition, lookAt, m_UpVector);
 }
 
 void Camera::aspectRatio(float ratio)
@@ -72,11 +70,11 @@ glm::vec3 Camera::lookDirection() const
 	return glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection,1.0));
 }
 
-void Camera::rotate(float degrees, const glm::vec3 & axis)
+void Camera::rotate(float radians, const glm::vec3 & axis)
 {
-	if (degrees == 0) {
+	if (radians == 0) {
 		return;
 	}
-	Object::rotate(degrees, axis);
+	Object::rotate(radians, axis);
 	calculateViewPerspectiveTransform();
 }

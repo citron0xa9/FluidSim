@@ -20,6 +20,7 @@
 #include <glm/geometric.hpp>
 
 GLViewer* GLViewer::m_instance = nullptr;
+const float GLViewer::m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION = -0.001f;
 
 void GLViewer::initInstance(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]) {
 	if (m_instance != nullptr) {
@@ -34,7 +35,7 @@ void GLViewer::initInstance(const char* titlePrefix, unsigned int width, unsigne
 	m_instance = new GLViewer(titlePrefix, width, height, argc, argv);
 }
 
-GLViewer* GLViewer::getInstance() {
+GLViewer* GLViewer::instance() {
 	return m_instance;
 }
 
@@ -64,16 +65,16 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 		throw std::runtime_error("Failed to create window");
 	}
 
-	glutReshapeFunc(&ResizeFunction);
-	glutDisplayFunc(&RenderFunction);
-	glutIdleFunc(&IdleFunction);
-	glutTimerFunc(0, &Timer_FPS, 0);	//call Timer_FPS immediately if everything is set up
+	glutReshapeFunc(&resizeFunction);
+	glutDisplayFunc(&renderFunction);
+	glutIdleFunc(&idleFunction);
+	glutTimerFunc(0, &timerFPS, 0);	//call Timer_FPS immediately if everything is set up
 	glutCloseFunc(&cleanup);
 
-	glutMouseFunc(&MouseFunction);
-	glutMotionFunc(&MouseMotionFunction);
-	glutKeyboardFunc(&KeyboardFunction);
-	glutKeyboardUpFunc(&KeyboardFunctionUp);
+	glutMouseFunc(&mouseFunction);
+	glutMotionFunc(&mouseMotionFunction);
+	glutKeyboardFunc(&keyboardFunction);
+	glutKeyboardUpFunc(&keyboardFunctionUp);
 
 	glewExperimental = GL_TRUE;
 	GLenum glewInitResult = glewInit();
@@ -136,10 +137,12 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	//create and add object to scene
 	TriangleNetObject vortonPrototype{ m_Scene, &sphereMatRef, &geomSphere, &prog };
-	vortonPrototype.scale(glm::vec3(0.01));
+	vortonPrototype.scale(glm::vec3(0.01f));
 
 	m_Scene.addObjectPtr(new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, vortonPrototype));
-	m_Scene.getCamera().translate(glm::vec3(0, 6, 12));
+	
+	m_Scene.camera().translate(glm::vec3(0, 6, 12));
+	m_Scene.camera().rotateLocalX(glm::radians(-20.0f));
 	m_Scene.startStepping();
 }
 
@@ -148,19 +151,19 @@ GLViewer::~GLViewer()
 	
 }
 
-void GLViewer::ResizeFunction(int width, int height) {
+void GLViewer::resizeFunction(int width, int height) {
 	glViewport(0, 0, width, height);
-	GLViewer* viewer = getInstance();
+	GLViewer* viewer = instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("ResizeFunction: Instance of GLViewer doesn't exist");
 	}
 	viewer->m_Scene.aspectRatio(static_cast<float>(width) / height);
-	viewer->setWidth(width);
-	viewer->setHeight(height);
+	viewer->width(width);
+	viewer->height(height);
 }
 
-void GLViewer::RenderFunction(void) {
-	GLViewer* viewer = GLViewer::getInstance();
+void GLViewer::renderFunction(void) {
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("RenderFunction: instance of GLViewer doesn't exist");
 	}
@@ -174,93 +177,93 @@ void GLViewer::RenderFunction(void) {
 }
 
 void GLViewer::MainLoop(void) {
-	if (GLViewer::getInstance() == nullptr) {
+	if (GLViewer::instance() == nullptr) {
 		throw std::runtime_error("GLViewer::MainLoop() called but GLViewer isn't initialized");
 	}
 	glutMainLoop();
 }
 
-void GLViewer::setWidth(int width) {
+void GLViewer::width(int width) {
 	assert(width >= 0);
 	m_width = width;
 }
 
-void GLViewer::setHeight(int height) {
+void GLViewer::height(int height) {
 	assert(height >= 0);
 	m_height = height;
 }
 
-void GLViewer::IdleFunction(void) {
+void GLViewer::idleFunction(void) {
 	glutPostRedisplay();
 }
 
-void GLViewer::Timer_FPS(int value) {
-	GLViewer* viewer = GLViewer::getInstance();
+void GLViewer::timerFPS(int value) {
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("Timer_FPS: instance of GLViewer doesn't exist");
 	}
 	if (value != 0) {	//if not first time called
-		unsigned int fps = viewer->getFrameCount()*(1000 / m_UPDATE_INTERVAL_MS);
+		unsigned int fps = viewer->frameCount()*(1000 / m_UPDATE_INTERVAL_MS);
 
 		std::stringstream title;
-		title << viewer->getTitlePrefix() << ": " << fps << " FPS @ " << viewer->getWidth() << " x " << viewer->getHeight();
-		viewer->setTitle(title.str());
+		title << viewer->titlePrefix() << ": " << fps << " FPS @ " << viewer->width() << " x " << viewer->height();
+		viewer->title(title.str());
 	}
-	viewer->setFrameCount(0);
-	glutTimerFunc(m_UPDATE_INTERVAL_MS, Timer_FPS, 1);	//we do not call for the first time -> pass value 1
+	viewer->frameCount(0);
+	glutTimerFunc(m_UPDATE_INTERVAL_MS, timerFPS, 1);	//we do not call for the first time -> pass value 1
 }
 
-void GLViewer::KeyboardFunction(unsigned char key, int x, int y)
+void GLViewer::keyboardFunction(unsigned char key, int x, int y)
 {
-	GLViewer* viewer = GLViewer::getInstance();
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
 	}
 	if ((viewer->m_KeysPressedState.count(key) == 0) || !(viewer->m_KeysPressedState[key])) {
 		switch (key) {
 		case 'w':
-			viewer->m_Scene.getCamera().addForwardVelocity(4.0);
+			viewer->m_Scene.camera().startMoveForward();
 			break;
 		case 'a':
-			viewer->m_Scene.getCamera().addLeftVelocity(4.0);
+			viewer->m_Scene.camera().startMoveLeft();
 			break;
 		case 'd':
-			viewer->m_Scene.getCamera().addRightVelocity(4.0);
+			viewer->m_Scene.camera().startMoveRight();
 			break;
 		case 's':
-			viewer->m_Scene.getCamera().addBackwardVelocity(4.0);
+			viewer->m_Scene.camera().startMoveBack();
 			break;
 		}
 	}
 	viewer->m_KeysPressedState[key] = true;
 }
 
-void GLViewer::KeyboardFunctionUp(unsigned char key, int x, int y)
+void GLViewer::keyboardFunctionUp(unsigned char key, int x, int y)
 {
-	GLViewer* viewer = GLViewer::getInstance();
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
 	}
 	switch (key) {
 	case 'w':
-		viewer->m_Scene.getCamera().addForwardVelocity(-4.0);
+		viewer->m_Scene.camera().stopMoveForward();
 		break;
 	case 'a':
-		viewer->m_Scene.getCamera().addLeftVelocity(-4.0);
+		viewer->m_Scene.camera().stopMoveLeft();
 		break;
 	case 'd':
-		viewer->m_Scene.getCamera().addRightVelocity(-4.0);
+		viewer->m_Scene.camera().stopMoveRight();
 		break;
 	case 's':
-		viewer->m_Scene.getCamera().addBackwardVelocity(-4.0);
+		viewer->m_Scene.camera().stopMoveBack();
 		break;
 	}
 	viewer->m_KeysPressedState[key] = false;
 }
 
-void GLViewer::MouseFunction(int button, int state, int x, int y)
+void GLViewer::mouseFunction(int button, int state, int x, int y)
 {
-	GLViewer* viewer = GLViewer::getInstance();
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("MouseFunction: instance of GLViewer doesn't exist");
 	}
@@ -269,9 +272,9 @@ void GLViewer::MouseFunction(int button, int state, int x, int y)
 	viewer->m_MouseRotationReady = (state == GLUT_DOWN) ? true : false;
 }
 
-void GLViewer::MouseMotionFunction(int x, int y)
+void GLViewer::mouseMotionFunction(int x, int y)
 {
-	GLViewer* viewer = GLViewer::getInstance();
+	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("MouseMotionFunction: instance of GLViewer doesn't exist");
 	}
@@ -282,20 +285,21 @@ void GLViewer::MouseMotionFunction(int x, int y)
 	glm::vec2 currentCoordinates = glm::vec2(x, y);
 	glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
 
-	float rotationXDeg = -delta.y/1000.0f;
-	float rotationYDeg = -delta.x/1000.0f;
-	Camera &cam = viewer->m_Scene.getCamera();
-	cam.rotateLocalX(rotationXDeg);
-	cam.rotateLocalY(rotationYDeg);
+	float rotationXDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.y;
+	float rotationYDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.x;
+	
+	Camera &camera = viewer->m_Scene.camera();
+	camera.rotateLocalX(rotationXDeg);
+	camera.rotateLocalY(rotationYDeg);
 	
 	viewer->m_LastMouseCoordinates = currentCoordinates;
 }
 
-unsigned int GLViewer::getFrameCount() const {
+unsigned int GLViewer::frameCount() const {
 	return m_FrameCount;
 }
 
-void GLViewer::setFrameCount(const unsigned int count) {
+void GLViewer::frameCount(const unsigned int count) {
 	m_FrameCount = count;
 }
 
@@ -303,101 +307,27 @@ void GLViewer::incrementFrameCount() {
 	m_FrameCount++;
 }
 
-Scene & GLViewer::getScene()
+Scene & GLViewer::scene()
 {
 	return m_Scene;
 }
 
-void GLViewer::setTitle(const std::string& title) {
+void GLViewer::title(const std::string& title) {
 	glutSetWindowTitle(title.c_str());
 	m_title = title;
 }
 
-int GLViewer::getWidth() const {
+int GLViewer::width() const {
 	return m_width;
 }
 
-int GLViewer::getHeight() const {
+int GLViewer::height() const {
 	return m_height;
 }
 
-std::string GLViewer::getTitlePrefix() const {
+std::string GLViewer::titlePrefix() const {
 	return m_TitlePrefix;
 }
-
-#if 0
-void GLViewer::setupTriangle()
-{
-	std::vector<GLfloat> trianglePos{
-		-0.8f, -0.8f, 0.0f,
-		0.8f, -0.8f, 0.0f,
-		0.0f, 0.8f, 0.0f };
-
-	std::vector<GLfloat> triangleColor{
-			1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f
-		};
-
-	GLenum errorCheckVal = glGetError();
-
-	m_TriangleVao = new VertexArrO(true);
-
-	m_TrianglePosVbo = new VertexBufO(true);
-	m_TrianglePosVbo->pushData(trianglePos, GL_STATIC_DRAW, false);
-
-	m_TriangleColorVbo = new VertexBufO(true);
-	m_TriangleColorVbo->pushData(triangleColor, GL_STATIC_DRAW, false);
-
-	m_TriangleVao->addVertexAttribArray(*m_TrianglePosVbo, false, true, 0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	m_TriangleVao->addVertexAttribArray(*m_TriangleColorVbo, false, true, 1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	m_TriangleVao->enableVertexAttribArray(false, 0);
-	m_TriangleVao->enableVertexAttribArray(false, 1);
-	
-	Shader vertSh(GL_VERTEX_SHADER);
-	vertSh.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic.vert");
-
-	Shader fragSh(GL_FRAGMENT_SHADER);
-	fragSh.setSourcePath("C:\\Users\\erik\\Documents\\Visual Studio 2013\\Projects\\FluidSim\\FluidSim\\shaders\\basic.frag");
-
-	m_TriangleProg = new Program;
-
-	m_TriangleProg->attachShader(&vertSh);
-	m_TriangleProg->attachShader(&fragSh);
-
-	try {
-		vertSh.compile();
-		fragSh.compile();
-		m_TriangleProg->link();
-		m_TriangleProg->detachAllShaders();
-		m_TriangleProg->use();
-	}
-	catch (const std::logic_error& err) {
-		ERROR_MSG("Couldn't compile or link shader/program:\n" << err.what() << "\nTrying to cleanup...");
-		try {
-			cleanupTriangle();
-		}
-		catch (const std::exception& ex) {
-			ERROR_MSG("Cleaning up triangle failed");
-		}
-		throw std::logic_error("Setting up triangle failed. Couldn't compile or link");
-	}
-
-	errorCheckVal = glGetError();
-	if (errorCheckVal != GL_NO_ERROR) {
-		ERROR_MSG("setting up triangle: opengl error:\n" << gluErrorString(errorCheckVal) << "\nTrying to cleanup...");
-		//try to cleanup
-		try {
-			cleanupTriangle();
-		}
-		catch (const std::exception& ex) {
-			ERROR_MSG("Cleanup triangle failed.");
-		}
-		throw std::exception("Setting up triangle failed: opengl error");
-	}
-}
-#endif
 
 void GLViewer::cleanup()
 {
@@ -407,37 +337,4 @@ void GLViewer::cleanup()
 	catch (const std::exception& ex) {
 		ERROR_MSG("In cleanup(): " << ex.what());
 	}
-	/*GLViewer *viewer = GLViewer::getInstance();
-	if (viewer == nullptr) {
-		throw std::runtime_error("in cleanup but instance of glviewer doesnt exist.");
-	}
-	try {
-		viewer->cleanupTriangle();
-	}
-	catch (const std::exception& ex) {
-		ERROR_MSG("In cleanup: " << ex.what());
-	}*/
 }
-
-void GLViewer::cleanupTriangle()
-{
-	GLenum errorCheckVal = glGetError();
-
-	delete m_TriangleProg;
-	delete m_TriangleVao;
-	delete m_TrianglePosVbo;
-	delete m_TriangleColorVbo;
-
-	errorCheckVal = glGetError();
-	if (errorCheckVal != GL_NO_ERROR) {
-		ERROR_MSG("Failed to cleanup triangle: opengl error:\n" << gluErrorString(errorCheckVal));
-		throw std::exception("Cleanup triangle failed: opengl error");
-	}
-}
-
-void GLViewer::drawTriangle()
-{
-	m_TriangleVao->bind();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-

@@ -14,14 +14,14 @@ public:
 	virtual void registerContainerObjectHooks();
 
 	virtual void translate(const glm::vec3 &delta);
-	void rotateLocalX(float degrees);
-	void rotateLocalY(float degrees);
+	void rotateLocalX(float radians);
+	void rotateLocalY(float radians);
 	void scale(const glm::vec3 &scaleVector);
 
-	glm::vec3 getPosition() const;
-	void setPosition(const glm::vec3 &position);
+	glm::vec3 position() const;
+	void position(const glm::vec3 &position);
 
-	void setContainerObject(ContainerObject &containerObject);
+	void containedIn(ContainerObject &containerObject);
 
 	//ContainerObject& getContainerObject();
 protected:
@@ -35,14 +35,12 @@ protected:
 	static const glm::vec3 m_RightVector;
 
 
-	virtual void rotate(float degrees, const glm::vec3 &axis);
+	virtual void rotate(float radians, const glm::vec3 &axis);
 
 	glm::mat4x4 m_RotationTransform;
 	glm::mat4x4 m_TranslationTransform;
 	glm::mat4x4 m_ScaleTransform;
 
-	ContainerObject *m_ContainerObjPtr;
-private:
-	
+	ContainerObject *m_ContainerObjectPtr;
 };
 
