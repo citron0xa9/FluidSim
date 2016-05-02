@@ -9,7 +9,7 @@ const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
 
 VortonSim::VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype)
 	: ActiveObject{ container }, DrawableObject{ container }, Object{ container }, m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
-	m_VortonsRendered{false}, m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}
+	m_VortonsRendered{false}, m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}
 {
 	initializeVortons(initialVorticity, vorticityMagnitude, vortonPrototype);
 	initializeTracers(initialVorticity);
@@ -20,7 +20,7 @@ VortonSim::VortonSim(const VortonSim & original)
 	: ActiveObject{*original.m_ContainerObjectPtr}, DrawableObject{ *original.m_ContainerObjectPtr }, Object{original},
 	m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
 	m_VortonsRendered{original.m_VortonsRendered}, m_TracersRendered{original.m_TracersRendered}, m_TracerVerticesBuf{false}, m_TracerVao{false},
-	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}
+	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}
 {
 	initializeVortons(original);
 	initializeTracers(original);
@@ -65,6 +65,9 @@ void VortonSim::registerContainerObjectHooks()
 
 void VortonSim::update(float seconds)
 {
+	if (!m_Simulating) {
+		return;
+	}
 	createOctHeap();
 	
 	calculateVelocityGrid();
@@ -85,6 +88,11 @@ void VortonSim::vortonsRendered(bool areRendered)
 void VortonSim::tracersRendered(bool areRendered)
 {
 	m_TracersRendered = areRendered;
+}
+
+void VortonSim::simulating(bool isSimulating)
+{
+	m_Simulating = isSimulating;
 }
 
 Object * VortonSim::copy() const

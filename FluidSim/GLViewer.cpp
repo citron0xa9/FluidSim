@@ -139,7 +139,8 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	TriangleNetObject vortonPrototype{ m_Scene, &sphereMatRef, &geomSphere, &prog };
 	vortonPrototype.scale(glm::vec3(0.01f));
 
-	m_Scene.addObjectPtr(new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, vortonPrototype));
+	m_VortonSimPtr = new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, vortonPrototype);
+	m_Scene.addObjectPtr(m_VortonSimPtr);
 	
 	m_Scene.camera().translate(glm::vec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0f));
@@ -310,6 +311,14 @@ void GLViewer::incrementFrameCount() {
 Scene & GLViewer::scene()
 {
 	return m_Scene;
+}
+
+VortonSim & GLViewer::vortonSim()
+{
+	if (m_VortonSimPtr == nullptr) {
+		throw std::runtime_error("GLViewer::vortonSim() m_VortonSimPtr is nullptr");
+	}
+	return *m_VortonSimPtr;
 }
 
 void GLViewer::title(const std::string& title) {

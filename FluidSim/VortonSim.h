@@ -28,6 +28,7 @@ public:
 
 	void vortonsRendered(bool areRendered);
 	void tracersRendered(bool areRendered);
+	void simulating(bool isSimulating);
 
 	virtual Object* copy() const override;
 	
@@ -77,6 +78,7 @@ private:
 
 	bool m_VortonsRendered;
 	bool m_TracersRendered;
+	bool m_Simulating;
 
 	Program m_TracerRenderProg;
 };

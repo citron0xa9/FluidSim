@@ -15,6 +15,9 @@ void cli() {
 			std::string cmd;
 			std::cin >> cmd;
 			GLViewer *inst = GLViewer::instance();
+			if (cmd == "exit") {
+				break;
+			}
 			if (inst == nullptr) {
 				throw std::runtime_error("Command entered but no instance of glviewer available");
 			}
@@ -30,8 +33,8 @@ void cli() {
 				std::cin >> f;
 				inst->scene().camera().fovY(f);
 			}
-			else if (cmd == "exit") {
-				break;
+			else if (cmd == "pauseSim") {
+				
 			}
 			else {
 				throw std::runtime_error("Unknown cli command");

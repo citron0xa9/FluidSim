@@ -32,6 +32,7 @@ public:
 	void incrementFrameCount();
 
 	Scene& scene();
+	VortonSim &vortonSim();
 private:
 	GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]);
 	GLViewer(const GLViewer& v) = delete;
@@ -59,6 +60,7 @@ private:
 	static GLViewer* m_instance;
 
 	Scene m_Scene;
+	VortonSim *m_VortonSimPtr;
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;
