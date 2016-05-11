@@ -75,6 +75,21 @@ Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVa
 	return *m_ProgramPtrs.back();
 }
 
+/*Geometry & Scene::firstGeometry()
+{
+	return *m_GeometriePtrs.front();
+}
+
+Material & Scene::firstMaterial()
+{
+	return m_Materials.front();
+}
+
+Program & Scene::firstProgram()
+{
+	return *m_ProgramPtrs.front();
+}*/
+
 void Scene::render()
 {
 	glm::mat4x4 viewProjectTransform = m_Camera.viewPerspectiveTransform();

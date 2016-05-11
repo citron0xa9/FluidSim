@@ -5,10 +5,14 @@
 #include <stdexcept>
 #include <thread>
 #include <chrono>
+#include <queue>
+#include <functional>
 #include "GLViewer.h"
 
+std::queue<std::function<void(GLViewer &viewer)>> g_GlDpenedentCommands;
+
 void cli() {
-	std::this_thread::sleep_for(std::chrono::seconds(20));
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	while (true) {
 		std::cout << "Enter command: " << std::endl;
 		try {
@@ -34,7 +38,18 @@ void cli() {
 				inst->scene().camera().fovY(f);
 			}
 			else if (cmd == "pauseSim") {
-				
+				inst->vortonSim().simulating(false);
+			}
+			else if (cmd == "continueSim") {
+				inst->vortonSim().simulating(true);
+			}
+			else if (cmd == "resetSim") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.resetSim(true); });
+			}
+			else if (cmd == "setTimescale") {
+				float f;
+				std::cin >> f;
+				inst->vortonSim().simulationTimescale(f);
 			}
 			else {
 				throw std::runtime_error("Unknown cli command");
@@ -51,15 +66,23 @@ int main(int argc, char* argv[])
 {
 	std::thread cliT(cli);
 	try {
-		GLViewer::initInstance("OpenGL test", 800, 600, argc, argv);
-		GLViewer::MainLoop();
+		GLViewer::initInstance("OpenGL test", 800, 600);
+		GLViewer *viewer = GLViewer::instance();
+		while (!viewer->shouldClose()) {
+			viewer->cycle();
+			while (!g_GlDpenedentCommands.empty()) {
+				(g_GlDpenedentCommands.front())(*viewer);
+				g_GlDpenedentCommands.pop();
+			}
+		}
+		GLViewer::deleteInstance();
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error with window: " << e.what() << std::endl;
 	}
-
 	
-	std::cout << "After main loop call" << std::endl;
+	
+	std::cout << "After main loop" << std::endl;
 	std::cout << "waiting for cli to exit..." << std::endl;
 	cliT.join();
 	std::cout << "cli finished, exiting..." << std::endl;

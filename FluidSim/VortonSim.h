@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 #include <glm/vec3.hpp>
 #include "VorticityDistribution.h"
 #include "VortonOctHeapElement.h"
@@ -23,16 +24,20 @@ public:
 	virtual void step(float secondsPassed) override;
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 	virtual void registerContainerObjectHooks() override;
+	virtual void deregisterContainerObjectHooks() override;
 
 	void update(float seconds);
 
 	void vortonsRendered(bool areRendered);
 	void tracersRendered(bool areRendered);
 	void simulating(bool isSimulating);
+	void simulationTimescale(float timescale);
 
 	virtual Object* copy() const override;
 	
 	const VortonSim& operator=(const VortonSim& original) = delete;
+
+	std::mutex &inUpdateMutex();
 
 private:
 
@@ -79,7 +84,10 @@ private:
 	bool m_VortonsRendered;
 	bool m_TracersRendered;
 	bool m_Simulating;
+	float m_SimulationTimescale;
 
 	Program m_TracerRenderProg;
+
+	std::mutex m_InUpdateMutex;
 };
 

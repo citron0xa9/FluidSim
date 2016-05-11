@@ -9,7 +9,8 @@ const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
 
 VortonSim::VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype)
 	: ActiveObject{ container }, DrawableObject{ container }, Object{ container }, m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
-	m_VortonsRendered{false}, m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}
+	m_VortonsRendered{false}, m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true},
+	m_SimulationTimescale{1.0}
 {
 	initializeVortons(initialVorticity, vorticityMagnitude, vortonPrototype);
 	initializeTracers(initialVorticity);
@@ -20,7 +21,7 @@ VortonSim::VortonSim(const VortonSim & original)
 	: ActiveObject{*original.m_ContainerObjectPtr}, DrawableObject{ *original.m_ContainerObjectPtr }, Object{original},
 	m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
 	m_VortonsRendered{original.m_VortonsRendered}, m_TracersRendered{original.m_TracersRendered}, m_TracerVerticesBuf{false}, m_TracerVao{false},
-	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}
+	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}, m_SimulationTimescale{original.m_SimulationTimescale}
 {
 	initializeVortons(original);
 	initializeTracers(original);
@@ -40,7 +41,9 @@ VortonSim::~VortonSim()
 void VortonSim::step(float secondsPassed)
 {
 	ContainerObject::step(secondsPassed);
+	m_InUpdateMutex.lock();
 	update(secondsPassed);
+	m_InUpdateMutex.unlock();
 }
 
 void VortonSim::render(const glm::mat4x4 & viewProjectTransform)
@@ -63,8 +66,15 @@ void VortonSim::registerContainerObjectHooks()
 	DrawableObject::registerContainerObjectHooks();
 }
 
+void VortonSim::deregisterContainerObjectHooks()
+{
+	ActiveObject::deregisterContainerObjectHooks();
+	DrawableObject::deregisterContainerObjectHooks();
+}
+
 void VortonSim::update(float seconds)
 {
+	seconds *= m_SimulationTimescale;
 	if (!m_Simulating) {
 		return;
 	}
@@ -95,10 +105,20 @@ void VortonSim::simulating(bool isSimulating)
 	m_Simulating = isSimulating;
 }
 
+void VortonSim::simulationTimescale(float timescale)
+{
+	m_SimulationTimescale = timescale;
+}
+
 Object * VortonSim::copy() const
 {
 	WARNING("VortonsSim::copy used");
 	return new VortonSim(*this);
+}
+
+std::mutex & VortonSim::inUpdateMutex()
+{
+	return m_InUpdateMutex;
 }
 
 void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype)

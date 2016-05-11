@@ -11,5 +11,6 @@ public:
 	virtual void step(float secondsPassed) = 0;
 
 	virtual void registerContainerObjectHooks() override;
+	virtual void deregisterContainerObjectHooks() override;
 };
 

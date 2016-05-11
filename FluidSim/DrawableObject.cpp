@@ -15,3 +15,8 @@ void DrawableObject::registerContainerObjectHooks()
 {
 	m_ContainerObjectPtr->addDrawableObject(*this);
 }
+
+void DrawableObject::deregisterContainerObjectHooks()
+{
+	m_ContainerObjectPtr->removeDrawableObject(*this);
+}

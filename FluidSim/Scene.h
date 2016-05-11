@@ -22,6 +22,10 @@ public:
 	Material& addMaterial(const Material &material);
 	Program& addProgram(const std::vector<ShaderLightSourceVariable> &lightVars);
 
+	//Geometry& firstGeometry();
+	//Material& firstMaterial();
+	//Program& firstProgram();
+
 	virtual void render();
 
 	void aspectRatio(float ratio);

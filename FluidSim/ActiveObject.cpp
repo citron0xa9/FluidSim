@@ -15,3 +15,8 @@ void ActiveObject::registerContainerObjectHooks()
 {
 	m_ContainerObjectPtr->addActiveObject(*this);
 }
+
+void ActiveObject::deregisterContainerObjectHooks()
+{
+	m_ContainerObjectPtr->removeActiveObject(*this);
+}

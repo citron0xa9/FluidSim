@@ -1,8 +1,6 @@
 #include "GLViewer.h"
 
 #include <iostream>
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <stdexcept>
 #include <cassert>
 #include <sstream>
@@ -22,17 +20,12 @@
 GLViewer* GLViewer::m_instance = nullptr;
 const float GLViewer::m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION = -0.001f;
 
-void GLViewer::initInstance(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]) {
+void GLViewer::initInstance(const char* titlePrefix, unsigned int width, unsigned int height) {
 	if (m_instance != nullptr) {
 		throw std::runtime_error("Already initialized");
 	}
-	glutInit(&argc, argv);
 
-	glutInitContextVersion(4, 5);
-	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-
-	m_instance = new GLViewer(titlePrefix, width, height, argc, argv);
+	m_instance = new GLViewer(titlePrefix, width, height);
 }
 
 GLViewer* GLViewer::instance() {
@@ -49,32 +42,27 @@ void GLViewer::deleteInstance() {
 	}
 }
 
-GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height, int argc, char* argv[]) : m_width( width ), m_height( height ), m_title( titlePrefix ), m_TitlePrefix( titlePrefix ) {
-	glutSetOption(
-		GLUT_ACTION_ON_WINDOW_CLOSE,
-		GLUT_ACTION_GLUTMAINLOOP_RETURNS
-		);
+GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height) : m_width( width ), m_height( height ), m_title( titlePrefix ), m_TitlePrefix( titlePrefix ) {
 
-	glutInitWindowSize(width, height);
+	glfwSetErrorCallback(&errorFunction);
 
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	if (!glfwInit()) {
+		throw std::runtime_error("Failed to initialize glfw");
+	}
 
-	m_WindowHandle = glutCreateWindow(titlePrefix);
-
-	if (m_WindowHandle < 1) {
+	m_WindowPtr = glfwCreateWindow(width, height, titlePrefix, nullptr, nullptr);
+	if (m_WindowPtr == nullptr) {
+		glfwTerminate();
 		throw std::runtime_error("Failed to create window");
 	}
 
-	glutReshapeFunc(&resizeFunction);
-	glutDisplayFunc(&renderFunction);
-	glutIdleFunc(&idleFunction);
-	glutTimerFunc(0, &timerFPS, 0);	//call Timer_FPS immediately if everything is set up
-	glutCloseFunc(&cleanup);
+	glfwMakeContextCurrent(m_WindowPtr);
+	glfwSwapInterval(1);
 
-	glutMouseFunc(&mouseFunction);
-	glutMotionFunc(&mouseMotionFunction);
-	glutKeyboardFunc(&keyboardFunction);
-	glutKeyboardUpFunc(&keyboardFunctionUp);
+	glfwSetFramebufferSizeCallback(m_WindowPtr, &framebufferResizeFunction);
+	glfwSetMouseButtonCallback(m_WindowPtr, &mouseButtonFunction);
+	glfwSetCursorPosCallback(m_WindowPtr, &mouseMotionFunction);
+	glfwSetKeyCallback(m_WindowPtr, &keyboardFunction);
 
 	glewExperimental = GL_TRUE;
 	GLenum glewInitResult = glewInit();
@@ -135,12 +123,11 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere.obj");
 	geomSphere.setupAttribArrays(prog);
 
-	//create and add object to scene
-	TriangleNetObject vortonPrototype{ m_Scene, &sphereMatRef, &geomSphere, &prog };
-	vortonPrototype.scale(glm::vec3(0.01f));
+	//create vorton prototype
+	m_VortonPrototypePtr = std::make_unique<TriangleNetObject>(m_Scene, &sphereMatRef, &geomSphere, &prog);
+	m_VortonPrototypePtr->scale(glm::vec3(0.01f));
 
-	m_VortonSimPtr = new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, vortonPrototype);
-	m_Scene.addObjectPtr(m_VortonSimPtr);
+	setupVortonSim(false);
 	
 	m_Scene.camera().translate(glm::vec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0f));
@@ -149,10 +136,17 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 GLViewer::~GLViewer()
 {
-	
+	glfwDestroyWindow(m_WindowPtr);
+	glfwTerminate();
 }
 
-void GLViewer::resizeFunction(int width, int height) {
+void GLViewer::errorFunction(int error, const char * description)
+{
+	std::cerr << "GLFW error: " << description << std::endl;
+}
+
+void GLViewer::framebufferResizeFunction(GLFWwindow * windowPtr, int width, int height)
+{
 	glViewport(0, 0, width, height);
 	GLViewer* viewer = instance();
 	if (viewer == nullptr) {
@@ -163,25 +157,21 @@ void GLViewer::resizeFunction(int width, int height) {
 	viewer->height(height);
 }
 
-void GLViewer::renderFunction(void) {
-	GLViewer* viewer = GLViewer::instance();
-	if (viewer == nullptr) {
-		throw std::runtime_error("RenderFunction: instance of GLViewer doesn't exist");
-	}
-	viewer->incrementFrameCount();
+
+void GLViewer::cycle()
+{
+	incrementFrameCount();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	viewer->m_Scene.render();
+	m_Scene.render();
 
-	glutSwapBuffers();
-	glutPostRedisplay();
+	glfwSwapBuffers(m_WindowPtr);
+	glfwPollEvents();
 }
 
-void GLViewer::MainLoop(void) {
-	if (GLViewer::instance() == nullptr) {
-		throw std::runtime_error("GLViewer::MainLoop() called but GLViewer isn't initialized");
-	}
-	glutMainLoop();
+bool GLViewer::shouldClose() const
+{
+	return glfwWindowShouldClose(m_WindowPtr);
 }
 
 void GLViewer::width(int width) {
@@ -194,11 +184,7 @@ void GLViewer::height(int height) {
 	m_height = height;
 }
 
-void GLViewer::idleFunction(void) {
-	glutPostRedisplay();
-}
-
-void GLViewer::timerFPS(int value) {
+/*void GLViewer::timerFPS(int value) {
 	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("Timer_FPS: instance of GLViewer doesn't exist");
@@ -212,88 +198,99 @@ void GLViewer::timerFPS(int value) {
 	}
 	viewer->frameCount(0);
 	glutTimerFunc(m_UPDATE_INTERVAL_MS, timerFPS, 1);	//we do not call for the first time -> pass value 1
-}
+}*/
 
-void GLViewer::keyboardFunction(unsigned char key, int x, int y)
+void GLViewer::keyboardFunction(GLFWwindow *windowPtr, int key, int scancode, int action, int mods)
 {
 	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
 	}
-	if ((viewer->m_KeysPressedState.count(key) == 0) || !(viewer->m_KeysPressedState[key])) {
+	if (action == GLFW_PRESS) {
+		viewer->keyboardFunctionDown(key);
+	}
+	else if (action == GLFW_RELEASE) {
+		viewer->keyboardFunctionUp(key);
+	}
+}
+
+void GLViewer::keyboardFunctionDown(int key)
+{
+	if ((m_KeysPressedState.count(key) == 0) || !(m_KeysPressedState[key])) {
 		switch (key) {
-		case 'w':
-			viewer->m_Scene.camera().startMoveForward();
+		case GLFW_KEY_W:
+			m_Scene.camera().startMoveForward();
 			break;
-		case 'a':
-			viewer->m_Scene.camera().startMoveLeft();
+		case GLFW_KEY_A:
+			m_Scene.camera().startMoveLeft();
 			break;
-		case 'd':
-			viewer->m_Scene.camera().startMoveRight();
+		case GLFW_KEY_D:
+			m_Scene.camera().startMoveRight();
 			break;
-		case 's':
-			viewer->m_Scene.camera().startMoveBack();
+		case GLFW_KEY_S:
+			m_Scene.camera().startMoveBack();
 			break;
 		}
 	}
-	viewer->m_KeysPressedState[key] = true;
+	m_KeysPressedState[key] = true;
 }
 
-void GLViewer::keyboardFunctionUp(unsigned char key, int x, int y)
+void GLViewer::keyboardFunctionUp(int key)
 {
-	GLViewer* viewer = GLViewer::instance();
-	if (viewer == nullptr) {
-		throw std::runtime_error("KeyboardFunction: instance of GLViewer doesn't exist");
-	}
 	switch (key) {
-	case 'w':
-		viewer->m_Scene.camera().stopMoveForward();
+	case GLFW_KEY_W:
+		m_Scene.camera().stopMoveForward();
 		break;
-	case 'a':
-		viewer->m_Scene.camera().stopMoveLeft();
+	case GLFW_KEY_A:
+		m_Scene.camera().stopMoveLeft();
 		break;
-	case 'd':
-		viewer->m_Scene.camera().stopMoveRight();
+	case GLFW_KEY_D:
+		m_Scene.camera().stopMoveRight();
 		break;
-	case 's':
-		viewer->m_Scene.camera().stopMoveBack();
+	case GLFW_KEY_S:
+		m_Scene.camera().stopMoveBack();
 		break;
 	}
-	viewer->m_KeysPressedState[key] = false;
+	m_KeysPressedState[key] = false;
 }
 
-void GLViewer::mouseFunction(int button, int state, int x, int y)
+void GLViewer::mouseButtonFunction(GLFWwindow *windowPtr, int button, int action, int mods)
 {
 	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("MouseFunction: instance of GLViewer doesn't exist");
 	}
 
-	viewer->m_LastMouseCoordinates = glm::vec2(x, y);
-	viewer->m_MouseRotationReady = (state == GLUT_DOWN) ? true : false;
+	viewer->m_MouseRotationReady = (action == GLFW_PRESS) ? true : false;
 }
 
-void GLViewer::mouseMotionFunction(int x, int y)
+void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 {
+	glm::vec2 currentCoordinates = glm::vec2(x, y);
+
 	GLViewer* viewer = GLViewer::instance();
 	if (viewer == nullptr) {
 		throw std::runtime_error("MouseMotionFunction: instance of GLViewer doesn't exist");
 	}
-	if (!viewer->m_MouseRotationReady) {
-		return;
+	if (viewer->m_MouseRotationReady) {
+		glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
+
+		float rotationXDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.y;
+		float rotationYDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.x;
+
+		Camera &camera = viewer->m_Scene.camera();
+		camera.rotateLocalX(rotationXDeg);
+		camera.rotateLocalY(rotationYDeg);
 	}
-
-	glm::vec2 currentCoordinates = glm::vec2(x, y);
-	glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
-
-	float rotationXDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.y;
-	float rotationYDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.x;
-	
-	Camera &camera = viewer->m_Scene.camera();
-	camera.rotateLocalX(rotationXDeg);
-	camera.rotateLocalY(rotationYDeg);
 	
 	viewer->m_LastMouseCoordinates = currentCoordinates;
+}
+
+void GLViewer::setupVortonSim(bool createPaused)
+{
+	m_VortonSimPtr = new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, *m_VortonPrototypePtr);
+	m_VortonSimPtr->simulating(!createPaused);
+	m_Scene.addObjectPtr(m_VortonSimPtr);
 }
 
 unsigned int GLViewer::frameCount() const {
@@ -321,8 +318,19 @@ VortonSim & GLViewer::vortonSim()
 	return *m_VortonSimPtr;
 }
 
+void GLViewer::resetSim(bool createPaused)
+{
+	if (m_VortonSimPtr != nullptr) {
+		m_Scene.removeObjectPtr(m_VortonSimPtr);
+		m_VortonSimPtr->inUpdateMutex().lock();
+		m_VortonSimPtr->inUpdateMutex().unlock();
+		delete m_VortonSimPtr;
+	}
+	setupVortonSim(createPaused);
+}
+
 void GLViewer::title(const std::string& title) {
-	glutSetWindowTitle(title.c_str());
+	glfwSetWindowTitle(m_WindowPtr, title.c_str());
 	m_title = title;
 }
 
@@ -338,12 +346,3 @@ std::string GLViewer::titlePrefix() const {
 	return m_TitlePrefix;
 }
 
-void GLViewer::cleanup()
-{
-	try {
-		GLViewer::deleteInstance();
-	}
-	catch (const std::exception& ex) {
-		ERROR_MSG("In cleanup(): " << ex.what());
-	}
-}

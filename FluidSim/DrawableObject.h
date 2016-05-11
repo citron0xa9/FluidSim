@@ -11,5 +11,6 @@ public:
 	virtual void render(const glm::mat4x4 &viewProjectTransform) = 0;
 
 	virtual void registerContainerObjectHooks() override;
+	virtual void deregisterContainerObjectHooks() override;
 };
 

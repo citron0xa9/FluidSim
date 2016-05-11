@@ -12,6 +12,7 @@ public:
 
 	virtual Object* copy() const;
 	virtual void registerContainerObjectHooks();
+	virtual void deregisterContainerObjectHooks();
 
 	virtual void translate(const glm::vec3 &delta);
 	void rotateLocalX(float radians);
