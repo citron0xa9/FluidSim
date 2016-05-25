@@ -30,16 +30,16 @@ void Scene::stepLoop()
 	auto timeBeforeLastStep = std::chrono::steady_clock::now();
 	while (m_Alive) {
 
-		float secondsPassed = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - timeBeforeLastStep).count()) / 1000.0f;
+		double secondsPassed = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - timeBeforeLastStep).count()) / 1000.0;
 		if ((secondsPassed*1000) > (runningBehindThresholdFactor * m_STEP_TIME_MS)) {
 			WARNING(std::string("stepLoop: Step takes to long! (took ") + std::to_string(secondsPassed) + std::string(" seconds)"));
-			secondsPassed = m_STEP_TIME_MS / 1000.0f;
+			secondsPassed = m_STEP_TIME_MS / 1000.0;
 		}
 
 		int leftMilliseconds = m_STEP_TIME_MS - static_cast<unsigned int>(secondsPassed * 1000);
 		if (leftMilliseconds > 0) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(m_STEP_TIME_MS));
-			secondsPassed = m_STEP_TIME_MS / 1000.0f;
+			secondsPassed = m_STEP_TIME_MS / 1000.0;
 		}
 
 		timeBeforeLastStep = std::chrono::steady_clock::now();

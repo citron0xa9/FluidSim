@@ -15,20 +15,20 @@ public:
 	void aspectRatio(float ratio);
 	void fovY(float f);
 
-	virtual void translate(const glm::vec3 &delta) override;
+	virtual void translate(const glm::dvec3 &delta) override;
 
-	glm::vec3 lookDirection() const;
+	glm::dvec3 lookDirection() const;
 
 protected:
-	virtual void rotate(float radians, const glm::vec3 &axis) override;
+	virtual void rotate(double radians, const glm::dvec3 &axis) override;
 
 private:
 	void calculatePerspectiveTransform();
 	void calculateViewTransform();
 	void calculateViewPerspectiveTransform();
 
-	static glm::vec3 m_LocalLookDirection;
-	static glm::vec3 m_UpVector;
+	static glm::dvec3 m_LocalLookDirection;
+	static glm::dvec3 m_UpVector;
 
 	float m_FovY;
 	float m_AspectRatio;

@@ -91,7 +91,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	SunLightSource light{m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
 
-	Material sphereMaterial{ glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.2f), 10 };
+	Material sphereMaterial{ glm::vec3(0.8f, 0.0f, 0.0f), glm::vec3(0.8f, 0.0f, 0.0f), glm::vec3(0.2f), 10 };
 	Material &sphereMatRef = m_Scene.addMaterial(sphereMaterial);
 
 	/*
@@ -125,12 +125,12 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	//create vorton prototype
 	m_VortonPrototypePtr = std::make_unique<TriangleNetObject>(m_Scene, &sphereMatRef, &geomSphere, &prog);
-	m_VortonPrototypePtr->scale(glm::vec3(0.01f));
+	m_VortonPrototypePtr->scale(glm::dvec3(0.03));
 
 	setupVortonSim(false);
 	
-	m_Scene.camera().translate(glm::vec3(0, 6, 12));
-	m_Scene.camera().rotateLocalX(glm::radians(-20.0f));
+	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
+	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
 	m_Scene.startStepping();
 }
 
@@ -171,7 +171,7 @@ void GLViewer::cycle()
 
 bool GLViewer::shouldClose() const
 {
-	return glfwWindowShouldClose(m_WindowPtr);
+	return (glfwWindowShouldClose(m_WindowPtr) == 1);
 }
 
 void GLViewer::width(int width) {
@@ -275,8 +275,8 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 	if (viewer->m_MouseRotationReady) {
 		glm::vec2 delta = currentCoordinates - viewer->m_LastMouseCoordinates;
 
-		float rotationXDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.y;
-		float rotationYDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.x;
+		double rotationXDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.y;
+		double rotationYDeg = m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION * delta.x;
 
 		Camera &camera = viewer->m_Scene.camera();
 		camera.rotateLocalX(rotationXDeg);
@@ -288,7 +288,7 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 
 void GLViewer::setupVortonSim(bool createPaused)
 {
-	m_VortonSimPtr = new VortonSim(m_Scene, 0.05f, 1.0f, JetRingVorticityDistribution(glm::vec3(0), 1.0f, 1.0f, glm::vec3(1.0, 0.0, 0.0)), 20.0f, *m_VortonPrototypePtr);
+	m_VortonSimPtr = new VortonSim(m_Scene, 0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0, *m_VortonPrototypePtr);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }

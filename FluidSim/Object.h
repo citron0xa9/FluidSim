@@ -14,33 +14,33 @@ public:
 	virtual void registerContainerObjectHooks();
 	virtual void deregisterContainerObjectHooks();
 
-	virtual void translate(const glm::vec3 &delta);
-	void rotateLocalX(float radians);
-	void rotateLocalY(float radians);
-	void scale(const glm::vec3 &scaleVector);
+	virtual void translate(const glm::dvec3 &delta);
+	void rotateLocalX(double radians);
+	void rotateLocalY(double radians);
+	void scale(const glm::dvec3 &scaleVector);
 
-	glm::vec3 position() const;
-	void position(const glm::vec3 &position);
+	glm::dvec3 position() const;
+	void position(const glm::dvec3 &position);
 
 	void containedIn(ContainerObject &containerObject);
 
 	//ContainerObject& getContainerObject();
 protected:
-	static const glm::vec3 m_xAxis;
-	static const glm::vec3 m_yAxis;
-	static const glm::vec3 m_zAxis;
+	static const glm::dvec3 m_xAxis;
+	static const glm::dvec3 m_yAxis;
+	static const glm::dvec3 m_zAxis;
 
-	static const glm::vec3 m_ForwardVector;
-	static const glm::vec3 m_LeftVector;
-	static const glm::vec3 m_BackwardVector;
-	static const glm::vec3 m_RightVector;
+	static const glm::dvec3 m_ForwardVector;
+	static const glm::dvec3 m_LeftVector;
+	static const glm::dvec3 m_BackwardVector;
+	static const glm::dvec3 m_RightVector;
 
 
-	virtual void rotate(float radians, const glm::vec3 &axis);
+	virtual void rotate(double radians, const glm::dvec3 &axis);
 
-	glm::mat4x4 m_RotationTransform;
-	glm::mat4x4 m_TranslationTransform;
-	glm::mat4x4 m_ScaleTransform;
+	glm::dmat4x4 m_RotationTransform;
+	glm::dmat4x4 m_TranslationTransform;
+	glm::dmat4x4 m_ScaleTransform;
 
 	ContainerObject *m_ContainerObjectPtr;
 };

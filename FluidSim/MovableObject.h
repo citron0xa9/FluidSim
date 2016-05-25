@@ -20,15 +20,15 @@ public:
 	void stopMoveRight();
 	void stopMoveBack();
 
-	virtual void step(float secondsPassed) override;
+	virtual void step(double secondsPassed) override;
 
 private:
 
-	void addLocalVelocity(const glm::vec3 &velocity);
-	void updatePosition(float secondsPassed);
+	void addLocalVelocity(const glm::dvec3 &velocity);
+	void updatePosition(double secondsPassed);
 
-	float m_MovementVelocityFactor;
+	double m_MovementVelocityFactor;
 	
-	glm::vec3 m_LocalVelocity;
+	glm::dvec3 m_LocalVelocity;
 };
 

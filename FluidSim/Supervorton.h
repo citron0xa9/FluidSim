@@ -18,5 +18,5 @@ private:
 	Vorton calculateSupervorton(const std::vector<Vorton*> &containedVortonPtrs);
 
 	std::vector<Vorton*> m_ContainedVortonPtrs;
-	float m_VorticityMagnitudeSum;
+	double m_VorticityMagnitudeSum;
 };

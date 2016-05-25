@@ -17,21 +17,21 @@ class VortonSim : public ContainerObject, public ActiveObject, public DrawableOb
 {
 public:
 	
-	VortonSim(ContainerObject &container, float viscosity, float density, const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype);
+	VortonSim(ContainerObject &container, double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
 	VortonSim(const VortonSim &original);
 	~VortonSim();
 
-	virtual void step(float secondsPassed) override;
+	virtual void step(double secondsPassed) override;
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 	virtual void registerContainerObjectHooks() override;
 	virtual void deregisterContainerObjectHooks() override;
 
-	void update(float seconds);
+	void update(double seconds);
 
 	void vortonsRendered(bool areRendered);
 	void tracersRendered(bool areRendered);
 	void simulating(bool isSimulating);
-	void simulationTimescale(float timescale);
+	void simulationTimescale(double timescale);
 
 	virtual Object* copy() const override;
 	
@@ -41,7 +41,7 @@ public:
 
 private:
 
-	void initializeVortons(const VorticityDistribution &initialVorticity, float vorticityMagnitude, const TriangleNetObject &vortonPrototype);
+	void initializeVortons(const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
 	void initializeVortons(const VortonSim &original);
 	
 	void initializeTracers(const VorticityDistribution &initialVorticity);
@@ -51,24 +51,24 @@ private:
 	void createOctHeap();
 
 	void calculateVelocityGrid();
-	glm::vec3 calculateVelocity(const glm::vec3 &position);
+	glm::dvec3 calculateVelocity(const glm::dvec3 &position);
 
-	void stretchAndTiltVortons(float seconds);
+	void stretchAndTiltVortons(double seconds);
 
-	void diffuseVorticityPSE(float seconds);
-	void diffuseVorticityInside(float seconds, std::vector<Vorton*> &vortonPtrs);
-	void diffuseVorticityBetween(float seconds, std::vector<Vorton*> &firstVortonPtrs, std::vector<Vorton*> &secondVortonPtrs);
-	void diffuseVorticityBetween(float seconds, Vorton &first, Vorton &second);
+	void diffuseVorticityPSE(double seconds);
+	void diffuseVorticityInside(double seconds, std::vector<Vorton*> &vortonPtrs);
+	void diffuseVorticityBetween(double seconds, std::vector<Vorton*> &firstVortonPtrs, std::vector<Vorton*> &secondVortonPtrs);
+	void diffuseVorticityBetween(double seconds, Vorton &first, Vorton &second);
 
-	void advectVortons(float secondsPassed);
-	void advectTracers(float secondsPassed);
+	void advectVortons(double secondsPassed);
+	void advectTracers(double secondsPassed);
 
 	void renderTracers(const glm::mat4x4 &viewProjectTransform);
 
-	std::pair<glm::vec3, glm::vec3> velocityGridDimensions();
+	std::pair<glm::dvec3, glm::dvec3> velocityGridDimensions();
 
-	float m_Viscosity;
-	float m_Density;
+	double m_Viscosity;
+	double m_Density;
 	std::vector<Vorton> m_Vortons;
 	std::vector<Object> m_Tracers;
 	std::vector<GLfloat> m_TracerVerticesRAM;
@@ -76,7 +76,7 @@ private:
 	VertexArrO m_TracerVao;
 
 	VortonOctHeap *m_VortonHeapPtr;
-	UniformGrid<glm::vec3> *m_VelocityGridPtr;
+	UniformGrid<glm::dvec3> *m_VelocityGridPtr;
 
 	static const size_t m_VORTONS_PER_DIMENSION;
 	static const size_t m_TRACERS_PER_DIMENSION;
@@ -84,7 +84,7 @@ private:
 	bool m_VortonsRendered;
 	bool m_TracersRendered;
 	bool m_Simulating;
-	float m_SimulationTimescale;
+	double m_SimulationTimescale;
 
 	Program m_TracerRenderProg;
 

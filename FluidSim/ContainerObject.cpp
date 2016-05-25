@@ -25,7 +25,7 @@ void ContainerObject::render(const glm::mat4x4 &viewProjectTransform)
 	m_UsingObjectListsRender.unlock();
 }
 
-void ContainerObject::step(float secondsPassed)
+void ContainerObject::step(double secondsPassed)
 {
 	m_UsingObjectListsStep.lock();
 	for (auto object : m_ActiveObjectPtrs) {

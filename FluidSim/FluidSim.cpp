@@ -26,11 +26,11 @@ void cli() {
 				throw std::runtime_error("Command entered but no instance of glviewer available");
 			}
 			if (cmd == "setCameraPos") {
-				glm::vec3 pos;
+				glm::dvec3 pos;
 				for (int i = 0; i < 3; i++) {
 					std::cin >> pos[i];
 				}
-				//inst->getScene().getCamera().setPosition(pos);
+				inst->scene().camera().position(pos);
 			}
 			else if (cmd == "setCameraFovY") {
 				float f;
@@ -47,9 +47,21 @@ void cli() {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.resetSim(true); });
 			}
 			else if (cmd == "setTimescale") {
-				float f;
+				double f;
 				std::cin >> f;
 				inst->vortonSim().simulationTimescale(f);
+			}
+			else if (cmd == "showTracers") {
+				inst->vortonSim().tracersRendered(true);
+			}
+			else if (cmd == "hideTracers") {
+				inst->vortonSim().tracersRendered(false);
+			}
+			else if (cmd == "showVortons") {
+				inst->vortonSim().vortonsRendered(true);
+			}
+			else if (cmd == "hideVortons") {
+				inst->vortonSim().vortonsRendered(false);
 			}
 			else {
 				throw std::runtime_error("Unknown cli command");

@@ -7,7 +7,7 @@
 //{
 //}
 
-UniformGridGeometry::UniformGridGeometry(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner)
+UniformGridGeometry::UniformGridGeometry(size_t numElements, const glm::dvec3 & minCorner, const glm::dvec3 & maxCorner)
 {
 	defineShape(numElements, minCorner, maxCorner);
 }
@@ -17,7 +17,7 @@ UniformGridGeometry::~UniformGridGeometry()
 {
 }
 
-void UniformGridGeometry::defineShape(size_t numElements, const glm::vec3 & minCorner, const glm::vec3 & maxCorner)
+void UniformGridGeometry::defineShape(size_t numElements, const glm::dvec3 & minCorner, const glm::dvec3 & maxCorner)
 {
 	m_MinCorner = minCorner;
 	calculateGridExtent(minCorner, maxCorner);
@@ -31,14 +31,14 @@ void UniformGridGeometry::defineShape(size_t numElements, const glm::vec3 & minC
 void UniformGridGeometry::calculateSpacing()
 {
 	glm::uvec3 cellAmount = cellsAmount();
-	m_CellExtent = gridExtent() / glm::vec3(cellAmount);
-	m_CellsPerExtent = glm::vec3(1) / m_CellExtent;
+	m_CellExtent = gridExtent() / glm::dvec3(cellAmount);
+	m_CellsPerExtent = glm::dvec3(1) / m_CellExtent;
 }
 
 void UniformGridGeometry::calculatePointsAmount(size_t numElements)
 {
-	const float volume = m_GridExtent.x * m_GridExtent.y * m_GridExtent.z;
-	const float cellLength = std::cbrt(volume / numElements);  //first calculate temporary uniform length, cbrt = cubic root
+	const double volume = m_GridExtent.x * m_GridExtent.y * m_GridExtent.z;
+	const double cellLength = std::cbrt(volume / numElements);  //first calculate temporary uniform length, cbrt = cubic root
 
 	glm::uvec3 numCells = glm::uvec3(
 		std::ceil(m_GridExtent.x / cellLength),
@@ -57,9 +57,9 @@ void UniformGridGeometry::calculatePointsAmount(size_t numElements)
 	m_PointsAmount = numCells + glm::uvec3(1);
 }
 
-void UniformGridGeometry::calculateGridExtent(const glm::vec3 & minCorner, const glm::vec3 & maxCorner)
+void UniformGridGeometry::calculateGridExtent(const glm::dvec3 & minCorner, const glm::dvec3 & maxCorner)
 {
-	static const float NUDGE = 1.0f + FLT_EPSILON;  // slightly expand size to ensure robust containment even with roundoff
-	glm::vec3 extent = (maxCorner - minCorner);
+	static const double NUDGE = 1.0 + FLT_EPSILON;  // slightly expand size to ensure robust containment even with roundoff
+	glm::dvec3 extent = (maxCorner - minCorner);
 	m_GridExtent = extent * NUDGE;
 }

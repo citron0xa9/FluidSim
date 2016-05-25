@@ -1,7 +1,7 @@
 #include "MovableObject.h"
 
 
-MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}, m_MovementVelocityFactor{4.0f}
+MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}, m_MovementVelocityFactor{4.0}
 {
 }
 
@@ -49,21 +49,21 @@ void MovableObject::stopMoveBack()
 	m_LocalVelocity -= m_MovementVelocityFactor * m_BackwardVector;
 }
 
-void MovableObject::step(float secondsPassed)
+void MovableObject::step(double secondsPassed)
 {
 	updatePosition(secondsPassed);
 }
 
 
 
-void MovableObject::addLocalVelocity(const glm::vec3 & velocity)
+void MovableObject::addLocalVelocity(const glm::dvec3 & velocity)
 {
 	m_LocalVelocity += velocity;
 }
 
-void MovableObject::updatePosition(float secondsPassed)
+void MovableObject::updatePosition(double secondsPassed)
 {
-	glm::vec3 globalVelocity = glm::vec3(m_RotationTransform*glm::vec4(m_LocalVelocity, 1.0));
-	glm::vec3 translationDelta = globalVelocity*secondsPassed;
+	glm::dvec3 globalVelocity = glm::dvec3(m_RotationTransform*glm::vec4(m_LocalVelocity, 1.0));
+	glm::dvec3 translationDelta = globalVelocity*secondsPassed;
 	translate(translationDelta);
 }

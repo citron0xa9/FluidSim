@@ -13,9 +13,9 @@ void Supervorton::addContainedVorton(Vorton & vorton)
 {
 	m_ContainedVortonPtrs.push_back(&vorton);
 
-	glm::vec3 currentPosition = position();
-	glm::vec3 currentVorticity = vorticity();
-	float vorticityMagnitude = static_cast<float>(glm::length(vorton.vorticity()));
+	glm::dvec3 currentPosition = position();
+	glm::dvec3 currentVorticity = vorticity();
+	double vorticityMagnitude = glm::length(vorton.vorticity());
 
 	currentPosition *= m_VorticityMagnitudeSum;
 	currentPosition += vorticityMagnitude * vorton.position();
@@ -49,12 +49,12 @@ Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVo
 	if (containedVortonPtrs.size() < 1) {
 		std::runtime_error("Supervorton::calculateSupervorton: no contained vortons given");
 	}
-	glm::vec3 position(0);
-	glm::vec3 vorticity(0);
+	glm::dvec3 position(0);
+	glm::dvec3 vorticity(0);
 	m_VorticityMagnitudeSum = 0;
 	for (auto vortonPtr : containedVortonPtrs) {
 
-		float vorticityMagnitude = static_cast<float>(glm::length(vortonPtr->vorticity()));
+		double vorticityMagnitude = glm::length(vortonPtr->vorticity());
 		m_VorticityMagnitudeSum += vorticityMagnitude;
 
 		position += vorticityMagnitude * vortonPtr->position();

@@ -37,7 +37,7 @@ void Camera::calculateViewTransform()
 {
 	glm::vec3 currentPosition = position();
 	glm::vec3 lookAt = currentPosition + glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection, 1.0));
-	m_ViewTransform = glm::lookAt(currentPosition, lookAt, m_UpVector);
+	m_ViewTransform = glm::lookAt(currentPosition, lookAt, glm::vec3(m_UpVector));
 }
 
 void Camera::aspectRatio(float ratio)
@@ -56,21 +56,21 @@ void Camera::fovY(float f) {
 	calculateViewPerspectiveTransform();
 }
 
-void Camera::translate(const glm::vec3 & delta)
+void Camera::translate(const glm::dvec3 & delta)
 {
-	if (delta == glm::vec3(0)) {
+	if (delta == glm::dvec3(0)) {
 		return;
 	}
 	Object::translate(delta);
 	calculateViewPerspectiveTransform();
 }
 
-glm::vec3 Camera::lookDirection() const
+glm::dvec3 Camera::lookDirection() const
 {
-	return glm::vec3(m_RotationTransform*glm::vec4(m_LocalLookDirection,1.0));
+	return glm::dvec3(m_RotationTransform*glm::vec4(m_LocalLookDirection,1.0));
 }
 
-void Camera::rotate(float radians, const glm::vec3 & axis)
+void Camera::rotate(double radians, const glm::dvec3 & axis)
 {
 	if (radians == 0) {
 		return;

@@ -3,7 +3,7 @@
 #include "VortonOctHeapElement.h"
 #include "fsmath.h"
 
-const float VortonOctHeap::m_MAX_VOLUME = 1.0f;
+const double VortonOctHeap::m_MAX_VOLUME = 1.0;
 const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 
 VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
@@ -43,37 +43,37 @@ VortonOctHeapElement & VortonOctHeap::atIndex(size_t index)
 	return m_Heap[index];
 }
 
-VortonOctHeapElement & VortonOctHeap::leaftAtPosition(const glm::vec3 & position)
+VortonOctHeapElement & VortonOctHeap::leaftAtPosition(const glm::dvec3 & position)
 {
 	return atIndex(leafIndexForPosition(position));
 }
 
-glm::vec3 VortonOctHeap::minCorner() const
+glm::dvec3 VortonOctHeap::minCorner() const
 {
 	return m_MinCorner;
 }
 
-glm::vec3 VortonOctHeap::extent() const
+glm::dvec3 VortonOctHeap::extent() const
 {
 	return m_Extent;
 }
 
 void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 {
-	glm::vec3 minCorner = vortons[0].position();
-	glm::vec3 maxCorner = vortons[0].position();
+	glm::dvec3 minCorner = vortons[0].position();
+	glm::dvec3 maxCorner = vortons[0].position();
 	for (auto& vorton : vortons) {
 		minCorner = fsmath::allMin(minCorner, vorton.position());
 		maxCorner = fsmath::allMax(maxCorner, vorton.position());
 	}
-	m_MinCorner = minCorner;
-	m_Extent = maxCorner - minCorner;
+	m_MinCorner = minCorner - glm::dvec3(FLT_EPSILON);
+	m_Extent = maxCorner - minCorner + glm::dvec3(FLT_EPSILON);
 	m_Extent = fsmath::allNextPowerOf2(m_Extent);
 }
 
-void VortonOctHeap::subdivide(float maxVolume)
+void VortonOctHeap::subdivide(double maxVolume)
 {
-	float volume = m_Extent.x * m_Extent.y * m_Extent.z;
+	double volume = m_Extent.x * m_Extent.y * m_Extent.z;
 	size_t divisions = static_cast<size_t>(std::ceil(std::log2(volume/maxVolume) / std::log2(8)));
 	
 	subdivide(divisions);
@@ -82,7 +82,7 @@ void VortonOctHeap::subdivide(float maxVolume)
 void VortonOctHeap::subdivide(size_t divisions)
 {
 	m_Divisions = divisions;
-	m_ExtentPerLeaf = glm::vec3(m_Extent) / static_cast<float>(1 << m_Divisions);
+	m_ExtentPerLeaf = glm::dvec3(m_Extent) / static_cast<double>(1 << m_Divisions);
 	m_LeafsPerDimension = static_cast<size_t>(1) << (divisions);	//2^divisions
 }
 
@@ -95,8 +95,8 @@ void VortonOctHeap::createEmptyOctHeap()
 	//create empty heap
 	size_t currentElementDepth = 0;
 	size_t currentElementDepthStartOffset = 0;
-	glm::vec3 currentElementExtent = m_Extent;
-	glm::vec3 currentElementCenter = m_MinCorner + (m_Extent / 2.0f);
+	glm::dvec3 currentElementExtent = m_Extent;
+	glm::dvec3 currentElementCenter = m_MinCorner + (m_Extent / 2.0);
 	size_t elementsPerDimension = 1;
 	size_t elementsPerDimensionSquared = 1;
 	for (size_t i = 0; i < heapSize; i++) {
@@ -105,7 +105,7 @@ void VortonOctHeap::createEmptyOctHeap()
 			currentElementDepthStartOffset = i;
 			currentElementDepth++;
 			currentElementExtent /= 2;
-			currentElementCenter = m_MinCorner + (currentElementExtent / 2.0f);
+			currentElementCenter = m_MinCorner + (currentElementExtent / 2.0);
 			elementsPerDimension = (static_cast<size_t>(1) << currentElementDepth);
 			elementsPerDimensionSquared = elementsPerDimension * elementsPerDimension;
 		}
@@ -119,12 +119,12 @@ void VortonOctHeap::createEmptyOctHeap()
 			currentElementCenter.x += currentElementExtent.x;
 		}
 		else if (currentElementCountInLayer % elementsPerDimensionSquared) {
-			currentElementCenter.x = m_MinCorner.x + (currentElementExtent.x / 2.0f);
+			currentElementCenter.x = m_MinCorner.x + (currentElementExtent.x / 2.0);
 			currentElementCenter.y += currentElementExtent.y;
 		}
 		else {
-			currentElementCenter.x = m_MinCorner.x + (currentElementExtent.x / 2.0f);
-			currentElementCenter.y = m_MinCorner.y + (currentElementExtent.y / 2.0f);
+			currentElementCenter.x = m_MinCorner.x + (currentElementExtent.x / 2.0);
+			currentElementCenter.y = m_MinCorner.y + (currentElementExtent.y / 2.0);
 			currentElementCenter.z += currentElementExtent.z;
 		}
 	}
@@ -157,13 +157,13 @@ void VortonOctHeap::initializeParents()
 	}
 }
 
-size_t VortonOctHeap::leafIndexForPosition(const glm::vec3 & position)
+size_t VortonOctHeap::leafIndexForPosition(const glm::dvec3 & position)
 {
 	if (!isInsideBoundingBox(position)) {
 		std::runtime_error("VortonOctHeap::getLeafIndexForPostion: position outside of bounding box");
 	}
 
-	glm::vec3 indices = (position - m_MinCorner) / m_ExtentPerLeaf;
+	glm::uvec3 indices = (position - m_MinCorner) / m_ExtentPerLeaf;
 	return indexForIndices(indices);
 }
 

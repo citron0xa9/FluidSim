@@ -2,9 +2,9 @@
 #include "fsmath.h"
 
 
-void fsmath::computeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid<glm::vec3>& velocityGrid)
+void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGrid<glm::dvec3>& velocityGrid)
 {
-	const glm::vec3 doubleCellExtent = 2.0f * velocityGrid.cellExtent();
+	const glm::dvec3 doubleCellExtent = 2.0 * velocityGrid.cellExtent();
 
 	const glm::uvec3 pointsAmountMinus1 = velocityGrid.pointsAmount() - glm::uvec3(1);
 
@@ -16,7 +16,7 @@ void fsmath::computeJacobian(UniformGrid<glm::mat3x3>& jacobianGrid, UniformGrid
 	for (size_t zIndex = 1; zIndex < pointsAmountMinus1.z; zIndex++) {
 		for (size_t yIndex = 1; yIndex < pointsAmountMinus1.y; yIndex++) {
 			for (size_t xIndex = 1; xIndex < pointsAmountMinus1.x; xIndex++) {
-				glm::mat3x3 &currentMatrix = jacobianGrid.atOffset(currentOffset);
+				glm::dmat3x3 &currentMatrix = jacobianGrid.atOffset(currentOffset);
 
 				//calculate d/dx, d/dy, d/dz.
 				//use centered derivation

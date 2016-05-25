@@ -8,7 +8,7 @@ public:
 	ActiveObject(ContainerObject &container);
 	virtual ~ActiveObject();
 
-	virtual void step(float secondsPassed) = 0;
+	virtual void step(double secondsPassed) = 0;
 
 	virtual void registerContainerObjectHooks() override;
 	virtual void deregisterContainerObjectHooks() override;
