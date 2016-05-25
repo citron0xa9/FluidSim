@@ -36,6 +36,9 @@ VortonSim::~VortonSim()
 	if (m_VelocityGridPtr != nullptr) {
 		delete m_VelocityGridPtr;
 	}
+	if (m_VelocityGridDrawPtr != nullptr) {
+		delete m_VelocityGridDrawPtr;
+	}
 }
 
 void VortonSim::step(double secondsPassed)
@@ -56,6 +59,10 @@ void VortonSim::render(const glm::mat4x4 & viewProjectTransform)
 
 	if (m_TracersRendered) {
 		renderTracers(viewProjectTransform);
+	}
+	if ((m_VelocityGridDrawPtr != nullptr) && (m_VelocityGridPtr != nullptr)) {
+		m_VelocityGridDrawPtr->updateGeometry(*m_VelocityGridPtr);
+		m_VelocityGridDrawPtr->render(viewProjectTransform);
 	}
 	ContainerObject::render(viewProjectTransform);
 }
@@ -364,8 +371,8 @@ void VortonSim::renderTracers(const glm::mat4x4 & viewProjectTransform)
 std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 {
 	//find min corner and max corner
-	glm::dvec3 minCorner = m_VortonHeapPtr->minCorner();
-	glm::dvec3 maxCorner = minCorner + glm::dvec3(m_VortonHeapPtr->extent());
+	glm::dvec3 minCorner = glm::dvec3(FLT_MAX);
+	glm::dvec3 maxCorner = glm::dvec3(FLT_MIN);
 
 	for (auto & tracer : m_Tracers) {
 		minCorner = fsmath::allMin(tracer.position(), minCorner);
@@ -381,4 +388,17 @@ std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 
 	//return dimensions as minCorner, maxCorner
 	return std::make_pair(minCorner, maxCorner);
+}
+
+void VortonSim::showVelocityGrid()
+{
+	m_VelocityGridDrawPtr = new DrawableGridGeometry(*this);
+}
+
+void VortonSim::hideVelocityGrid()
+{
+	if (m_VelocityGridDrawPtr != nullptr) {
+		delete m_VelocityGridDrawPtr;
+		m_VelocityGridDrawPtr = nullptr;
+	}
 }

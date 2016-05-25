@@ -63,6 +63,12 @@ void cli() {
 			else if (cmd == "hideVortons") {
 				inst->vortonSim().vortonsRendered(false);
 			}
+			else if (cmd == "showVGrid") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSim().showVelocityGrid(); });
+			}
+			else if (cmd == "hideVGrid") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSim().hideVelocityGrid(); });
+			}
 			else {
 				throw std::runtime_error("Unknown cli command");
 			}

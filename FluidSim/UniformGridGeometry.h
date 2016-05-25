@@ -11,7 +11,7 @@ public:
 
 	glm::dvec3 minCorner() const { return m_MinCorner; }
 	glm::dvec3 gridExtent() const { return m_GridExtent; }
-	size_t gridPointCapacity() { return (pointsAmount().x * pointsAmount().y * pointsAmount().z); }
+	size_t gridPointCapacity() const { return (pointsAmount().x * pointsAmount().y * pointsAmount().z); }
 	glm::dvec3 cellsPerExtent() const { return m_CellsPerExtent; }
 	glm::uvec3 pointsAmount() const { return m_PointsAmount; }
 	glm::uvec3 cellsAmount() const { return (pointsAmount() - glm::uvec3(1)); }

@@ -7,6 +7,11 @@
 GLuint Program::m_usedProgramId = 0;
 const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraPosition" };
 
+Program::Program() : m_loadedMaterialId(-1)
+{
+	m_Id = glCreateProgram();
+}
+
 Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables( lightSrcVars ), m_loadedMaterialId(-1)
 {
 	m_Id = glCreateProgram();

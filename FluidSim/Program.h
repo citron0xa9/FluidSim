@@ -23,6 +23,7 @@ struct UniformNames {
 class Program
 {
 public:
+	Program();
 	Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars);
 	virtual ~Program();
 

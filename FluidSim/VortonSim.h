@@ -12,6 +12,7 @@
 #include "VortonOctHeap.h"
 #include "UniformGrid.h"
 #include "Vorton.h"
+#include "DrawableGridGeometry.h"
 
 class VortonSim : public ContainerObject, public ActiveObject, public DrawableObject
 {
@@ -32,6 +33,8 @@ public:
 	void tracersRendered(bool areRendered);
 	void simulating(bool isSimulating);
 	void simulationTimescale(double timescale);
+	void showVelocityGrid();
+	void hideVelocityGrid();
 
 	virtual Object* copy() const override;
 	
@@ -89,5 +92,7 @@ private:
 	Program m_TracerRenderProg;
 
 	std::mutex m_InUpdateMutex;
+
+	DrawableGridGeometry* m_VelocityGridDrawPtr;
 };
 
