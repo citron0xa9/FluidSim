@@ -1,7 +1,7 @@
 #include "MovableObject.h"
 
 
-MovableObject::MovableObject(ContainerObject & container) : ActiveObject{container}, Object{container}, m_MovementVelocityFactor{4.0}
+MovableObject::MovableObject() : m_MovementVelocityFactor{4.0}
 {
 }
 

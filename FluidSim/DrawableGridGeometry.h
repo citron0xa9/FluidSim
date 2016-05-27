@@ -9,7 +9,7 @@
 class DrawableGridGeometry : public DrawableObject
 {
 public:
-	DrawableGridGeometry(ContainerObject &container);
+	DrawableGridGeometry();
 	virtual ~DrawableGridGeometry();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;

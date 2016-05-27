@@ -1,12 +1,14 @@
 #include "Scene.h"
 #include <chrono>
 #include "Log.h"
+#include "ActiveObject.h"
+#include "DrawableObject.h"
 
 const unsigned int Scene::m_STEP_TIME_MS = 15;
 
 Scene::Scene() : m_Camera{*this}, m_Alive{true}
 {
-	m_Camera.registerContainerObjectHooks();
+	m_Camera.registerSceneHooks(*this);
 }
 
 
@@ -20,6 +22,10 @@ Scene::~Scene()
 	}
 	for (auto &programPtr : m_ProgramPtrs) {
 		delete programPtr;
+	}
+
+	for (auto objectPtr : m_ObjectPtrs) {
+		delete objectPtr;
 	}
 }
 
@@ -75,21 +81,6 @@ Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVa
 	return *m_ProgramPtrs.back();
 }
 
-/*Geometry & Scene::firstGeometry()
-{
-	return *m_GeometriePtrs.front();
-}
-
-Material & Scene::firstMaterial()
-{
-	return m_Materials.front();
-}
-
-Program & Scene::firstProgram()
-{
-	return *m_ProgramPtrs.front();
-}*/
-
 void Scene::render()
 {
 	glm::mat4x4 viewProjectTransform = m_Camera.viewPerspectiveTransform();
@@ -99,9 +90,8 @@ void Scene::render()
 		programPtr->loadCameraPosition(cameraPosition);
 	}
 	
-	ContainerObject::render(viewProjectTransform);
+	render(viewProjectTransform);
 }
-
 
 void Scene::aspectRatio(float ratio)
 {
@@ -116,4 +106,78 @@ Camera& Scene::camera()
 void Scene::startStepping()
 {
 	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
+}
+
+void Scene::render(const glm::mat4x4 &viewProjectTransform)
+{
+	m_UsingObjectListsRender.lock();
+	for (auto objectPtr : m_DrawableObjectPtrs) {
+		objectPtr->render(viewProjectTransform);
+	}
+	m_UsingObjectListsRender.unlock();
+}
+
+void Scene::step(double secondsPassed)
+{
+	m_UsingObjectListsStep.lock();
+	for (auto objectPtr : m_ActiveObjectPtrs) {
+		objectPtr->step(secondsPassed);
+	}
+	m_UsingObjectListsStep.unlock();
+}
+
+void Scene::addObject(const Object & object)
+{
+	m_UsingObjectListsRender.lock();
+	m_UsingObjectListsStep.lock();
+
+	m_ObjectPtrs.push_back(object.copy());
+	m_ObjectPtrs.back()->registerSceneHooks(*this);
+
+	m_UsingObjectListsStep.unlock();
+	m_UsingObjectListsRender.unlock();
+}
+
+void Scene::addObjectPtr(Object * objPtr)
+{
+	m_UsingObjectListsRender.lock();
+	m_UsingObjectListsStep.lock();
+
+	m_ObjectPtrs.push_back(objPtr);
+	m_ObjectPtrs.back()->registerSceneHooks(*this);
+
+	m_UsingObjectListsStep.unlock();
+	m_UsingObjectListsRender.unlock();
+}
+
+void Scene::removeObjectPtr(Object *objectPtr)
+{
+	m_UsingObjectListsRender.lock();
+	m_UsingObjectListsStep.lock();
+
+	objectPtr->deregisterSceneHooks(*this);
+	m_ObjectPtrs.remove(objectPtr);
+
+	m_UsingObjectListsStep.unlock();
+	m_UsingObjectListsRender.unlock();
+}
+
+void Scene::addActiveObject(ActiveObject & object)
+{
+	m_ActiveObjectPtrs.push_back(&object);
+}
+
+void Scene::removeActiveObject(ActiveObject & object)
+{
+	m_ActiveObjectPtrs.remove(&object);
+}
+
+void Scene::addDrawableObject(DrawableObject & object)
+{
+	m_DrawableObjectPtrs.push_back(&object);
+}
+
+void Scene::removeDrawableObject(DrawableObject & object)
+{
+	m_DrawableObjectPtrs.remove(&object);
 }

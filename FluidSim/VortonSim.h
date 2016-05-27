@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ContainerObject.h"
 #include "ActiveObject.h"
 
 #include <vector>
@@ -14,18 +13,18 @@
 #include "Vorton.h"
 #include "DrawableGridGeometry.h"
 
-class VortonSim : public ContainerObject, public ActiveObject, public DrawableObject
+class VortonSim : public ActiveObject, public DrawableObject
 {
 public:
 	
-	VortonSim(ContainerObject &container, double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
+	VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
 	VortonSim(const VortonSim &original);
 	~VortonSim();
 
 	virtual void step(double secondsPassed) override;
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
-	virtual void registerContainerObjectHooks() override;
-	virtual void deregisterContainerObjectHooks() override;
+	virtual void registerSceneHooks(Scene &scene) override;
+	virtual void deregisterSceneHooks(Scene &scene) override;
 
 	void update(double seconds);
 

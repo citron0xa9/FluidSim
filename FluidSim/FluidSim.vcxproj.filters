@@ -135,9 +135,6 @@
     <ClInclude Include="ActiveObject.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="ContainerObject.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="DrawableObject.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -235,9 +232,6 @@
     </ClCompile>
     <ClCompile Include="VortonSim.cpp">
       <Filter>Source Files\Objects\Sim</Filter>
-    </ClCompile>
-    <ClCompile Include="ContainerObject.cpp">
-      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="ActiveObject.cpp">
       <Filter>Source Files\Objects</Filter>

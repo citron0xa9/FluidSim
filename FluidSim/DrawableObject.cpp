@@ -1,8 +1,8 @@
 
 #include "DrawableObject.h"
+#include "Scene.h"
 
-
-DrawableObject::DrawableObject(ContainerObject &container) : Object{container}
+DrawableObject::DrawableObject()
 {
 }
 
@@ -11,12 +11,12 @@ DrawableObject::~DrawableObject()
 {
 }
 
-void DrawableObject::registerContainerObjectHooks()
+void DrawableObject::registerSceneHooks(Scene &scene)
 {
-	m_ContainerObjectPtr->addDrawableObject(*this);
+	scene.addDrawableObject(*this);
 }
 
-void DrawableObject::deregisterContainerObjectHooks()
+void DrawableObject::deregisterSceneHooks(Scene &scene)
 {
-	m_ContainerObjectPtr->removeDrawableObject(*this);
+	scene.removeDrawableObject(*this);
 }

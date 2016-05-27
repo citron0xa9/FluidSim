@@ -1,7 +1,7 @@
 
 #include "Supervorton.h"
 
-Supervorton::Supervorton(TriangleNetObject & object) : Vorton(object), Object(object), m_VorticityMagnitudeSum{0}
+Supervorton::Supervorton(TriangleNetObject & object) : Vorton(object), m_VorticityMagnitudeSum{0}
 {
 }
 

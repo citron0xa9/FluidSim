@@ -3,7 +3,7 @@
 #include "Scene.h"
 
 
-LightSource::LightSource(Scene &scene, GLfloat intensity) : Object{ scene }, m_Intensity { intensity }
+LightSource::LightSource(Scene &scene, GLfloat intensity) : m_Intensity { intensity }
 {
 	
 }
@@ -11,11 +11,6 @@ LightSource::LightSource(Scene &scene, GLfloat intensity) : Object{ scene }, m_I
 
 LightSource::~LightSource()
 {
-}
-
-void LightSource::registerContainerObjectHooks()
-{
-	registerSceneHooks(static_cast<Scene&>(*m_ContainerObjectPtr));
 }
 
 void LightSource::registerSceneHooks(Scene & scene)

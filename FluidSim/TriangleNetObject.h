@@ -8,7 +8,7 @@
 class TriangleNetObject : public DrawableObject
 {
 public:
-	TriangleNetObject(ContainerObject& container, Material *materialPtr = nullptr, Geometry *geometryPtr = nullptr, Program *renderProgPtr = nullptr);
+	TriangleNetObject(Material *materialPtr = nullptr, Geometry *geometryPtr = nullptr, Program *renderProgPtr = nullptr);
 	virtual ~TriangleNetObject();
 
 	virtual Object* copy() const override;

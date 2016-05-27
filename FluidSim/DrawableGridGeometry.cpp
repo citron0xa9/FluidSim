@@ -5,8 +5,8 @@
 const GLuint DrawableGridGeometry::m_VertexPositionIndex = 0;
 const std::string DrawableGridGeometry::m_ColorUniformName = "color";
 
-DrawableGridGeometry::DrawableGridGeometry(ContainerObject & container)
-	:DrawableObject(container), Object(container), m_LinePointsBuf{ false }, m_Color{ 0.345f, 0.949f, 0.122f }
+DrawableGridGeometry::DrawableGridGeometry()
+	: m_LinePointsBuf{ false }, m_Color{ 0.345f, 0.949f, 0.122f }
 {
 	setupRendering();
 }

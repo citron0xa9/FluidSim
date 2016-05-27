@@ -124,7 +124,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	geomSphere.setupAttribArrays(prog);
 
 	//create vorton prototype
-	m_VortonPrototypePtr = std::make_unique<TriangleNetObject>(m_Scene, &sphereMatRef, &geomSphere, &prog);
+	m_VortonPrototypePtr = std::make_unique<TriangleNetObject>(&sphereMatRef, &geomSphere, &prog);
 	m_VortonPrototypePtr->scale(glm::dvec3(0.03));
 
 	setupVortonSim(false);
@@ -288,7 +288,7 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 
 void GLViewer::setupVortonSim(bool createPaused)
 {
-	m_VortonSimPtr = new VortonSim(m_Scene, 0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0, *m_VortonPrototypePtr);
+	m_VortonSimPtr = new VortonSim(0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0, *m_VortonPrototypePtr);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }

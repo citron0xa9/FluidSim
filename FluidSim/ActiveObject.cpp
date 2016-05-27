@@ -1,8 +1,9 @@
 
 #include "ActiveObject.h"
+#include "Scene.h"
 
 
-ActiveObject::ActiveObject(ContainerObject &container) : Object{container}
+ActiveObject::ActiveObject()
 {
 }
 
@@ -11,12 +12,12 @@ ActiveObject::~ActiveObject()
 {
 }
 
-void ActiveObject::registerContainerObjectHooks()
+void ActiveObject::registerSceneHooks(Scene &scene)
 {
-	m_ContainerObjectPtr->addActiveObject(*this);
+	scene.addActiveObject(*this);
 }
 
-void ActiveObject::deregisterContainerObjectHooks()
+void ActiveObject::deregisterSceneHooks(Scene &scene)
 {
-	m_ContainerObjectPtr->removeActiveObject(*this);
+	scene.removeActiveObject(*this);
 }

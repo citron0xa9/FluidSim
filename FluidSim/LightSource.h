@@ -24,8 +24,7 @@ public:
 	virtual ~LightSource();
 	virtual void loadIntoProgram(Program &program) const = 0;
 
-	virtual void registerContainerObjectHooks() override;
-	void registerSceneHooks(Scene &scene);
+	virtual void registerSceneHooks(Scene &scene) override;
 
 protected:
 	GLfloat m_Intensity;

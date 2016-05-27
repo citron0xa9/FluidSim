@@ -7,10 +7,10 @@
 const size_t VortonSim::m_VORTONS_PER_DIMENSION = 16;
 const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
 
-VortonSim::VortonSim(ContainerObject &container, double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype)
-	: ActiveObject{ container }, DrawableObject{ container }, Object{ container }, m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
-	m_VortonsRendered{false}, m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true},
-	m_SimulationTimescale{1.0}
+VortonSim::VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype)
+	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr }, m_VortonsRendered{false},
+	m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()},
+	m_Simulating{true}, m_SimulationTimescale{1.0}
 {
 	initializeVortons(initialVorticity, vorticityMagnitude, vortonPrototype);
 	initializeTracers(initialVorticity);
@@ -18,8 +18,7 @@ VortonSim::VortonSim(ContainerObject &container, double viscosity, double densit
 }
 
 VortonSim::VortonSim(const VortonSim & original)
-	: ActiveObject{*original.m_ContainerObjectPtr}, DrawableObject{ *original.m_ContainerObjectPtr }, Object{original},
-	m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
+	: m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
 	m_VortonsRendered{original.m_VortonsRendered}, m_TracersRendered{original.m_TracersRendered}, m_TracerVerticesBuf{false}, m_TracerVao{false},
 	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}, m_SimulationTimescale{original.m_SimulationTimescale}
 {
@@ -43,7 +42,6 @@ VortonSim::~VortonSim()
 
 void VortonSim::step(double secondsPassed)
 {
-	ContainerObject::step(secondsPassed);
 	m_InUpdateMutex.lock();
 	update(secondsPassed);
 	m_InUpdateMutex.unlock();
@@ -64,19 +62,18 @@ void VortonSim::render(const glm::mat4x4 & viewProjectTransform)
 		m_VelocityGridDrawPtr->updateGeometry(*m_VelocityGridPtr);
 		m_VelocityGridDrawPtr->render(viewProjectTransform);
 	}
-	ContainerObject::render(viewProjectTransform);
 }
 
-void VortonSim::registerContainerObjectHooks()
+void VortonSim::registerSceneHooks(Scene &scene)
 {
-	ActiveObject::registerContainerObjectHooks();
-	DrawableObject::registerContainerObjectHooks();
+	ActiveObject::registerSceneHooks(scene);
+	DrawableObject::registerSceneHooks(scene);
 }
 
-void VortonSim::deregisterContainerObjectHooks()
+void VortonSim::deregisterSceneHooks(Scene &scene)
 {
-	ActiveObject::deregisterContainerObjectHooks();
-	DrawableObject::deregisterContainerObjectHooks();
+	ActiveObject::deregisterSceneHooks(scene);
+	DrawableObject::deregisterSceneHooks(scene);
 }
 
 void VortonSim::update(double seconds)
@@ -144,7 +141,6 @@ void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity
 					vortonDistance.z * zIndex);
 				position += minCorner;
 				Vorton vorton(vortonPrototype, position, initialVorticity.vorticityAtPosition(position) * vorticityMagnitude);
-				vorton.containedIn(*this);
 				vorton.radius(vortonRadius);
 				if (glm::length(vorton.vorticity()) > SIGNIFICANT_VORTICITY) {
 					m_Vortons.push_back(vorton);
@@ -158,7 +154,6 @@ void VortonSim::initializeVortons(const VortonSim & original)
 {
 	for (auto & originalVorton : original.m_Vortons) {
 		Vorton vorton(originalVorton);
-		vorton.containedIn(*this);
 		m_Vortons.push_back(vorton);
 	}
 }
@@ -392,7 +387,7 @@ std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 
 void VortonSim::showVelocityGrid()
 {
-	m_VelocityGridDrawPtr = new DrawableGridGeometry(*this);
+	m_VelocityGridDrawPtr = new DrawableGridGeometry();
 }
 
 void VortonSim::hideVelocityGrid()

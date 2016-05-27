@@ -1,5 +1,6 @@
 
 #include "Object.h"
+#include "Scene.h"
 #include "Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -14,7 +15,7 @@ const glm::dvec3 Object::m_RightVector = -m_LeftVector;
 glm::dvec3 Camera::m_LocalLookDirection = Object::m_ForwardVector;
 glm::dvec3 Camera::m_UpVector = Object::m_yAxis;
 
-Object::Object(ContainerObject &container) : m_ContainerObjectPtr{&container}
+Object::Object()
 {
 	
 }
@@ -29,12 +30,11 @@ Object * Object::copy() const
 	return new Object(*this);
 }
 
-void Object::registerContainerObjectHooks()
+void Object::registerSceneHooks(Scene & scene)
 {
-	
 }
 
-void Object::deregisterContainerObjectHooks()
+void Object::deregisterSceneHooks(Scene & scene)
 {
 }
 
@@ -68,10 +68,6 @@ void Object::position(const glm::dvec3 & position)
 	m_TranslationTransform[3] = glm::dvec4(position, 1.0);
 }
 
-void Object::containedIn(ContainerObject & containerObject)
-{
-	m_ContainerObjectPtr = &containerObject;
-}
 
 void Object::rotate(double radians, const glm::dvec3 & axis)
 {

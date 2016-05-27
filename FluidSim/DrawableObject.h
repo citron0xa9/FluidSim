@@ -5,12 +5,12 @@
 class DrawableObject : public virtual Object
 {
 public:
-	DrawableObject(ContainerObject &container);
+	DrawableObject();
 	virtual ~DrawableObject();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) = 0;
 
-	virtual void registerContainerObjectHooks() override;
-	virtual void deregisterContainerObjectHooks() override;
+	virtual void registerSceneHooks(Scene &scene) override;
+	virtual void deregisterSceneHooks(Scene &scene) override;
 };
 

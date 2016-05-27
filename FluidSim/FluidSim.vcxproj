@@ -225,7 +225,6 @@
     <ClInclude Include="ActiveObject.h" />
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="ContainerObject.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DrawableGridGeometry.h" />
     <ClInclude Include="DrawableObject.h" />
@@ -261,7 +260,6 @@
     <ClCompile Include="ActiveObject.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ContainerObject.cpp" />
     <ClCompile Include="DrawableGridGeometry.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="FluidSim.cpp" />

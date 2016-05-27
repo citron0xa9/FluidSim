@@ -4,9 +4,8 @@
 #include <glm/gtx/transform.hpp>
 
 
-Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far) :
-	MovableObject{ scene }, Object{ scene },
-	m_FovY{ fovy }, m_AspectRatio{ aspectRatio }, m_NearClippingPlane{ near }, m_FarClippingPlane{ far }
+Camera::Camera(Scene &scene, float fovy, float aspectRatio, float near, float far)
+	: m_FovY{ fovy }, m_AspectRatio{ aspectRatio }, m_NearClippingPlane{ near }, m_FarClippingPlane{ far }
 {
 	calculateViewPerspectiveTransform();
 }

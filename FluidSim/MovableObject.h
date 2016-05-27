@@ -7,7 +7,7 @@ class Scene;
 class MovableObject : public ActiveObject
 {
 public:
-	MovableObject(ContainerObject &container);
+	MovableObject();
 	virtual ~MovableObject();
 
 	void startMoveForward();

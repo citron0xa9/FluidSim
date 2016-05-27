@@ -1,11 +1,9 @@
 #include "TriangleNetObject.h"
 
-TriangleNetObject::TriangleNetObject(ContainerObject& container, Material *materialPtr, Geometry *geometryPtr, Program *renderProgPtr)
-	: DrawableObject{ container }, Object(container), m_MaterialPtr{ materialPtr }, m_GeometryPtr{ geometryPtr }, m_ProgramPtr{renderProgPtr}
+TriangleNetObject::TriangleNetObject(Material *materialPtr, Geometry *geometryPtr, Program *renderProgPtr)
+	: m_MaterialPtr{ materialPtr }, m_GeometryPtr{ geometryPtr }, m_ProgramPtr{renderProgPtr}
 {
-
 }
-
 
 TriangleNetObject::~TriangleNetObject()
 {
