@@ -10,6 +10,7 @@
 #include "VertexBufO.h"
 #include "Program.h"
 #include "Scene.h"
+#include "VortonSimRenderer.h"
 
 class GLViewer {
 public:
@@ -39,6 +40,7 @@ public:
 
 	Scene& scene();
 	VortonSim &vortonSim();
+	VortonSimRenderer &vortonSimRenderer();
 
 	void resetSim(bool createPaused);
 private:
@@ -71,11 +73,10 @@ private:
 
 	Scene m_Scene;
 	VortonSim *m_VortonSimPtr;
+	VortonSimRenderer *m_VortonSimRendererPtr;
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;
 	static const float m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION;
-
-	std::unique_ptr<TriangleNetObject> m_VortonPrototypePtr;
 };
 

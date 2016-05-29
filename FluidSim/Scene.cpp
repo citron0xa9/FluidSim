@@ -56,9 +56,7 @@ void Scene::stepLoop()
 void Scene::addLightSource(LightSource &lightSource)
 {
 	m_LightSourcePtrs.push_back(&lightSource);
-	for (auto programPtr : m_ProgramPtrs) {
-		programPtr->loadLights(m_LightSourcePtrs);
-	}
+	loadLightsIntoPrograms();
 }
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
@@ -74,10 +72,18 @@ Material& Scene::addMaterial(const Material &material)
 	return m_Materials.back();
 }
 
+Program & Scene::addProgram()
+{
+	Program *newProg = new Program{};
+	m_ProgramPtrs.push_back(newProg);
+	return *m_ProgramPtrs.back();
+}
+
 Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVars)
 {
 	Program *newProg = new Program{ lightVars };
 	m_ProgramPtrs.push_back(newProg);
+
 	return *m_ProgramPtrs.back();
 }
 
@@ -106,6 +112,13 @@ Camera& Scene::camera()
 void Scene::startStepping()
 {
 	m_StepLoopThread = std::thread{ &Scene::stepLoop, this };
+}
+
+void Scene::loadLightsIntoPrograms()
+{
+	for (auto programPtr : m_ProgramPtrs) {
+		programPtr->loadLights(m_LightSourcePtrs);
+	}
 }
 
 void Scene::render(const glm::mat4x4 &viewProjectTransform)

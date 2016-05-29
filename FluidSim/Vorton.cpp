@@ -1,14 +1,14 @@
 
 #include "Vorton.h"
 
-Vorton::Vorton(const TriangleNetObject &triangleNetObject, const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, double radius)
-	: TriangleNetObject(triangleNetObject), m_Vorticity(vorticity), m_Radius(radius), m_Velocity(0)
+Vorton::Vorton(const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, double radius)
+	: m_Vorticity(vorticity), m_Radius(radius), m_Velocity(0)
 {
 	position(initialPosition);
 }
 
 
-Vorton::Vorton(const TriangleNetObject & triangleNetObj) : TriangleNetObject(triangleNetObj), m_Vorticity{ 0 }
+Vorton::Vorton() : m_Vorticity{ 0 }
 {
 }
 

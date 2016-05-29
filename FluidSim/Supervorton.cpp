@@ -1,7 +1,7 @@
 
 #include "Supervorton.h"
 
-Supervorton::Supervorton(TriangleNetObject & object) : Vorton(object), m_VorticityMagnitudeSum{0}
+Supervorton::Supervorton() : m_VorticityMagnitudeSum{0}
 {
 }
 
@@ -67,5 +67,5 @@ Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVo
 	else {
 		position = containedVortonPtrs[0]->position();
 	}
-	return Vorton(*containedVortonPtrs.back(), position, vorticity, containedVortonPtrs[0]->radius());
+	return Vorton(position, vorticity, containedVortonPtrs[0]->radius());
 }

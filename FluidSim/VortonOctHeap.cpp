@@ -7,7 +7,7 @@ const double VortonOctHeap::m_MAX_VOLUME = 1.0;
 const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 
 VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
-	: m_NullSupervorton(vortons.back())
+	: m_NullSupervorton()
 {
 	m_NullSupervorton.radius(vortons.back().radius());
 	if (vortons.empty()) {

@@ -7,24 +7,20 @@
 const size_t VortonSim::m_VORTONS_PER_DIMENSION = 16;
 const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
 
-VortonSim::VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype)
-	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr }, m_VortonsRendered{false},
-	m_TracersRendered{true}, m_TracerVerticesBuf{false}, m_TracerVao{false}, m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()},
+VortonSim::VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude)
+	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
 	m_Simulating{true}, m_SimulationTimescale{1.0}
 {
-	initializeVortons(initialVorticity, vorticityMagnitude, vortonPrototype);
+	initializeVortons(initialVorticity, vorticityMagnitude);
 	initializeTracers(initialVorticity);
-	setupTracerRenderProgram();
 }
 
 VortonSim::VortonSim(const VortonSim & original)
 	: m_Viscosity{original.m_Viscosity}, m_Density{original.m_Density}, m_VortonHeapPtr{nullptr}, m_VelocityGridPtr{nullptr},
-	m_VortonsRendered{original.m_VortonsRendered}, m_TracersRendered{original.m_TracersRendered}, m_TracerVerticesBuf{false}, m_TracerVao{false},
-	m_TracerRenderProg{std::vector<ShaderLightSourceVariable>()}, m_Simulating{true}, m_SimulationTimescale{original.m_SimulationTimescale}
+	m_Simulating{true}, m_SimulationTimescale{original.m_SimulationTimescale}
 {
 	initializeVortons(original);
 	initializeTracers(original);
-	setupTracerRenderProgram();
 }
 
 VortonSim::~VortonSim()
@@ -35,9 +31,6 @@ VortonSim::~VortonSim()
 	if (m_VelocityGridPtr != nullptr) {
 		delete m_VelocityGridPtr;
 	}
-	if (m_VelocityGridDrawPtr != nullptr) {
-		delete m_VelocityGridDrawPtr;
-	}
 }
 
 void VortonSim::step(double secondsPassed)
@@ -45,35 +38,6 @@ void VortonSim::step(double secondsPassed)
 	m_InUpdateMutex.lock();
 	update(secondsPassed);
 	m_InUpdateMutex.unlock();
-}
-
-void VortonSim::render(const glm::mat4x4 & viewProjectTransform)
-{
-	if (m_VortonsRendered) {
-		for (auto & vorton : m_Vortons) {
-			vorton.render(viewProjectTransform);
-		}
-	}
-
-	if (m_TracersRendered) {
-		renderTracers(viewProjectTransform);
-	}
-	if ((m_VelocityGridDrawPtr != nullptr) && (m_VelocityGridPtr != nullptr)) {
-		m_VelocityGridDrawPtr->updateGeometry(*m_VelocityGridPtr);
-		m_VelocityGridDrawPtr->render(viewProjectTransform);
-	}
-}
-
-void VortonSim::registerSceneHooks(Scene &scene)
-{
-	ActiveObject::registerSceneHooks(scene);
-	DrawableObject::registerSceneHooks(scene);
-}
-
-void VortonSim::deregisterSceneHooks(Scene &scene)
-{
-	ActiveObject::deregisterSceneHooks(scene);
-	DrawableObject::deregisterSceneHooks(scene);
 }
 
 void VortonSim::update(double seconds)
@@ -94,15 +58,21 @@ void VortonSim::update(double seconds)
 	advectTracers(seconds);
 }
 
-void VortonSim::vortonsRendered(bool areRendered)
+const std::vector<Object>& VortonSim::tracers() const
 {
-	m_VortonsRendered = areRendered;
+	return m_Tracers;
 }
 
-void VortonSim::tracersRendered(bool areRendered)
+const std::vector<Vorton>& VortonSim::vortons() const
 {
-	m_TracersRendered = areRendered;
+	return m_Vortons;
 }
+
+const UniformGridGeometry * VortonSim::velocityGridPtr() const
+{
+	return m_VelocityGridPtr;
+}
+
 
 void VortonSim::simulating(bool isSimulating)
 {
@@ -125,7 +95,7 @@ std::mutex & VortonSim::inUpdateMutex()
 	return m_InUpdateMutex;
 }
 
-void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype)
+void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity, double vorticityMagnitude)
 {
 	glm::dvec3 minCorner = initialVorticity.minCorner();
 	//glm::vec3 maxCorner = minCorner + initialVorticity.getDomainSize();
@@ -140,7 +110,7 @@ void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity
 					vortonDistance.y * yIndex,
 					vortonDistance.z * zIndex);
 				position += minCorner;
-				Vorton vorton(vortonPrototype, position, initialVorticity.vorticityAtPosition(position) * vorticityMagnitude);
+				Vorton vorton(position, initialVorticity.vorticityAtPosition(position) * vorticityMagnitude);
 				vorton.radius(vortonRadius);
 				if (glm::length(vorton.vorticity()) > SIGNIFICANT_VORTICITY) {
 					m_Vortons.push_back(vorton);
@@ -174,16 +144,9 @@ void VortonSim::initializeTracers(const VorticityDistribution & initialVorticity
 				position += minCorner;
 				m_Tracers.emplace_back(*this);
 				m_Tracers.back().position(position);
-				for (int i = 0; i < 3; i++) {
-					m_TracerVerticesRAM.push_back(static_cast<GLfloat>(position[i]));
-				}
 			}
 		}
 	}
-	m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
-	m_TracerVao.addVertexAttribArray(m_TracerVerticesBuf, true, false, m_TracerRenderProg.vertexPositionIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
-	m_TracerVao.enableVertexAttribArray(false, m_TracerRenderProg.vertexPositionIndex());
-	m_TracerVao.unbind();
 }
 
 void VortonSim::initializeTracers(const VortonSim & original)
@@ -192,32 +155,7 @@ void VortonSim::initializeTracers(const VortonSim & original)
 		glm::dvec3 position = originalTracer.position();
 		m_Tracers.emplace_back(*this);
 		m_Tracers.back().position(position);
-		for (int i = 0; i < 3; i++) {
-			m_TracerVerticesRAM.push_back(static_cast<GLfloat>(position[i]));
-		}
 	}
-
-	m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
-	m_TracerVao.addVertexAttribArray(m_TracerVerticesBuf, true, false, m_TracerRenderProg.vertexPositionIndex(), 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
-	m_TracerVao.enableVertexAttribArray(false, m_TracerRenderProg.vertexPositionIndex());
-	m_TracerVao.unbind();
-}
-
-void VortonSim::setupTracerRenderProgram()
-{
-	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.loadSourceFromFile("shaders\\tracer.vert");
-
-	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.loadSourceFromFile("shaders\\tracer.frag");
-
-	m_TracerRenderProg.attachShader(&vertexShader);
-	m_TracerRenderProg.attachShader(&fragmentShader);
-
-	vertexShader.compile();
-	fragmentShader.compile();
-	m_TracerRenderProg.link();
-	m_TracerRenderProg.detachAllShaders();
 }
 
 void VortonSim::createOctHeap()
@@ -341,27 +279,10 @@ void VortonSim::advectTracers(double secondsPassed)
 		//update m_TracerVericesRAM
 		glm::dvec3 tracerPosition = m_Tracers[i].position();
 		size_t iterationCounter = 0;
-		for (int j = i*3; j < (i*3+3); j++) {
-			m_TracerVerticesRAM[j] = static_cast<GLfloat>(tracerPosition[iterationCounter++]);
-		}
 	}
-	/*m_TracerVao.bind();
-	m_TracerVerticesBuf.pushDataSubset(m_TracerVerticesRAM, 0, m_TracerVerticesRAM.size(), true);*/
-	//m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
-}
-
-void VortonSim::renderTracers(const glm::mat4x4 & viewProjectTransform)
-{
-	m_TracerVao.bind();
-
-	m_TracerVerticesBuf.pushDataSubset(m_TracerVerticesRAM, 0, m_TracerVerticesRAM.size(), true);
-
-	m_TracerRenderProg.loadModelViewProjectTransform(viewProjectTransform);
-	m_TracerRenderProg.use();
-	glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(m_Tracers.size()));
-	m_TracerVao.unbind();
 	
 }
+
 
 std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 {
@@ -383,17 +304,4 @@ std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 
 	//return dimensions as minCorner, maxCorner
 	return std::make_pair(minCorner, maxCorner);
-}
-
-void VortonSim::showVelocityGrid()
-{
-	m_VelocityGridDrawPtr = new DrawableGridGeometry();
-}
-
-void VortonSim::hideVelocityGrid()
-{
-	if (m_VelocityGridDrawPtr != nullptr) {
-		delete m_VelocityGridDrawPtr;
-		m_VelocityGridDrawPtr = nullptr;
-	}
 }

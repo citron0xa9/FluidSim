@@ -226,12 +226,13 @@
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
-    <ClInclude Include="DrawableGridGeometry.h" />
+    <ClInclude Include="GridRenderer.h" />
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="TracerRenderer.h" />
     <ClInclude Include="VorticityDistribution.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="Log.h" />
@@ -254,13 +255,15 @@
     <ClInclude Include="Vorton.h" />
     <ClInclude Include="VortonOctHeap.h" />
     <ClInclude Include="VortonOctHeapElement.h" />
+    <ClInclude Include="VortonRenderer.h" />
     <ClInclude Include="VortonSim.h" />
+    <ClInclude Include="VortonSimRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveObject.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DrawableGridGeometry.cpp" />
+    <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="FluidSim.cpp" />
     <ClCompile Include="fsmath.cpp" />
@@ -269,6 +272,7 @@
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="TracerRenderer.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -287,7 +291,9 @@
     <ClCompile Include="Vorton.cpp" />
     <ClCompile Include="VortonOctHeap.cpp" />
     <ClCompile Include="VortonOctHeapElement.cpp" />
+    <ClCompile Include="VortonRenderer.cpp" />
     <ClCompile Include="VortonSim.cpp" />
+    <ClCompile Include="VortonSimRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

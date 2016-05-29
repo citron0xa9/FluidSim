@@ -11,12 +11,11 @@ const double DEFAULT_VORTON_RADIUS = FLT_EPSILON * 100;
 const double SIGNIFICANT_VORTICITY = expf(0.5f * (logf(FLT_EPSILON) + logf(FLT_MIN)));
 const double ONE_OVER_FOUR_PI = 0.25f * glm::one_over_pi<double>();
 
-class Vorton : public TriangleNetObject
+class Vorton : public Object
 {
 public:
-	Vorton(const TriangleNetObject &triangleNetObj);
-	Vorton(const TriangleNetObject &triangleNetObj, 
-		const glm::dvec3 &position, const glm::dvec3 &vorticity, double radius = DEFAULT_VORTON_RADIUS);
+	Vorton();
+	Vorton(const glm::dvec3 &position, const glm::dvec3 &vorticity, double radius = DEFAULT_VORTON_RADIUS);
 
 	virtual ~Vorton();
 

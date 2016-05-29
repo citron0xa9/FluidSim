@@ -52,22 +52,22 @@ void cli() {
 				inst->vortonSim().simulationTimescale(f);
 			}
 			else if (cmd == "showTracers") {
-				inst->vortonSim().tracersRendered(true);
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().tracersRendered(true); });
 			}
 			else if (cmd == "hideTracers") {
-				inst->vortonSim().tracersRendered(false);
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().tracersRendered(false); });
 			}
 			else if (cmd == "showVortons") {
-				inst->vortonSim().vortonsRendered(true);
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonsRendered(true); });
 			}
 			else if (cmd == "hideVortons") {
-				inst->vortonSim().vortonsRendered(false);
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonsRendered(false); });
 			}
 			else if (cmd == "showVGrid") {
-				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSim().showVelocityGrid(); });
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityGridRendered(true); });
 			}
 			else if (cmd == "hideVGrid") {
-				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSim().hideVelocityGrid(); });
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityGridRendered(false); });
 			}
 			else {
 				throw std::runtime_error("Unknown cli command");

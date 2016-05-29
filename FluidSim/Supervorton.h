@@ -6,7 +6,7 @@
 class Supervorton : public Vorton
 {
 public:
-	Supervorton(TriangleNetObject &object);
+	Supervorton();
 	virtual ~Supervorton();
 
 	void addContainedVorton(Vorton &vorton);

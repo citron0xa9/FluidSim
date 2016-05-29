@@ -88,46 +88,13 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	/*
 	 * Setup scene
 	*/
-	SunLightSource light{m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
-	ShaderLightSourceVariable lightSrcVar{ "sunLight", LightSourceType::SUNLIGHT };
-
-	Material sphereMaterial{ glm::vec3(0.8f, 0.0f, 0.0f), glm::vec3(0.8f, 0.0f, 0.0f), glm::vec3(0.2f), 10 };
-	Material &sphereMatRef = m_Scene.addMaterial(sphereMaterial);
-
-	/*
-	* setup scene: setup program
-	*/
-	std::vector<ShaderLightSourceVariable> lightSrcVars;
-	lightSrcVars.push_back(lightSrcVar);
-
-	Program &prog = m_Scene.addProgram(lightSrcVars);
-
-	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.loadSourceFromFile("shaders\\basic3D.vert");
-
-	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.loadSourceFromFile("shaders\\basic3D_phong.frag");
-
-	prog.attachShader(&vertexShader);
-	prog.attachShader(&fragmentShader);
-
-	vertexShader.compile();
-	fragmentShader.compile();
-	prog.link();
-	prog.detachAllShaders();
+	SunLightSource light{ m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 
 	m_Scene.addObject(light);
 
-	//setup geometry
-	m_Scene.aspectRatio(static_cast<float>(width) / height);
-	Geometry &geomSphere = m_Scene.addGeometryFromFile("objects\\sphere.obj");
-	geomSphere.setupAttribArrays(prog);
-
-	//create vorton prototype
-	m_VortonPrototypePtr = std::make_unique<TriangleNetObject>(&sphereMatRef, &geomSphere, &prog);
-	m_VortonPrototypePtr->scale(glm::dvec3(0.03));
-
 	setupVortonSim(false);
+	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
+	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 	
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
@@ -288,7 +255,7 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 
 void GLViewer::setupVortonSim(bool createPaused)
 {
-	m_VortonSimPtr = new VortonSim(0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0, *m_VortonPrototypePtr);
+	m_VortonSimPtr = new VortonSim(0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }
@@ -316,6 +283,11 @@ VortonSim & GLViewer::vortonSim()
 		throw std::runtime_error("GLViewer::vortonSim() m_VortonSimPtr is nullptr");
 	}
 	return *m_VortonSimPtr;
+}
+
+VortonSimRenderer & GLViewer::vortonSimRenderer()
+{
+	return *m_VortonSimRendererPtr;
 }
 
 void GLViewer::resetSim(bool createPaused)

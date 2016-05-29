@@ -11,29 +11,25 @@
 #include "VortonOctHeap.h"
 #include "UniformGrid.h"
 #include "Vorton.h"
-#include "DrawableGridGeometry.h"
 
-class VortonSim : public ActiveObject, public DrawableObject
+class VortonSim : public ActiveObject
 {
 public:
 	
-	VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
+	VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude);
 	VortonSim(const VortonSim &original);
 	~VortonSim();
 
 	virtual void step(double secondsPassed) override;
-	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
-	virtual void registerSceneHooks(Scene &scene) override;
-	virtual void deregisterSceneHooks(Scene &scene) override;
 
 	void update(double seconds);
 
-	void vortonsRendered(bool areRendered);
-	void tracersRendered(bool areRendered);
+	const std::vector<Object> &tracers() const;
+	const std::vector<Vorton> &vortons() const;
+	const UniformGridGeometry *velocityGridPtr() const;
+
 	void simulating(bool isSimulating);
 	void simulationTimescale(double timescale);
-	void showVelocityGrid();
-	void hideVelocityGrid();
 
 	virtual Object* copy() const override;
 	
@@ -43,12 +39,11 @@ public:
 
 private:
 
-	void initializeVortons(const VorticityDistribution &initialVorticity, double vorticityMagnitude, const TriangleNetObject &vortonPrototype);
+	void initializeVortons(const VorticityDistribution &initialVorticity, double vorticityMagnitude);
 	void initializeVortons(const VortonSim &original);
 	
 	void initializeTracers(const VorticityDistribution &initialVorticity);
 	void initializeTracers(const VortonSim &original);
-	void setupTracerRenderProgram();
 
 	void createOctHeap();
 
@@ -65,17 +60,12 @@ private:
 	void advectVortons(double secondsPassed);
 	void advectTracers(double secondsPassed);
 
-	void renderTracers(const glm::mat4x4 &viewProjectTransform);
-
 	std::pair<glm::dvec3, glm::dvec3> velocityGridDimensions();
 
 	double m_Viscosity;
 	double m_Density;
 	std::vector<Vorton> m_Vortons;
 	std::vector<Object> m_Tracers;
-	std::vector<GLfloat> m_TracerVerticesRAM;
-	VertexBufO m_TracerVerticesBuf;
-	VertexArrO m_TracerVao;
 
 	VortonOctHeap *m_VortonHeapPtr;
 	UniformGrid<glm::dvec3> *m_VelocityGridPtr;
@@ -83,15 +73,10 @@ private:
 	static const size_t m_VORTONS_PER_DIMENSION;
 	static const size_t m_TRACERS_PER_DIMENSION;
 
-	bool m_VortonsRendered;
-	bool m_TracersRendered;
 	bool m_Simulating;
 	double m_SimulationTimescale;
 
-	Program m_TracerRenderProg;
-
 	std::mutex m_InUpdateMutex;
 
-	DrawableGridGeometry* m_VelocityGridDrawPtr;
 };
 

@@ -1,0 +1,21 @@
+#pragma once
+
+#include "DrawableObject.h"
+
+#include <vector>
+
+#include "Vorton.h"
+
+class VortonRenderer : public DrawableObject
+{
+public:
+	VortonRenderer(Scene &scene, const std::vector<Vorton> &baseVortons);
+	virtual ~VortonRenderer();
+
+	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
+
+private:
+	const std::vector<Vorton> &m_BaseVortons;
+	TriangleNetObject m_DrawPrototype;
+};
+

@@ -22,6 +22,7 @@ public:
 	void addLightSource(LightSource &lightSource);
 	Geometry& addGeometryFromFile(const std::string &fileName);
 	Material& addMaterial(const Material &material);
+	Program& addProgram();
 	Program& addProgram(const std::vector<ShaderLightSourceVariable> &lightVars);
 
 	virtual void render();
@@ -43,6 +44,8 @@ public:
 	Camera& camera();
 
 	void startStepping();
+
+	void loadLightsIntoPrograms();
 
 private:
 	void stepLoop();
