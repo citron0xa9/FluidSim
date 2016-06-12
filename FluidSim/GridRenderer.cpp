@@ -5,7 +5,7 @@
 const GLuint GridRenderer::m_VertexPositionIndex = 0;
 const std::string GridRenderer::m_ColorUniformName = "color";
 
-GridRenderer::GridRenderer(std::function<const UniformGridGeometry*(void)> gridGeometryGetter)
+GridRenderer::GridRenderer(std::function<const std::shared_ptr<UniformGridGeometry>(void)> gridGeometryGetter)
 	: m_LinePointsBuf{ false }, m_Color{ 0.345f, 0.949f, 0.122f }, m_GridGeometryGetter{gridGeometryGetter}
 {
 	setupRendering();
@@ -17,7 +17,7 @@ GridRenderer::~GridRenderer()
 
 void GridRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	const UniformGridGeometry *gridGeometry = m_GridGeometryGetter();
+	const std::shared_ptr<UniformGridGeometry> gridGeometry = m_GridGeometryGetter();
 	if (gridGeometry != nullptr) {
 		updateGeometry(*gridGeometry);
 	}

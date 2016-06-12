@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "Program.h"
 #include "VertexArrO.h"
@@ -11,7 +12,7 @@
 class GridRenderer : public DrawableObject
 {
 public:
-	GridRenderer(std::function<const UniformGridGeometry*(void)> gridGeometryGetter);
+	GridRenderer(std::function<const std::shared_ptr<UniformGridGeometry>(void)> gridGeometryGetter);
 	virtual ~GridRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -34,6 +35,6 @@ private:
 	static const GLuint m_VertexPositionIndex;
 	static const std::string m_ColorUniformName;
 
-	std::function<const UniformGridGeometry*(void)> m_GridGeometryGetter;
+	std::function<const std::shared_ptr<UniformGridGeometry>(void)> m_GridGeometryGetter;
 };
 

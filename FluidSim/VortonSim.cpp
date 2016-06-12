@@ -25,12 +25,7 @@ VortonSim::VortonSim(const VortonSim & original)
 
 VortonSim::~VortonSim()
 {
-	if (m_VortonHeapPtr != nullptr) {
-		delete m_VortonHeapPtr;
-	}
-	if (m_VelocityGridPtr != nullptr) {
-		delete m_VelocityGridPtr;
-	}
+	
 }
 
 void VortonSim::step(double secondsPassed)
@@ -68,7 +63,7 @@ const std::vector<Vorton>& VortonSim::vortons() const
 	return m_Vortons;
 }
 
-const UniformGridGeometry * VortonSim::velocityGridPtr() const
+const std::shared_ptr<UniformGridGeometry> VortonSim::velocityGridPtr() const
 {
 	return m_VelocityGridPtr;
 }
@@ -160,22 +155,16 @@ void VortonSim::initializeTracers(const VortonSim & original)
 
 void VortonSim::createOctHeap()
 {
-	if (m_VortonHeapPtr != nullptr) {
-		delete m_VortonHeapPtr;
-	}
-	m_VortonHeapPtr = new VortonOctHeap(m_Vortons);
+	m_VortonHeapPtr = std::make_shared<VortonOctHeap>(m_Vortons);
 }
 
 void VortonSim::calculateVelocityGrid()
 {
 	size_t numPoints = m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION;
-	if (m_VelocityGridPtr != nullptr) {
-		delete m_VelocityGridPtr;
-	}
 
 	auto gridDimensions = velocityGridDimensions();
 
-	m_VelocityGridPtr = new UniformGrid<glm::dvec3>(numPoints, gridDimensions.first, gridDimensions.second);
+	m_VelocityGridPtr = std::make_shared<UniformGrid<glm::dvec3>>(numPoints, gridDimensions.first, gridDimensions.second);
 	
 	//loop over every point in uniform grid
 	size_t velocityGridOffset = 0;

@@ -26,7 +26,7 @@ public:
 
 	const std::vector<Object> &tracers() const;
 	const std::vector<Vorton> &vortons() const;
-	const UniformGridGeometry *velocityGridPtr() const;
+	const std::shared_ptr<UniformGridGeometry> velocityGridPtr() const;
 
 	void simulating(bool isSimulating);
 	void simulationTimescale(double timescale);
@@ -67,8 +67,8 @@ private:
 	std::vector<Vorton> m_Vortons;
 	std::vector<Object> m_Tracers;
 
-	VortonOctHeap *m_VortonHeapPtr;
-	UniformGrid<glm::dvec3> *m_VelocityGridPtr;
+	std::shared_ptr<VortonOctHeap> m_VortonHeapPtr;
+	std::shared_ptr<UniformGrid<glm::dvec3>> m_VelocityGridPtr;
 
 	static const size_t m_VORTONS_PER_DIMENSION;
 	static const size_t m_TRACERS_PER_DIMENSION;
