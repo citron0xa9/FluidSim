@@ -73,3 +73,8 @@ void Object::rotate(double radians, const glm::dvec3 & axis)
 {
 	m_RotationTransform *= glm::rotate(glm::dmat4x4(1.0), radians, axis);
 }
+
+void Object::resetRotation()
+{
+	m_RotationTransform = glm::dmat4x4(1);
+}

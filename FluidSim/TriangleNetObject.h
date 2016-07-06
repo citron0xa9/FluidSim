@@ -16,9 +16,11 @@ public:
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 
 	const Program& program() const;
+	Program& program();
 	void program(Program *programPtr);
 
 	const Material& material() const;
+	Material& material();
 	void material(Material *materialPtr);
 
 	const Geometry& geometry() const;

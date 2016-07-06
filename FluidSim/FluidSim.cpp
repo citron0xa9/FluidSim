@@ -69,6 +69,12 @@ void cli() {
 			else if (cmd == "hideVGrid") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityGridRendered(false); });
 			}
+			else if (cmd == "showVV") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityVectorsRendered(true); });
+			}
+			else if (cmd == "hideVV") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityVectorsRendered(false); });
+			}
 			else {
 				throw std::runtime_error("Unknown cli command");
 			}

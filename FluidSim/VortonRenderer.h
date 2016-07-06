@@ -9,7 +9,7 @@
 class VortonRenderer : public DrawableObject
 {
 public:
-	VortonRenderer(Scene &scene, const std::vector<Vorton> &baseVortons);
+	VortonRenderer(Scene &scene, const std::vector<Vorton> &baseVortons, Program &phongProgram);
 	virtual ~VortonRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;

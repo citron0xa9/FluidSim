@@ -77,3 +77,9 @@ void Camera::rotate(double radians, const glm::dvec3 & axis)
 	Object::rotate(radians, axis);
 	calculateViewPerspectiveTransform();
 }
+
+void Camera::resetRotation()
+{
+	Object::resetRotation();
+	calculateViewPerspectiveTransform();
+}

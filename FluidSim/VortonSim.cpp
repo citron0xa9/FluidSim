@@ -63,7 +63,7 @@ const std::vector<Vorton>& VortonSim::vortons() const
 	return m_Vortons;
 }
 
-const std::shared_ptr<UniformGridGeometry> VortonSim::velocityGridPtr() const
+const std::shared_ptr<UniformGrid<glm::dvec3>> VortonSim::velocityGridPtr() const
 {
 	return m_VelocityGridPtr;
 }
@@ -164,25 +164,26 @@ void VortonSim::calculateVelocityGrid()
 
 	auto gridDimensions = velocityGridDimensions();
 
-	m_VelocityGridPtr = std::make_shared<UniformGrid<glm::dvec3>>(numPoints, gridDimensions.first, gridDimensions.second);
+	auto velocityGridPtr = std::make_shared<UniformGrid<glm::dvec3>>(numPoints, gridDimensions.first, gridDimensions.second);
 	
 	//loop over every point in uniform grid
 	size_t velocityGridOffset = 0;
-	glm::dvec3 currentGridPosition = m_VelocityGridPtr->minCorner();
+	glm::dvec3 currentGridPosition = velocityGridPtr->minCorner();
 
-	for (size_t zIndex = 0; zIndex < m_VelocityGridPtr->pointsAmount().z; zIndex++) {
-		for (size_t yIndex = 0; yIndex < m_VelocityGridPtr->pointsAmount().y; yIndex++) {
-			for (size_t xIndex = 0; xIndex < m_VelocityGridPtr->pointsAmount().x; xIndex++) {
-				m_VelocityGridPtr->atOffset(velocityGridOffset) = calculateVelocity(currentGridPosition);
+	for (size_t zIndex = 0; zIndex < velocityGridPtr->pointsAmount().z; zIndex++) {
+		for (size_t yIndex = 0; yIndex < velocityGridPtr->pointsAmount().y; yIndex++) {
+			for (size_t xIndex = 0; xIndex < velocityGridPtr->pointsAmount().x; xIndex++) {
+				velocityGridPtr->atOffset(velocityGridOffset) = calculateVelocity(currentGridPosition);
 				velocityGridOffset++;
-				currentGridPosition.x += m_VelocityGridPtr->cellExtent().x;
+				currentGridPosition.x += velocityGridPtr->cellExtent().x;
 			}
-			currentGridPosition.x = m_VelocityGridPtr->minCorner().x;
-			currentGridPosition.y += m_VelocityGridPtr->cellExtent().y;
+			currentGridPosition.x = velocityGridPtr->minCorner().x;
+			currentGridPosition.y += velocityGridPtr->cellExtent().y;
 		}
-		currentGridPosition.y = m_VelocityGridPtr->minCorner().y;
-		currentGridPosition.z += m_VelocityGridPtr->cellExtent().z;
+		currentGridPosition.y = velocityGridPtr->minCorner().y;
+		currentGridPosition.z += velocityGridPtr->cellExtent().z;
 	}
+	m_VelocityGridPtr = velocityGridPtr;
 }
 
 glm::dvec3 VortonSim::calculateVelocity(const glm::dvec3 & position)

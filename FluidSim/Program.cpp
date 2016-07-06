@@ -12,7 +12,7 @@ Program::Program() : m_loadedMaterialId(-1)
 	m_Id = glCreateProgram();
 }
 
-Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_FreeShaderLightSourceVariables( lightSrcVars ), m_loadedMaterialId(-1)
+Program::Program(const std::vector<ShaderLightSourceVariable> &lightSrcVars) : m_InitialFreeShaderLightSourceVariables( lightSrcVars ), m_FreeShaderLightSourceVariables(lightSrcVars), m_loadedMaterialId(-1)
 {
 	m_Id = glCreateProgram();
 }
@@ -118,7 +118,7 @@ ShaderLightSourceVariable Program::popFreeLightSourceVariable(const LightSourceT
 									[&lightSrcType](const ShaderLightSourceVariable &var){return (var.type == lightSrcType); });
 
 	if (freeVariable == m_FreeShaderLightSourceVariables.end()) {
-		throw std::runtime_error("getFreeLightSourceUniformLocation: no free variable found");
+		throw std::runtime_error("popFreeLightSourceVariable: no free variable found");
 	}
 
 	ShaderLightSourceVariable returnValue = *freeVariable;
@@ -143,6 +143,7 @@ GLuint Program::normalIndex() const
 
 void Program::loadLights(const std::list<LightSource*> &lights)
 {
+	resetLights();
 	std::for_each(lights.begin(), lights.end(), [this](const LightSource *light){light->loadIntoProgram(*this); });
 }
 
@@ -179,4 +180,9 @@ void Program::loadCameraPosition(const glm::vec3 &position)
 		throw std::runtime_error("Error getting uniform location for cameraPosition");
 	}
 	glUniform3fv(location, 1, glm::value_ptr(position));
+}
+
+void Program::resetLights()
+{
+	m_FreeShaderLightSourceVariables = m_InitialFreeShaderLightSourceVariables;
 }

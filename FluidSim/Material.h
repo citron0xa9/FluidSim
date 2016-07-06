@@ -23,6 +23,9 @@ public:
 	void loadIntoProgram(const MaterialUniformLocations &uniLoc, Program &prog) const;
 
 	unsigned int id() const;
+
+	void ambientCoefficient(const glm::vec3 &coefficient);
+	void diffuseCoefficient(const glm::vec3 &coefficient);
 private:
 	glm::vec3 m_AmbientCoefficient;
 	glm::vec3 m_DiffuseCoefficient;

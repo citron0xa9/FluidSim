@@ -139,16 +139,19 @@ void Scene::step(double secondsPassed)
 	m_UsingObjectListsStep.unlock();
 }
 
-void Scene::addObject(const Object & object)
+Object& Scene::addObject(const Object & object)
 {
 	m_UsingObjectListsRender.lock();
 	m_UsingObjectListsStep.lock();
 
 	m_ObjectPtrs.push_back(object.copy());
 	m_ObjectPtrs.back()->registerSceneHooks(*this);
+	Object &addedObject = *m_ObjectPtrs.back();
 
 	m_UsingObjectListsStep.unlock();
 	m_UsingObjectListsRender.unlock();
+
+	return addedObject;
 }
 
 void Scene::addObjectPtr(Object * objPtr)

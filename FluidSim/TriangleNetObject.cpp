@@ -19,12 +19,22 @@ const Program& TriangleNetObject::program() const
 	return *m_ProgramPtr;
 }
 
+Program & TriangleNetObject::program()
+{
+	return *m_ProgramPtr;
+}
+
 void TriangleNetObject::program(Program * programPtr)
 {
 	m_ProgramPtr = programPtr;
 }
 
 const Material & TriangleNetObject::material() const
+{
+	return *m_MaterialPtr;
+}
+
+Material & TriangleNetObject::material()
 {
 	return *m_MaterialPtr;
 }

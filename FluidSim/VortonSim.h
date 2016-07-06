@@ -26,7 +26,7 @@ public:
 
 	const std::vector<Object> &tracers() const;
 	const std::vector<Vorton> &vortons() const;
-	const std::shared_ptr<UniformGridGeometry> velocityGridPtr() const;
+	const std::shared_ptr<UniformGrid<glm::dvec3>> velocityGridPtr() const;
 
 	void simulating(bool isSimulating);
 	void simulationTimescale(double timescale);

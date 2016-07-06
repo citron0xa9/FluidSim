@@ -50,6 +50,11 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 		throw std::runtime_error("Failed to initialize glfw");
 	}
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
 	m_WindowPtr = glfwCreateWindow(width, height, titlePrefix, nullptr, nullptr);
 	if (m_WindowPtr == nullptr) {
 		glfwTerminate();
@@ -293,12 +298,16 @@ VortonSimRenderer & GLViewer::vortonSimRenderer()
 void GLViewer::resetSim(bool createPaused)
 {
 	if (m_VortonSimPtr != nullptr) {
+		m_Scene.removeObjectPtr(m_VortonSimRendererPtr);
 		m_Scene.removeObjectPtr(m_VortonSimPtr);
 		m_VortonSimPtr->inUpdateMutex().lock();
 		m_VortonSimPtr->inUpdateMutex().unlock();
 		delete m_VortonSimPtr;
+		delete m_VortonSimRendererPtr;
 	}
 	setupVortonSim(createPaused);
+	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
+	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 }
 
 void GLViewer::title(const std::string& title) {

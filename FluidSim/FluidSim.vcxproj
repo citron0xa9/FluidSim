@@ -233,6 +233,7 @@
     <ClInclude Include="IndexCombination.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="TracerRenderer.h" />
+    <ClInclude Include="VectorFieldRenderer.h" />
     <ClInclude Include="VorticityDistribution.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="Log.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="IndexCombination.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="TracerRenderer.cpp" />
+    <ClCompile Include="VectorFieldRenderer.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Material.cpp" />

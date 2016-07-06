@@ -145,16 +145,19 @@
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="GridRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VortonSimRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VortonRenderer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics-Core</Filter>
     </ClInclude>
     <ClInclude Include="TracerRenderer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorFieldRenderer.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VortonRenderer.h">
+      <Filter>Header Files\Graphics-Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VortonSimRenderer.h">
+      <Filter>Header Files\Graphics-Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,16 +252,19 @@
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="GridRenderer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
-    <ClCompile Include="VortonSimRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VortonRenderer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="VectorFieldRenderer.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
     <ClCompile Include="TracerRenderer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonRenderer.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VortonSimRenderer.cpp">
+      <Filter>Source Files\Graphics-Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -29,7 +29,7 @@ public:
 	virtual void render(const glm::mat4x4 &viewProjectTransform);
 	virtual void step(double secondsPassed);
 
-	void addObject(const Object &object);
+	Object& addObject(const Object &object);
 	void addObjectPtr(Object *objPtr);
 	void removeObjectPtr(Object *objectPtr);
 

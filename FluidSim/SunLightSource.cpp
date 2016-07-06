@@ -1,6 +1,8 @@
 #include "SunLightSource.h"
 #include "Program.h"
 
+#include <iostream>
+
 
 SunLightSource::SunLightSource(Scene &scene, GLfloat intensity, glm::vec3 direction) : LightSource{ scene, intensity }, m_Direction{direction}
 {
@@ -14,7 +16,6 @@ SunLightSource::~SunLightSource()
 void SunLightSource::loadIntoProgram(Program &program) const
 {
 	auto freeSunLightSourceVariable = program.popFreeLightSourceVariable(LightSourceType::SUNLIGHT);
-
 	GLint intensityUniformLocation = program.uniformLocation((freeSunLightSourceVariable.name + "_Intensity").c_str());
 	GLint directionUniformLocation = program.uniformLocation((freeSunLightSourceVariable.name + "_Direction").c_str());
 
@@ -24,6 +25,7 @@ void SunLightSource::loadIntoProgram(Program &program) const
 
 	program.use();
 	glUniform1f(intensityUniformLocation, m_Intensity);
+	intensityUniformLocation = program.uniformLocation((freeSunLightSourceVariable.name + "_Intensity").c_str());
 	glUniform3fv(directionUniformLocation, 1, &m_Direction[0]);
 }
 

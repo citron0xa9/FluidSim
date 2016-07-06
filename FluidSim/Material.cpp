@@ -29,3 +29,15 @@ unsigned int Material::id() const
 {
 	return m_Id;
 }
+
+void Material::ambientCoefficient(const glm::vec3 & coefficient)
+{
+	m_AmbientCoefficient = coefficient;
+}
+
+void Material::diffuseCoefficient(const glm::vec3 & coefficient)
+{
+	m_DiffuseCoefficient = coefficient;
+}
+
+

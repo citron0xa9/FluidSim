@@ -52,9 +52,12 @@ public:
 	void loadCameraPosition(const glm::vec3 &position);
 
 private:
+	void resetLights();
+
 	GLuint m_Id;
 	static GLuint m_usedProgramId;
 	std::unordered_map<GLuint,Shader*> m_AttachedShaders;
+	std::vector<ShaderLightSourceVariable> m_InitialFreeShaderLightSourceVariables;
 	std::vector<ShaderLightSourceVariable> m_FreeShaderLightSourceVariables;
 
 	int m_loadedMaterialId;

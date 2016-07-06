@@ -2,7 +2,7 @@
 
 #define PI 3.1415
 
-//in vec3 ex_position;
+in vec3 ex_position;
 in vec3 ex_normal;
 
 out vec4 out_color;
@@ -15,7 +15,7 @@ uniform int matSpecularExp;
 uniform float sunLight_Intensity;
 uniform vec3 sunLight_Direction;
 
-uniform vec3 cameraLookDirection;
+uniform vec3 cameraPosition;
 
 float ambientLight_Intensity = 0.2;
 
@@ -23,7 +23,7 @@ void main(void)
 {
 	vec3 inv_normal_normalized = normalize(ex_normal) * -1;
 	vec3 lightDirNorm = normalize(sunLight_Direction);
-	vec3 lookDirNorm = normalize(cameraLookDirection);
+	vec3 lookDirNorm = normalize(ex_position-cameraPosition);
 
 	vec3 I_amb = ambientLight_Intensity * matAmbientCoeff;
 	vec3 I_diff = sunLight_Intensity * matDiffuseCoeff * max(0.0, dot(inv_normal_normalized, lightDirNorm));

@@ -19,8 +19,8 @@ public:
 
 	glm::dvec3 lookDirection() const;
 
-protected:
 	virtual void rotate(double radians, const glm::dvec3 &axis) override;
+	virtual void resetRotation() override;
 
 private:
 	void calculatePerspectiveTransform();

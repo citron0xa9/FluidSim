@@ -18,6 +18,9 @@ public:
 	virtual void translate(const glm::dvec3 &delta);
 	void rotateLocalX(double radians);
 	void rotateLocalY(double radians);
+	virtual void rotate(double radians, const glm::dvec3 &axis);
+	virtual void resetRotation();
+
 	void scale(const glm::dvec3 &scaleVector);
 
 	glm::dvec3 position() const;
@@ -32,9 +35,6 @@ protected:
 	static const glm::dvec3 m_LeftVector;
 	static const glm::dvec3 m_BackwardVector;
 	static const glm::dvec3 m_RightVector;
-
-
-	virtual void rotate(double radians, const glm::dvec3 &axis);
 
 	glm::dmat4x4 m_RotationTransform;
 	glm::dmat4x4 m_TranslationTransform;
