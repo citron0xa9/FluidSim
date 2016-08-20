@@ -1,5 +1,6 @@
 
 #include "Framebuffer.h"
+#include <iostream>
 
 
 Framebuffer::Framebuffer()
@@ -49,6 +50,11 @@ void Framebuffer::unbindRead()
 void Framebuffer::unbindDraw()
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void Framebuffer::bindDefault()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::addDrawBuffer(GLenum drawBuffer)

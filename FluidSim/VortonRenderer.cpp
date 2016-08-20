@@ -31,6 +31,6 @@ void VortonRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
 	for (auto &vorton : m_BaseVortons) {
 		m_DrawPrototype.position(vorton.position());
-		m_DrawPrototype.render(viewProjectTransform);
+		m_DrawPrototype.renderWithId(viewProjectTransform, vorton.id());
 	}
 }

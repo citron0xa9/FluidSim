@@ -54,7 +54,7 @@ void TriangleNetObject::geometry(Geometry * geometryPtr)
 	m_GeometryPtr = geometryPtr;
 }
 
-void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
+void TriangleNetObject::coreRender(const glm::mat4x4 & viewProjectTransform)
 {
 	if (m_ProgramPtr == nullptr || m_GeometryPtr == nullptr || m_MaterialPtr == nullptr) {
 		throw std::runtime_error("TriangleNetObject: Can't render because needed Pointer is missing");
@@ -65,7 +65,26 @@ void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
 	glm::mat4x4 modelTransform = m_TranslationTransform * m_ScaleTransform * m_RotationTransform;
 	m_ProgramPtr->loadModelViewProjectTransform(viewProjectTransform*modelTransform);
 	m_ProgramPtr->loadModelTransform(modelTransform);
+
 	m_ProgramPtr->use();
 
 	m_GeometryPtr->render();
+}
+
+void TriangleNetObject::render(const glm::mat4x4 &viewProjectTransform)
+{
+	if (m_ProgramPtr == nullptr) {
+		throw std::runtime_error("TriangleNetObject: Can't render because needed Pointer to program is missing");
+	}
+	m_ProgramPtr->loadObjectIndex(id());
+	coreRender(viewProjectTransform);
+}
+
+void TriangleNetObject::renderWithId(const glm::mat4x4 & viewProjectTransform, unsigned int id)
+{
+	if (m_ProgramPtr == nullptr) {
+		throw std::runtime_error("TriangleNetObject: Can't render because needed Pointer to program is missing");
+	}
+	m_ProgramPtr->loadObjectIndex(id);
+	coreRender(viewProjectTransform);
 }

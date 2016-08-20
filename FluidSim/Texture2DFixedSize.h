@@ -9,6 +9,7 @@ public:
 	virtual ~Texture2DFixedSize();
 
 	void pushImage(GLenum format, GLenum type, const GLvoid *data);
+	void texImage(GLenum format, GLenum type, GLvoid *img);
 	const GLuint id() const;
 
 	void bind();

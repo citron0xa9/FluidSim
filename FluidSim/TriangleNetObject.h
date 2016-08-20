@@ -14,6 +14,7 @@ public:
 	virtual Object* copy() const override;
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
+	void renderWithId(const glm::mat4x4 &viewProjectTransform, unsigned int id);
 
 	const Program& program() const;
 	Program& program();
@@ -27,6 +28,8 @@ public:
 	void geometry(Geometry *geometryPtr);
 
 private:
+	void coreRender(const glm::mat4x4 &viewProjectTransform);
+
 	Material *m_MaterialPtr;
 	Geometry *m_GeometryPtr;
 	Program *m_ProgramPtr;

@@ -226,12 +226,14 @@
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GridRenderer.h" />
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Texture2DFixedSize.h" />
     <ClInclude Include="TracerRenderer.h" />
     <ClInclude Include="VectorFieldRenderer.h" />
     <ClInclude Include="VorticityDistribution.h" />
@@ -264,6 +266,7 @@
     <ClCompile Include="ActiveObject.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="FluidSim.cpp" />
@@ -273,6 +276,7 @@
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Texture2DFixedSize.cpp" />
     <ClCompile Include="TracerRenderer.cpp" />
     <ClCompile Include="VectorFieldRenderer.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />

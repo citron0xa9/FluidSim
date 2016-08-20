@@ -5,7 +5,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 GLuint Program::m_usedProgramId = 0;
-const UniformNames Program::m_UNIFORM_NAMES{ "matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp", "modelViewProjectTransform", "modelTransform", "cameraPosition" };
+const UniformNames Program::m_UNIFORM_NAMES{
+	"matAmbientCoeff", "matDiffuseCoeff", "matSpecularCoeff", "matSpecularExp",
+	"modelViewProjectTransform", "modelTransform", "cameraPosition", "objectIndex"
+};
 
 Program::Program() : m_loadedMaterialId(-1)
 {
@@ -180,6 +183,16 @@ void Program::loadCameraPosition(const glm::vec3 &position)
 		throw std::runtime_error("Error getting uniform location for cameraPosition");
 	}
 	glUniform3fv(location, 1, glm::value_ptr(position));
+}
+
+void Program::loadObjectIndex(const unsigned int index)
+{
+	use();
+	GLint location = glGetUniformLocation(m_Id, m_UNIFORM_NAMES.objectIndex.c_str());
+	if (location == -1) {
+		throw std::runtime_error("Error getting uniform location for cameraPosition");
+	}
+	glUniform1ui(location, index);
 }
 
 void Program::resetLights()

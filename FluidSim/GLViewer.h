@@ -11,6 +11,7 @@
 #include "Program.h"
 #include "Scene.h"
 #include "VortonSimRenderer.h"
+#include "Framebuffer.h"
 
 class GLViewer {
 public:
@@ -59,6 +60,7 @@ private:
 	static void mouseMotionFunction(GLFWwindow *windowPtr, double x, double y);
 
 	void setupVortonSim(bool createPaused);
+	void attachTexturesToFBO();
 
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;
 
@@ -72,6 +74,11 @@ private:
 	static GLViewer* m_instance;
 
 	Scene m_Scene;
+	std::unique_ptr<Framebuffer> m_MainFramebufferPtr;
+	std::unique_ptr<Texture2DFixedSize> m_MainColorTexturePtr;
+	std::unique_ptr<Texture2DFixedSize> m_ObjectIndexTexturePtr;
+	std::unique_ptr<Texture2DFixedSize> m_MainDepthTexturePtr;
+
 	VortonSim *m_VortonSimPtr;
 	VortonSimRenderer *m_VortonSimRendererPtr;
 

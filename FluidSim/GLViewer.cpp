@@ -16,6 +16,7 @@
 #include "VorticityDistribution.h"
 
 #include <glm/geometric.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 GLViewer* GLViewer::m_instance = nullptr;
 const float GLViewer::m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION = -0.001f;
@@ -104,6 +105,27 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
 	m_Scene.startStepping();
+
+	m_MainFramebufferPtr = std::make_unique<Framebuffer>();
+	attachTexturesToFBO();
+	m_MainFramebufferPtr->addDrawBuffer(GL_COLOR_ATTACHMENT0);
+	m_MainFramebufferPtr->addDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+	if (!m_MainFramebufferPtr->isComplete()) {
+		throw std::runtime_error("GLViewer::GLViewer: Main Framebuffer isn't complete!");
+	}
+}
+
+void GLViewer::attachTexturesToFBO()
+{
+	m_MainColorTexturePtr = std::make_unique<Texture2DFixedSize>(GL_RGB8, m_width, m_height);
+	m_MainColorTexturePtr->minFilter(GL_NEAREST);
+	m_ObjectIndexTexturePtr = std::make_unique<Texture2DFixedSize>(GL_R32F, m_width, m_height);
+	m_MainDepthTexturePtr = std::make_unique<Texture2DFixedSize>(GL_DEPTH_COMPONENT24, m_width, m_height);
+
+	m_MainFramebufferPtr->attachTexture(GL_COLOR_ATTACHMENT0, *m_MainColorTexturePtr);
+	m_MainFramebufferPtr->attachTexture(GL_COLOR_ATTACHMENT1, *m_ObjectIndexTexturePtr);
+	m_MainFramebufferPtr->attachTexture(GL_DEPTH_ATTACHMENT, *m_MainDepthTexturePtr);
 }
 
 GLViewer::~GLViewer()
@@ -127,15 +149,21 @@ void GLViewer::framebufferResizeFunction(GLFWwindow * windowPtr, int width, int 
 	viewer->m_Scene.aspectRatio(static_cast<float>(width) / height);
 	viewer->width(width);
 	viewer->height(height);
+	viewer->attachTexturesToFBO();
 }
 
 
 void GLViewer::cycle()
 {
 	incrementFrameCount();
+	m_MainFramebufferPtr->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_Scene.render();
+	m_MainFramebufferPtr->render(m_Scene);
+	m_MainFramebufferPtr->blitColorToDefaultFBO(
+		GL_COLOR_ATTACHMENT0, glm::ivec2(0), glm::ivec2(m_width, m_height), glm::ivec2(0), glm::ivec2(m_width, m_height)
+	);
 
 	glfwSwapBuffers(m_WindowPtr);
 	glfwPollEvents();
@@ -234,6 +262,19 @@ void GLViewer::mouseButtonFunction(GLFWwindow *windowPtr, int button, int action
 	}
 
 	viewer->m_MouseRotationReady = (action == GLFW_PRESS) ? true : false;
+	if (action == GLFW_PRESS) {
+		glm::dvec2 cursorPos;
+		glfwGetCursorPos(windowPtr, &cursorPos.x, &cursorPos.y);
+
+		GLuint objectIndex;
+		cursorPos.y = viewer->m_height - cursorPos.y;	//inverted version needed
+		std::cout << "glGetError Bef: " << glGetError() << std::endl;
+		viewer->m_MainFramebufferPtr->readPixels(GL_COLOR_ATTACHMENT1, glm::ivec2(cursorPos), glm::ivec2(1), GL_RED, GL_UNSIGNED_INT, &objectIndex);
+		std::cout << "glGetError Af: " << glGetError() << std::endl;
+
+		std::cout << "Mouse pressed at: " << glm::to_string(cursorPos) << std::endl;
+		std::cout << "Object index is: " << objectIndex << std::endl;
+	}
 }
 
 void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)

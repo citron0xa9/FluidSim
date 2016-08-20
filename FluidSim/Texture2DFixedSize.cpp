@@ -26,6 +26,13 @@ void Texture2DFixedSize::pushImage(GLenum format, GLenum type, const GLvoid * da
 	unbind();
 }
 
+void Texture2DFixedSize::texImage(GLenum format, GLenum type, GLvoid * img)
+{
+	bind();
+	glGetTexImage(GL_TEXTURE_2D, 0, format, type, img);
+	unbind();
+}
+
 const GLuint Texture2DFixedSize::id() const
 {
 	return m_Id;

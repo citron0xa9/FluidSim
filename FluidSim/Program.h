@@ -16,8 +16,15 @@ struct UniformNames {
 	std::string modelViewProjectTransform;
 	std::string modelTransform;
 	std::string cameraPosition;
-	UniformNames(const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform, const char *modTransform, const char *camPos) : ambientCoefficient( ambC ), diffuseCoefficient( diffC ), specularCoefficient( specC ),
-		specularExponent( specExp ), modelViewProjectTransform( mvpTransform ), modelTransform( modTransform ), cameraPosition(camPos) {}
+	std::string objectIndex;
+	UniformNames(
+		const char *ambC, const char *diffC, const char *specC, const char *specExp, const char *mvpTransform,
+		const char *modTransform, const char *camPos, const char *objIndex)
+			: ambientCoefficient( ambC ), diffuseCoefficient( diffC ), specularCoefficient( specC ),
+			specularExponent( specExp ), modelViewProjectTransform( mvpTransform ), modelTransform( modTransform ),
+			cameraPosition(camPos), objectIndex(objIndex)
+	{
+	}
 };
 
 class Program
@@ -50,6 +57,7 @@ public:
 	void loadModelViewProjectTransform(const glm::mat4x4 &transform);
 	void loadModelTransform(const glm::mat4x4 &transform);
 	void loadCameraPosition(const glm::vec3 &position);
+	void loadObjectIndex(const unsigned int index);
 
 private:
 	void resetLights();

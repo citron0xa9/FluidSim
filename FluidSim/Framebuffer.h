@@ -20,6 +20,8 @@ public:
 	void unbindRead();
 	void unbindDraw();
 
+	static void bindDefault();
+
 	void addDrawBuffer(GLenum drawBuffer);
 	void readBuffer(GLenum readBuffer);
 

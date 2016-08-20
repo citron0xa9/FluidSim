@@ -2,6 +2,8 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <vector>
+#include <mutex>
 
 class Scene;
 
@@ -9,11 +11,15 @@ class Object
 {
 public:
 	Object();
+	Object(const Object &object);
 	virtual ~Object();
 
 	virtual Object* copy() const;
 	virtual void registerSceneHooks(Scene &scene);
 	virtual void deregisterSceneHooks(Scene &scene);
+
+	//void addToScene(Scene &scene);
+	//void removeFromScene();
 
 	virtual void translate(const glm::dvec3 &delta);
 	void rotateLocalX(double radians);
@@ -25,6 +31,8 @@ public:
 
 	glm::dvec3 position() const;
 	void position(const glm::dvec3 &position);
+
+	unsigned int id() const;
 
 protected:
 	static const glm::dvec3 m_xAxis;
@@ -39,5 +47,12 @@ protected:
 	glm::dmat4x4 m_RotationTransform;
 	glm::dmat4x4 m_TranslationTransform;
 	glm::dmat4x4 m_ScaleTransform;
+
+	//Scene *m_ScenePtr;
+
+private:
+	unsigned int m_Id;
+	static std::vector<Object*> m_AllObjects;
+	static std::mutex m_AllObjectsLock;
 };
 

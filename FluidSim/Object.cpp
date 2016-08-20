@@ -15,14 +15,34 @@ const glm::dvec3 Object::m_RightVector = -m_LeftVector;
 glm::dvec3 Camera::m_LocalLookDirection = Object::m_ForwardVector;
 glm::dvec3 Camera::m_UpVector = Object::m_yAxis;
 
+std::vector<Object*> Object::m_AllObjects{};
+std::mutex Object::m_AllObjectsLock{};
+
 Object::Object()
 {
-	
+	m_AllObjectsLock.lock();
+
+	m_AllObjects.push_back(this);
+	m_Id = m_AllObjects.size() - 1;
+
+	m_AllObjectsLock.unlock();
+}
+
+Object::Object(const Object & object)
+	: m_TranslationTransform{object.m_TranslationTransform}, m_RotationTransform{object.m_RotationTransform}, m_ScaleTransform{object.m_ScaleTransform}
+{
+	m_AllObjectsLock.lock();
+
+	m_AllObjects.push_back(this);
+	m_Id = m_AllObjects.size() - 1;
+
+	m_AllObjectsLock.unlock();
 }
 
 
 Object::~Object()
 {
+	m_AllObjects[m_Id] = nullptr;
 }
 
 Object * Object::copy() const
@@ -37,6 +57,23 @@ void Object::registerSceneHooks(Scene & scene)
 void Object::deregisterSceneHooks(Scene & scene)
 {
 }
+
+/*void Object::addToScene(Scene & scene)
+{
+	if (m_ScenePtr != nullptr) {
+		throw std::runtime_error("Object::addToScene: object can only be added to 0-1 scenes");
+	}
+	m_ScenePtr = &scene;
+	registerSceneHooks(scene);
+}
+
+void Object::removeFromScene()
+{
+	if (m_ScenePtr == nullptr) {
+		throw std::runtime_error("Object::removeFromScene: No scene to remove from");
+	}
+	deregisterSceneHooks(*m_ScenePtr);
+}*/
 
 void Object::translate(const glm::dvec3 & delta)
 {
@@ -66,6 +103,11 @@ glm::dvec3 Object::position() const
 void Object::position(const glm::dvec3 & position)
 {
 	m_TranslationTransform[3] = glm::dvec4(position, 1.0);
+}
+
+unsigned int Object::id() const
+{
+	return m_Id;
 }
 
 
