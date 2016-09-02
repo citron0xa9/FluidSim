@@ -75,6 +75,11 @@ void cli() {
 			else if (cmd == "hideVV") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityVectorsRendered(false); });
 			}
+			else if (cmd == "VVRes") {
+				float f;
+				std::cin >> f;
+				g_GlDpenedentCommands.push([f](GLViewer &viewer) {(viewer.vortonSimRenderer().VelocityVectorsRendererPtr())->gridResolutionFactor(f); });
+			}
 			else {
 				throw std::runtime_error("Unknown cli command");
 			}

@@ -4,6 +4,8 @@
 #include <cassert>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <queue>
+#include <functional>
 
 #include "VortonSim.h"
 #include "VertexArrO.h"
@@ -62,7 +64,10 @@ private:
 	void setupVortonSim(bool createPaused);
 	void attachTexturesToFBO();
 
+	void handleRightclick(glm::dvec2 &cursorPosition);
+
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;
+	std::queue<std::function<void()>> m_PerformAfterRender;
 
 	unsigned int m_width, m_height;
 	GLFWwindow *m_WindowPtr;

@@ -22,7 +22,7 @@ uniform uint objectIndex;
 
 float ambientLight_Intensity = 0.2;
 
-const float MAX_UINT = pow(2f, 32);
+const float MAX_UINT = pow(2f, 32) - 1;
 
 void main(void)
 {

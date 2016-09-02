@@ -2,6 +2,7 @@
 
 #include "TriangleNetObject.h"
 
+#include "Log.h"
 #include <glm/gtc/constants.hpp>
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
@@ -26,6 +27,8 @@ public:
 
 	virtual Object* copy() const override;
 	glm::dvec3 inducedVelocity(const glm::dvec3 &position) const;
+
+	virtual void printInfo() const override;
 
 private:
 	glm::dvec3 m_Vorticity;

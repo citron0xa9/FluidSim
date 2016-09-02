@@ -16,33 +16,29 @@ glm::dvec3 Camera::m_LocalLookDirection = Object::m_ForwardVector;
 glm::dvec3 Camera::m_UpVector = Object::m_yAxis;
 
 std::vector<Object*> Object::m_AllObjects{};
+std::list<unsigned int> Object::m_ReusableIds{};
+std::mutex Object::m_ReusableIdsLock{};
 std::mutex Object::m_AllObjectsLock{};
+
 
 Object::Object()
 {
-	m_AllObjectsLock.lock();
-
-	m_AllObjects.push_back(this);
-	m_Id = m_AllObjects.size() - 1;
-
-	m_AllObjectsLock.unlock();
+	getId();
 }
 
 Object::Object(const Object & object)
 	: m_TranslationTransform{object.m_TranslationTransform}, m_RotationTransform{object.m_RotationTransform}, m_ScaleTransform{object.m_ScaleTransform}
 {
-	m_AllObjectsLock.lock();
-
-	m_AllObjects.push_back(this);
-	m_Id = m_AllObjects.size() - 1;
-
-	m_AllObjectsLock.unlock();
+	getId();
 }
 
 
 Object::~Object()
 {
 	m_AllObjects[m_Id] = nullptr;
+	m_ReusableIdsLock.lock();
+	m_ReusableIds.push_back(m_Id);
+	m_ReusableIdsLock.unlock();
 }
 
 Object * Object::copy() const
@@ -108,6 +104,32 @@ void Object::position(const glm::dvec3 & position)
 unsigned int Object::id() const
 {
 	return m_Id;
+}
+
+void Object::printInfo() const
+{
+}
+
+Object& Object::objectWithId(unsigned int id)
+{
+	return *(m_AllObjects[id]);
+}
+
+void Object::getId()
+{
+	m_AllObjectsLock.lock();
+	m_ReusableIdsLock.lock();
+	if (!m_ReusableIds.empty()) {
+		m_Id = m_ReusableIds.front();
+		m_ReusableIds.pop_front();
+		m_AllObjects[m_Id] = this;
+	}
+	else {
+		m_AllObjects.push_back(this);
+		m_Id = m_AllObjects.size() - 1;
+	}
+	m_ReusableIdsLock.unlock();
+	m_AllObjectsLock.unlock();
 }
 
 

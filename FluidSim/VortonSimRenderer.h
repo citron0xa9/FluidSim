@@ -18,6 +18,8 @@ public:
 	void velocityGridRendered(bool isRendered);
 	void velocityVectorsRendered(bool isRendered);
 
+	VectorFieldRenderer* VelocityVectorsRendererPtr();
+
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 
 private:

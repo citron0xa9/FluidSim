@@ -192,7 +192,7 @@ void Program::loadObjectIndex(const unsigned int index)
 	if (location == -1) {
 		throw std::runtime_error("Error getting uniform location for cameraPosition");
 	}
-	glUniform1ui(location, index);
+	glUniform1ui(location, index+1);	//saved with 1 added to distinguish no object from object with id 0
 }
 
 void Program::resetLights()

@@ -223,6 +223,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActiveObject.h" />
+    <ClInclude Include="Arrow.h" />
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
@@ -264,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveObject.cpp" />
+    <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Framebuffer.cpp" />

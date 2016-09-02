@@ -128,6 +128,31 @@ void GLViewer::attachTexturesToFBO()
 	m_MainFramebufferPtr->attachTexture(GL_DEPTH_ATTACHMENT, *m_MainDepthTexturePtr);
 }
 
+void GLViewer::handleRightclick(glm::dvec2 &cursorPosition)
+{
+	GLuint objectIndex;
+	float objectIndexF;
+	cursorPosition.y = m_height - cursorPosition.y;	//inverted version needed
+
+	const float MAX_UINT = std::pow(2.0, 32) - 1;
+	m_MainFramebufferPtr->readPixels(GL_COLOR_ATTACHMENT1, glm::ivec2(cursorPosition), glm::ivec2(1), GL_RED, GL_FLOAT, &objectIndexF);
+	
+	objectIndex = static_cast<unsigned int>(objectIndexF * MAX_UINT);
+	if (objectIndex == 0) {
+		INFO("No Object at this location");
+		return;
+	}
+	objectIndex--;
+	Object::objectWithId(objectIndex).printInfo();
+	try {
+		Arrow& arrow = dynamic_cast<Arrow&>(Object::objectWithId(objectIndex));
+		arrow.toggleHighlight();
+	}
+	catch (const std::bad_cast& error) {
+		INFO("NOT AN ARROW--> No Highlight");
+	}
+}
+
 GLViewer::~GLViewer()
 {
 	glfwDestroyWindow(m_WindowPtr);
@@ -159,12 +184,14 @@ void GLViewer::cycle()
 	m_MainFramebufferPtr->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_Scene.render();
 	m_MainFramebufferPtr->render(m_Scene);
 	m_MainFramebufferPtr->blitColorToDefaultFBO(
 		GL_COLOR_ATTACHMENT0, glm::ivec2(0), glm::ivec2(m_width, m_height), glm::ivec2(0), glm::ivec2(m_width, m_height)
 	);
-
+	while (!m_PerformAfterRender.empty()) {
+		(m_PerformAfterRender.front())();
+		m_PerformAfterRender.pop();
+	}
 	glfwSwapBuffers(m_WindowPtr);
 	glfwPollEvents();
 }
@@ -262,18 +289,12 @@ void GLViewer::mouseButtonFunction(GLFWwindow *windowPtr, int button, int action
 	}
 
 	viewer->m_MouseRotationReady = (action == GLFW_PRESS) ? true : false;
-	if (action == GLFW_PRESS) {
+	if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_RIGHT) {
 		glm::dvec2 cursorPos;
 		glfwGetCursorPos(windowPtr, &cursorPos.x, &cursorPos.y);
 
-		GLuint objectIndex;
-		cursorPos.y = viewer->m_height - cursorPos.y;	//inverted version needed
-		std::cout << "glGetError Bef: " << glGetError() << std::endl;
-		viewer->m_MainFramebufferPtr->readPixels(GL_COLOR_ATTACHMENT1, glm::ivec2(cursorPos), glm::ivec2(1), GL_RED, GL_UNSIGNED_INT, &objectIndex);
-		std::cout << "glGetError Af: " << glGetError() << std::endl;
-
-		std::cout << "Mouse pressed at: " << glm::to_string(cursorPos) << std::endl;
-		std::cout << "Object index is: " << objectIndex << std::endl;
+		std::function<void()> rightclickCall = std::bind(&GLViewer::handleRightclick, viewer, cursorPos);
+		viewer->m_PerformAfterRender.push(rightclickCall);
 	}
 }
 

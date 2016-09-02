@@ -84,6 +84,11 @@ void VortonSimRenderer::velocityVectorsRendered(bool isRendered)
 	}
 }
 
+VectorFieldRenderer * VortonSimRenderer::VelocityVectorsRendererPtr()
+{
+	return m_VelocityVectorsRendererPtr;
+}
+
 void VortonSimRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
 	std::vector<DrawableObject*> renderers{ m_TracerRendererPtr, m_VortonRendererPtr, m_VelocityGridRendererPtr, m_VelocityVectorsRendererPtr };

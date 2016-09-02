@@ -6,6 +6,11 @@
 	std::cout << "DEBUG INFO: " << s << std::endl; \
 }
 
+#define INFO(s) \
+{ \
+	std::cout << "INFO: " << s << std::endl; \
+}
+
 #define WARNING(s) \
 { \
 	std::cout << "WARNING: " << s << std::endl; \

@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <mutex>
+#include <list>
 
 class Scene;
 
@@ -34,6 +35,10 @@ public:
 
 	unsigned int id() const;
 
+	virtual void printInfo() const;
+
+	static Object& objectWithId(unsigned int id);
+
 protected:
 	static const glm::dvec3 m_xAxis;
 	static const glm::dvec3 m_yAxis;
@@ -51,8 +56,12 @@ protected:
 	//Scene *m_ScenePtr;
 
 private:
+	void getId();
+
 	unsigned int m_Id;
 	static std::vector<Object*> m_AllObjects;
+	static std::list<unsigned int> m_ReusableIds;
+	static std::mutex m_ReusableIdsLock;
 	static std::mutex m_AllObjectsLock;
 };
 

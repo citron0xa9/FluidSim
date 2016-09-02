@@ -77,6 +77,7 @@ void Framebuffer::blitColorToDefaultFBO(GLenum readBuffer, glm::ivec2 sourceStar
 	bindRead();
 	glReadBuffer(readBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glDrawBuffer(GL_BACK);
 	
 	glBlitFramebuffer(
 		sourceStart.x, sourceStart.y, sourceEnd.x, sourceEnd.y,
