@@ -68,6 +68,11 @@ const std::shared_ptr<UniformGrid<glm::dvec3>> VortonSim::velocityGridPtr() cons
 	return m_VelocityGridPtr;
 }
 
+const std::shared_ptr<VortonOctHeap> VortonSim::vortonOctHeapPtr() const
+{
+	return m_VortonHeapPtr;
+}
+
 
 void VortonSim::simulating(bool isSimulating)
 {

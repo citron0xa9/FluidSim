@@ -16,11 +16,13 @@ public:
 
 	VortonOctHeapElement& root();
 	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> leafs();
+	std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> allAtLevel(size_t level);
 	VortonOctHeapElement& atIndex(size_t index);
 	VortonOctHeapElement& leaftAtPosition(const glm::dvec3 &position);
 
 	glm::dvec3 minCorner() const;
 	glm::dvec3 extent() const;
+	size_t divisions() const;
 
 private:
 	void calculateBoundingBox(const std::vector<Vorton> &vortons);
@@ -36,6 +38,8 @@ private:
 	glm::uvec3 indicesForIndex(size_t index);
 
 	size_t calculateFirstLeafIndex() const;
+	size_t calculateFirstIndexForLevel(size_t level) const;
+	size_t calculateLastIndexForLevel(size_t level) const;
 
 	bool isInsideBoundingBox(const glm::dvec3 &position);
 	

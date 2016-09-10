@@ -4,9 +4,10 @@
 
 VortonSimRenderer::VortonSimRenderer(const VortonSim & baseVortonSim, Scene & scene)
 	: m_BaseVortonSim{ baseVortonSim }, m_Scene{ scene },
-	m_TracerRendererPtr{ nullptr }, m_VortonRendererPtr{ nullptr }, m_VelocityGridRendererPtr{ nullptr }
+	m_TracerRendererPtr{ nullptr }, m_VortonRendererPtr{ nullptr }, m_VelocityGridRendererPtr{ nullptr },
+	m_VortonOctHeapRendererPtr{nullptr}
 {
-	m_TracerRendererPtr = new TracerRenderer{ baseVortonSim.tracers() };
+	m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ baseVortonSim.tracers() });
 
 	setupPhongProgram(scene);
 }
@@ -20,13 +21,12 @@ void VortonSimRenderer::tracersRendered(bool areRendered)
 	if (areRendered) {
 		if (m_TracerRendererPtr == nullptr) {
 			//not rendered before
-			m_TracerRendererPtr = new TracerRenderer{ m_BaseVortonSim.tracers() };
+			m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ m_BaseVortonSim.tracers() });
 		}
 	}
 	else {
 		if (m_TracerRendererPtr != nullptr) {
 			//was rendered before
-			delete m_TracerRendererPtr;
 			m_TracerRendererPtr = nullptr;
 		}
 	}
@@ -37,13 +37,13 @@ void VortonSimRenderer::vortonsRendered(bool areRendered)
 	if (areRendered) {
 		if (m_VortonRendererPtr == nullptr) {
 			//not rendered before
-			m_VortonRendererPtr = new VortonRenderer{ m_Scene, m_BaseVortonSim.vortons(), *m_PhongProgramPtr };
+			m_VortonRendererPtr =
+				std::unique_ptr<VortonRenderer>(new VortonRenderer{ m_Scene, m_BaseVortonSim.vortons(), *m_PhongProgramPtr });
 		}
 	}
 	else {
 		if (m_VortonRendererPtr != nullptr) {
 			//was rendered before
-			delete m_VortonRendererPtr;
 			m_VortonRendererPtr = nullptr;
 		}
 	}
@@ -54,13 +54,13 @@ void VortonSimRenderer::velocityGridRendered(bool isRendered)
 	if (isRendered) {
 		if (m_VelocityGridRendererPtr == nullptr) {
 			//not rendered before
-			m_VelocityGridRendererPtr = new GridRenderer{ std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim) };
+			m_VelocityGridRendererPtr = 
+				std::unique_ptr<GridRenderer>(new GridRenderer{ std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim) });
 		}
 	}
 	else {
 		if (m_VelocityGridRendererPtr != nullptr) {
 			//was rendered before
-			delete m_VelocityGridRendererPtr;
 			m_VelocityGridRendererPtr = nullptr;
 		}
 	}
@@ -72,26 +72,76 @@ void VortonSimRenderer::velocityVectorsRendered(bool isRendered)
 		if (m_VelocityVectorsRendererPtr == nullptr) {
 			//not rendered before
 			m_VelocityVectorsRendererPtr = 
-				new VectorFieldRenderer{ m_Scene, std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim), *m_PhongProgramPtr };
+				std::unique_ptr<VectorFieldRenderer>(
+					new VectorFieldRenderer{ m_Scene, std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim), *m_PhongProgramPtr }
+				);
 		}
 	}
 	else {
 		if (m_VelocityVectorsRendererPtr != nullptr) {
 			//was rendered before
-			delete m_VelocityVectorsRendererPtr;
 			m_VelocityVectorsRendererPtr = nullptr;
+		}
+	}
+}
+
+void VortonSimRenderer::vortonOctHeapRendered(bool isRendered)
+{
+	if (isRendered) {
+		if (m_VortonOctHeapRendererPtr == nullptr) {
+			//not rendered before
+			m_VortonOctHeapRendererPtr =
+				std::unique_ptr<VortonOctHeapRenderer>(
+					new VortonOctHeapRenderer{ std::bind(&VortonSim::vortonOctHeapPtr, &m_BaseVortonSim)}
+				);
+		}
+	}
+	else {
+		if (m_VortonOctHeapRendererPtr != nullptr) {
+			//was rendered before
+			m_VortonOctHeapRendererPtr = nullptr;
+		}
+	}
+}
+
+void VortonSimRenderer::vortonsOctHeapRendered(bool isRendered)
+{
+	if (isRendered) {
+		if (m_VortonRendererOctHeapPtr == nullptr) {
+			//not rendered before
+			m_VortonRendererOctHeapPtr =
+				std::unique_ptr<VortonRendererOctHeap>(
+					new VortonRendererOctHeap{ m_Scene, *m_PhongProgramPtr, std::bind(&VortonSim::vortonOctHeapPtr, &m_BaseVortonSim) }
+			);
+		}
+	}
+	else {
+		if (m_VortonRendererOctHeapPtr != nullptr) {
+			//was rendered before
+			m_VortonRendererOctHeapPtr = nullptr;
 		}
 	}
 }
 
 VectorFieldRenderer * VortonSimRenderer::VelocityVectorsRendererPtr()
 {
-	return m_VelocityVectorsRendererPtr;
+	return m_VelocityVectorsRendererPtr.get();
+}
+
+VortonOctHeapRenderer * VortonSimRenderer::vortonOctHeapRendererPtr()
+{
+	return m_VortonOctHeapRendererPtr.get();
+}
+
+VortonRendererOctHeap * VortonSimRenderer::vortonRendererOctHeapPtr()
+{
+	return m_VortonRendererOctHeapPtr.get();
 }
 
 void VortonSimRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	std::vector<DrawableObject*> renderers{ m_TracerRendererPtr, m_VortonRendererPtr, m_VelocityGridRendererPtr, m_VelocityVectorsRendererPtr };
+	std::vector<DrawableObject*> renderers{ m_TracerRendererPtr.get(), m_VortonRendererPtr.get(), m_VelocityGridRendererPtr.get(),
+		m_VelocityVectorsRendererPtr.get(), m_VortonOctHeapRendererPtr.get(), m_VortonRendererOctHeapPtr.get() };
 	for (auto renderer : renderers) {
 		if (renderer != nullptr) {
 			renderer->render(viewProjectTransform);

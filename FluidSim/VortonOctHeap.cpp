@@ -37,6 +37,14 @@ std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeap
 	return std::make_pair(begin, m_Heap.end());
 }
 
+std::pair<std::vector<VortonOctHeapElement>::iterator, std::vector<VortonOctHeapElement>::iterator> VortonOctHeap::allAtLevel(size_t level)
+{
+	assert(!m_Heap.empty());
+	std::vector<VortonOctHeapElement>::iterator begin = m_Heap.begin() + calculateFirstIndexForLevel(level);
+	std::vector<VortonOctHeapElement>::iterator end = m_Heap.begin() + calculateLastIndexForLevel(level) + 1;
+	return std::make_pair(begin, end);
+}
+
 VortonOctHeapElement & VortonOctHeap::atIndex(size_t index)
 {
 	assert(index < m_Heap.size());
@@ -58,6 +66,11 @@ glm::dvec3 VortonOctHeap::extent() const
 	return m_Extent;
 }
 
+size_t VortonOctHeap::divisions() const
+{
+	return m_Divisions;
+}
+
 void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 {
 	glm::dvec3 minCorner = vortons[0].position();
@@ -68,7 +81,7 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 	}
 	m_MinCorner = minCorner - glm::dvec3(FLT_EPSILON);
 	m_Extent = maxCorner - minCorner + glm::dvec3(FLT_EPSILON);
-	m_Extent = fsmath::allNextPowerOf2(m_Extent);
+	//m_Extent = fsmath::allNextPowerOf2(m_Extent);
 }
 
 void VortonOctHeap::subdivide(double maxVolume)
@@ -202,6 +215,29 @@ glm::uvec3 VortonOctHeap::indicesForIndex(size_t index)
 size_t VortonOctHeap::calculateFirstLeafIndex() const
 {
 	return static_cast<size_t>(std::floor((m_Heap.size() - 1) / 8));
+}
+
+size_t VortonOctHeap::calculateFirstIndexForLevel(size_t level) const
+{
+	level = std::min(level, m_Divisions);
+	size_t index = 0;
+	for (int i = 0; i < level; i++) {
+		index += 1 << (i*3);	//8^i
+	}
+	assert(index < m_Heap.size());
+	return index;
+}
+
+size_t VortonOctHeap::calculateLastIndexForLevel(size_t level) const
+{
+	level = std::min(level, m_Divisions);
+	size_t index = 0;
+	for (int i = 0; i < level+1; i++) {
+		index += 1 << (i * 3);	//8^i
+	}
+	index--;
+	assert(index < m_Heap.size());
+	return index;
 }
 
 

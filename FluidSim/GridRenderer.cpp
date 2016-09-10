@@ -18,11 +18,13 @@ GridRenderer::~GridRenderer()
 void GridRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
 	const std::shared_ptr<UniformGridGeometry> gridGeometry = m_GridGeometryGetter();
-	if (gridGeometry != nullptr) {
-		updateGeometry(*gridGeometry);
+	if (gridGeometry == nullptr) {
+		return;
 	}
-
+	
+	updateGeometry(*gridGeometry);
 	m_LinePointsBuf.pushData(m_LinePointsRAM, GL_STATIC_DRAW, true);
+	
 	m_Program.use();
 
 	GLuint colorUniformLocation = m_Program.uniformLocation(m_ColorUniformName.c_str());
@@ -46,7 +48,7 @@ void GridRenderer::setupRendering()
 void GridRenderer::updateGeometry(const UniformGridGeometry &geometry)
 {
 	m_LinePointsRAM.clear();
-	m_LinePointsRAM.reserve(24 * geometry.gridPointCapacity());
+	m_LinePointsRAM.reserve(18 * geometry.pointsAmount().x*geometry.pointsAmount().x); //3*(2*x*y+2*x*z+2*y*z) with x=y=z, 3* because 3 components per point
 	glm::dvec3 currentPoint;
 
 	//push lines along z axis

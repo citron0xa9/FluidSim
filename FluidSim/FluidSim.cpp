@@ -80,6 +80,28 @@ void cli() {
 				std::cin >> f;
 				g_GlDpenedentCommands.push([f](GLViewer &viewer) {(viewer.vortonSimRenderer().VelocityVectorsRendererPtr())->gridResolutionFactor(f); });
 			}
+			else if (cmd == "showOct") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonOctHeapRendered(true); });
+			}
+			else if (cmd == "hideOct") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonOctHeapRendered(false); });
+			}
+			else if (cmd == "OctLevel") {
+				size_t l;
+				std::cin >> l;
+				g_GlDpenedentCommands.push([l](GLViewer &viewer) {(viewer.vortonSimRenderer().vortonOctHeapRendererPtr())->renderedLevel(l); });
+			}
+			else if (cmd == "showOctV") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonsOctHeapRendered(true); });
+			}
+			else if (cmd == "hideOctV") {
+				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().vortonsOctHeapRendered(false); });
+			}
+			else if (cmd == "OctLevelV") {
+				size_t l;
+				std::cin >> l;
+				g_GlDpenedentCommands.push([l](GLViewer &viewer) {(viewer.vortonSimRenderer().vortonRendererOctHeapPtr())->renderedLevel(l); });
+			}
 			else {
 				throw std::runtime_error("Unknown cli command");
 			}

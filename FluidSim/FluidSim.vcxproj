@@ -259,7 +259,9 @@
     <ClInclude Include="Vorton.h" />
     <ClInclude Include="VortonOctHeap.h" />
     <ClInclude Include="VortonOctHeapElement.h" />
+    <ClInclude Include="VortonOctHeapRenderer.h" />
     <ClInclude Include="VortonRenderer.h" />
+    <ClInclude Include="VortonRendererOctHeap.h" />
     <ClInclude Include="VortonSim.h" />
     <ClInclude Include="VortonSimRenderer.h" />
   </ItemGroup>
@@ -299,7 +301,9 @@
     <ClCompile Include="Vorton.cpp" />
     <ClCompile Include="VortonOctHeap.cpp" />
     <ClCompile Include="VortonOctHeapElement.cpp" />
+    <ClCompile Include="VortonOctHeapRenderer.cpp" />
     <ClCompile Include="VortonRenderer.cpp" />
+    <ClCompile Include="VortonRendererOctHeap.cpp" />
     <ClCompile Include="VortonSim.cpp" />
     <ClCompile Include="VortonSimRenderer.cpp" />
   </ItemGroup>
