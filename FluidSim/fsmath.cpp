@@ -30,7 +30,9 @@ void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGri
 
 				currentOffset++;
 			}
+			currentOffset += 2;
 		}
+		currentOffset += 2 * yOffsetDistance;
 	}
 
 	//compute derivatives for boundaries

@@ -322,7 +322,10 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 
 void GLViewer::setupVortonSim(bool createPaused)
 {
-	m_VortonSimPtr = new VortonSim(0.05, 1.0, JetRingVorticityDistribution(glm::dvec3(0), 1.0, 1.0, glm::dvec3(1.0, 0.0, 0.0)), 20.0);
+	std::vector<VorticityDistribution*> initialVorticityPtrs;
+	initialVorticityPtrs.push_back(new JetRingVorticityDistribution(glm::dvec3(0), 1, 1, glm::dvec3(1.0, 0.0, 0.0)));
+	//initialVorticityPtrs.push_back(new VortexTubeVorticityDistribution(glm::dvec3(0), 0.5, 0.0, 2.0, 2, -1));
+	m_VortonSimPtr = new VortonSim(0.05, 1.0, initialVorticityPtrs, 20.0);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }

@@ -17,6 +17,7 @@ class VortonSim : public ActiveObject
 public:
 	
 	VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude);
+	VortonSim(double viscosity, double density, const std::vector<VorticityDistribution*> &initialVorticityPtrs, double vorticityMagnitude);
 	VortonSim(const VortonSim &original);
 	~VortonSim();
 

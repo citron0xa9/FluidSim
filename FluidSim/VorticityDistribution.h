@@ -41,3 +41,23 @@ private:
 	glm::dvec3 m_Direction;
 };
 
+class VortexTubeVorticityDistribution : public VorticityDistribution
+{
+public:
+	VortexTubeVorticityDistribution(const glm::dvec3 &center, double radius, double variation, double width, int periods, int location);
+	virtual ~VortexTubeVorticityDistribution();
+
+	virtual glm::dvec3 vorticityAtPosition(const glm::dvec3 &position) const override;
+
+protected:
+
+private:
+	virtual glm::dvec3 calculateDomainSize() override;
+	glm::dvec3 calculateCenter(const glm::dvec3 &center, int location, const double radius);
+
+	double m_Radius;
+	double m_Variation;
+	double m_Width;
+	double m_Wavenumber;
+	int m_Location;
+};

@@ -1,18 +1,31 @@
 
 #include "VortonSim.h"
 #include <glm/mat3x3.hpp>
+#include <glm/detail/func_matrix.hpp>
 #include "fsmath.h"
 #include "Log.h"
 
 const size_t VortonSim::m_VORTONS_PER_DIMENSION = 16;
 const size_t VortonSim::m_TRACERS_PER_DIMENSION = m_VORTONS_PER_DIMENSION*2;
 
+
 VortonSim::VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude)
 	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
-	m_Simulating{true}, m_SimulationTimescale{1.0}
+	m_Simulating{ true }, m_SimulationTimescale{ 1.0 }
 {
 	initializeVortons(initialVorticity, vorticityMagnitude);
 	initializeTracers(initialVorticity);
+}
+
+
+VortonSim::VortonSim(double viscosity, double density, const std::vector<VorticityDistribution*> &initialVorticityPtrs, double vorticityMagnitude)
+	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
+	m_Simulating{true}, m_SimulationTimescale{1.0}
+{
+	for (auto initialVorticityPtr : initialVorticityPtrs) {
+		initializeVortons(*initialVorticityPtr, vorticityMagnitude);
+		initializeTracers(*initialVorticityPtr);
+	}
 }
 
 VortonSim::VortonSim(const VortonSim & original)
@@ -203,7 +216,7 @@ void VortonSim::stretchAndTiltVortons(double seconds)
 	fsmath::computeJacobian(velocityJacobianGrid, *m_VelocityGridPtr);
 
 	for (auto &vorton : m_Vortons) {
-		glm::dmat3x3 velocityJacobian = velocityJacobianGrid.interpolate(vorton.position());
+		glm::dmat3x3 velocityJacobian = glm::transpose(velocityJacobianGrid.interpolate(vorton.position()));
 
 		glm::dvec3 stretchTilt = vorton.vorticity() * velocityJacobian;
 		glm::dvec3 newVorticity = vorton.vorticity() + 0.5 * stretchTilt * seconds;	//0.5 is fudge factor for stability
@@ -283,7 +296,7 @@ std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 {
 	//find min corner and max corner
 	glm::dvec3 minCorner = glm::dvec3(FLT_MAX);
-	glm::dvec3 maxCorner = glm::dvec3(FLT_MIN);
+	glm::dvec3 maxCorner = glm::dvec3(-FLT_MAX);
 
 	for (auto & tracer : m_Tracers) {
 		minCorner = fsmath::allMin(tracer.position(), minCorner);
@@ -294,8 +307,9 @@ std::pair<glm::dvec3, glm::dvec3> VortonSim::velocityGridDimensions()
 		minCorner = fsmath::allMin(vorton.position(), minCorner);
 		maxCorner = fsmath::allMax(vorton.position(), maxCorner);
 	}
-	minCorner -= glm::dvec3(FLT_EPSILON);
-	maxCorner += glm::dvec3(FLT_EPSILON);
+	glm::dvec3 extentAdjustment = static_cast<double>(FLT_EPSILON) * (maxCorner - minCorner);
+	minCorner -= extentAdjustment;
+	maxCorner += extentAdjustment;
 
 	//return dimensions as minCorner, maxCorner
 	return std::make_pair(minCorner, maxCorner);
