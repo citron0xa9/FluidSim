@@ -10,7 +10,6 @@
 
 const double DEFAULT_VORTON_RADIUS = FLT_EPSILON * 100;
 const double SIGNIFICANT_VORTICITY = expf(0.5f * (logf(FLT_EPSILON) + logf(FLT_MIN)));
-const double ONE_OVER_FOUR_PI = 0.25f * glm::one_over_pi<double>();
 
 class Vorton : public Object
 {

@@ -1,7 +1,6 @@
 
 #include "VortonSim.h"
 #include <glm/mat3x3.hpp>
-#include <glm/detail/func_matrix.hpp>
 #include "fsmath.h"
 #include "Log.h"
 
@@ -206,8 +205,12 @@ void VortonSim::calculateVelocityGrid()
 
 glm::dvec3 VortonSim::calculateVelocity(const glm::dvec3 & position)
 {
+	if (m_Vortons.empty()) {
+		return glm::dvec3(0);
+	}
 	assert(m_VortonHeapPtr != nullptr);
-	return (m_VortonHeapPtr->root().calculateVelocity(position));
+	static const double ONE_OVER_FOUR_PI = glm::one_over_pi<double>() * 0.25;
+	return (ONE_OVER_FOUR_PI * 8 * std::pow(m_Vortons.front().radius(), 3) * m_VortonHeapPtr->root().calculateVelocity(position));
 }
 
 void VortonSim::stretchAndTiltVortons(double seconds)
@@ -216,7 +219,7 @@ void VortonSim::stretchAndTiltVortons(double seconds)
 	fsmath::computeJacobian(velocityJacobianGrid, *m_VelocityGridPtr);
 
 	for (auto &vorton : m_Vortons) {
-		glm::dmat3x3 velocityJacobian = glm::transpose(velocityJacobianGrid.interpolate(vorton.position()));
+		glm::dmat3x3 velocityJacobian = velocityJacobianGrid.interpolate(vorton.position());
 
 		glm::dvec3 stretchTilt = vorton.vorticity() * velocityJacobian;
 		glm::dvec3 newVorticity = vorton.vorticity() + 0.5 * stretchTilt * seconds;	//0.5 is fudge factor for stability

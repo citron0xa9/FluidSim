@@ -1,7 +1,6 @@
 
 #include "fsmath.h"
 
-
 void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGrid<glm::dvec3>& velocityGrid)
 {
 	const glm::dvec3 doubleCellExtent = 2.0 * velocityGrid.cellExtent();
@@ -27,6 +26,8 @@ void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGri
 				currentMatrix[1] = (velocityGrid.atOffset(currentOffset + yOffsetDistance) - velocityGrid.atOffset(currentOffset - yOffsetDistance)) / doubleCellExtent;
 				// d/dz
 				currentMatrix[2] = (velocityGrid.atOffset(currentOffset + zOffsetDistance) - velocityGrid.atOffset(currentOffset - zOffsetDistance)) / doubleCellExtent;
+				
+				currentMatrix = glm::transpose(currentMatrix);
 
 				currentOffset++;
 			}

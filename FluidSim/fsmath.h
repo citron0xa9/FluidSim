@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <glm/vec3.hpp>
 #include <glm/mat3x3.hpp>
+#include <glm/detail/func_matrix.hpp>
 
 #include "UniformGrid.h"
 
@@ -106,6 +107,8 @@ namespace fsmath {
 		else {
 			currentMatrix[2] = (velocityGrid.atOffset(offset + zOffsetDistance) - velocityGrid.atOffset(offset - zOffsetDistance)) / doubleCellExtent;
 		}
+
+		currentMatrix = glm::transpose(currentMatrix);
 
 	}
 

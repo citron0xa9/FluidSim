@@ -26,6 +26,7 @@ public:
 
 private:
 	void calculateBoundingBox(const std::vector<Vorton> &vortons);
+	size_t calculateNeededDivisions(const size_t numElements);
 	void subdivide(double maxVolume);
 	void subdivide(size_t divisions);
 	void createEmptyOctHeap();

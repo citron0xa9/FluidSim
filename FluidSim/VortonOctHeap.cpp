@@ -14,7 +14,8 @@ VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
 		std::runtime_error("VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons): given vorton vector is empty");
 	}
 	calculateBoundingBox(vortons);
-	subdivide(m_DEFAULT_DIVISIONS_COUNT);
+	const size_t divisionsCount = calculateNeededDivisions(vortons.size());
+	subdivide(divisionsCount);
 	createEmptyOctHeap();
 	initializeLeafs(vortons);
 	initializeParents();
@@ -86,6 +87,11 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
 	m_Extent = (maxCorner - minCorner);
 	m_MinCorner = minCorner;
 	//m_Extent = fsmath::allNextPowerOf2(m_Extent);
+}
+
+size_t VortonOctHeap::calculateNeededDivisions(const size_t numElements)
+{
+	return std::ceil(std::log2(numElements) / 3);	//log_8(numElements) = numDivisions
 }
 
 void VortonOctHeap::subdivide(double maxVolume)

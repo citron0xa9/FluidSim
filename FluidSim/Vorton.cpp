@@ -25,8 +25,8 @@ glm::dvec3 Vorton::inducedVelocity(const glm::dvec3 & querriedPosition) const
 	}*/
 	glm::dvec3 distanceVector = querriedPosition - position();
 	double distanceMagnitude = glm::length(distanceVector);
-	double divisor = (distanceMagnitude < m_Radius) ? (pow(m_Radius, 2) * distanceMagnitude) : pow(distanceMagnitude, 3);
-	return glm::cross(ONE_OVER_FOUR_PI * 8.0f * pow(m_Radius, 3) * m_Vorticity, distanceVector / divisor);
+	double divisor = (distanceMagnitude < m_Radius) ? (std::pow(m_Radius, 3)) : pow(distanceMagnitude, 3);
+	return (glm::cross(m_Vorticity, distanceVector) / divisor);
 }
 
 void Vorton::printInfo() const
