@@ -11,13 +11,15 @@
 #include "VortonOctHeap.h"
 #include "UniformGrid.h"
 #include "Vorton.h"
+#include "RigidBodySim.h"
+#include "RigidBodySphere.h"
 
 class VortonSim : public ActiveObject
 {
 public:
 	
-	VortonSim(double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude);
-	VortonSim(double viscosity, double density, const std::vector<VorticityDistribution*> &initialVorticityPtrs, double vorticityMagnitude);
+	VortonSim(RigidBodySim& rbSim, double viscosity, double density, const VorticityDistribution &initialVorticity, double vorticityMagnitude);
+	VortonSim(RigidBodySim& rbSim, double viscosity, double density, const std::vector<const VorticityDistribution*> &initialVorticityPtrs, double vorticityMagnitude);
 	VortonSim(const VortonSim &original);
 	~VortonSim();
 
@@ -25,7 +27,7 @@ public:
 
 	void update(double seconds);
 
-	const std::vector<Object> &tracers() const;
+	const std::vector<Tracer> &tracers() const;
 	const std::vector<Vorton> &vortons() const;
 	const std::shared_ptr<UniformGrid<glm::dvec3>> velocityGridPtr() const;
 	const std::shared_ptr<VortonOctHeap> vortonOctHeapPtr() const;
@@ -45,7 +47,12 @@ private:
 	void initializeVortons(const VortonSim &original);
 	
 	void initializeTracers(const VorticityDistribution &initialVorticity);
-	void initializeTracers(const VortonSim &original);
+	//void initializeTracers(const VortonSim &original);
+
+    void initializeRigidBodies();
+    void intializeRigidBodies(const VortonSim& original);
+
+    void removeRigidBodyEmbeddedObjects();
 
 	void createOctHeap();
 
@@ -61,19 +68,27 @@ private:
 
 	void advectVortons(double secondsPassed);
 	void advectTracers(double secondsPassed);
+    void solveBoundaryConditions();
+    void solveVortonRigidBodySphereCollision(Vorton& vorton, RigidBodySphere& sphere, const glm::dvec3& sphereToVortonVector, const double sphereToVortonDistance) const;
+    void solveTracerRigidBodySphereCollision(Tracer& tracer, RigidBodySphere& sphere, const glm::dvec3& sphereToTracerVector, const double sphereToTracerDistance) const;
 
 	std::pair<glm::dvec3, glm::dvec3> velocityGridDimensions();
 
 	double m_Viscosity;
 	double m_Density;
 	std::vector<Vorton> m_Vortons;
-	std::vector<Object> m_Tracers;
+	std::vector<Tracer> m_Tracers;
+    RigidBodySim& m_RigidBodySim;
 
 	std::shared_ptr<VortonOctHeap> m_VortonHeapPtr;
 	std::shared_ptr<UniformGrid<glm::dvec3>> m_VelocityGridPtr;
 
-	static const size_t m_VORTONS_PER_DIMENSION;
-	static const size_t m_TRACERS_PER_DIMENSION;
+	static constexpr size_t m_VORTONS_PER_DIMENSION = 16;
+    static constexpr size_t m_VORTONS_TOTAL = m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION;
+	static constexpr size_t m_TRACERS_PER_DIMENSION = 2 * m_VORTONS_PER_DIMENSION;
+    static constexpr size_t m_TRACERS_TOTAL = m_TRACERS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_TRACERS_PER_DIMENSION;
+
+    double m_MassPerTracer;
 
 	bool m_Simulating;
 	double m_SimulationTimescale;

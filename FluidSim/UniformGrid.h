@@ -53,7 +53,7 @@ template<class ItemT>
 inline ItemT UniformGrid<ItemT>::interpolate(const glm::dvec3 & position) const
 {
 	if (fsmath::anyLess(position, minCorner()) || fsmath::anyLess(minCorner() + gridExtent(), position)) {
-		std::runtime_error("UniformGrid::Interpolate: given position is outside of grid");
+		throw std::runtime_error("UniformGrid::Interpolate: given position is outside of grid");
 	}
 
 	glm::uvec3 responsiblePointIndices = getResponsiblePointIndices(position);

@@ -144,6 +144,11 @@ GLuint Program::normalIndex() const
 	return 1;
 }
 
+GLuint Program::colorIndex() const
+{
+    return 2u;
+}
+
 void Program::loadLights(const std::list<LightSource*> &lights)
 {
 	resetLights();

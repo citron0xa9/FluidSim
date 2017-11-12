@@ -3,6 +3,9 @@
 #include <functional>
 #include <memory>
 #include "VortonOctHeap.h"
+#include "DrawableObject.h"
+#include "Program.h"
+#include "VertexArrO.h"
 
 class VortonOctHeapRenderer : public DrawableObject
 {

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Vorton.h"
+#include "TriangleNetObject.h"
 
 class VortonRenderer : public DrawableObject
 {

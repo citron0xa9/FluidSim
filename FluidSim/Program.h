@@ -49,6 +49,7 @@ public:
 	GLint uniformLocation(const GLchar *name) const;
 	GLuint vertexPositionIndex() const;
 	GLuint normalIndex() const;
+    GLuint colorIndex() const;
 
 	GLuint id() const;
 

@@ -19,6 +19,7 @@ public:
 	void vortonsRendered(bool areRendered);
 	void velocityGridRendered(bool isRendered);
 	void velocityVectorsRendered(bool isRendered);
+    void velocityLinesRendered(bool isRendered);
 	void vortonOctHeapRendered(bool isRendered);
 	void vortonsOctHeapRendered(bool isRendered);
 

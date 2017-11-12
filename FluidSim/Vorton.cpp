@@ -3,8 +3,16 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-Vorton::Vorton(const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, double radius)
-	: m_Vorticity(vorticity), m_Radius(radius), m_Velocity(0)
+#include <iostream>
+
+const double Vorton::ONE_OVER_4_PI = 1.0 / (4.0 * glm::pi<double>());
+const double Vorton::VOLUME_CONSTANT = 8;
+const double Vorton::VELOCITY_FROM_VORTICITY_CONSTANT = ONE_OVER_4_PI * VOLUME_CONSTANT;
+const double Vorton::VORTICITY_FROM_VELOCITY_CONSTANT = 1.0 / VELOCITY_FROM_VORTICITY_CONSTANT;
+
+
+Vorton::Vorton(const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, double radius, const double mass)
+    : Tracer{ radius, mass }, m_Vorticity(vorticity)
 {
 	position(initialPosition);
 }
@@ -20,13 +28,17 @@ Vorton::~Vorton()
 
 glm::dvec3 Vorton::inducedVelocity(const glm::dvec3 & querriedPosition) const
 {
-	/*if (m_Vorticity.length < SIGNIFICANT_VORTICITY) {
+	if (glm::length(m_Vorticity) < SIGNIFICANT_VORTICITY) {
 		return glm::vec3(0);
-	}*/
+	}
+
+    const double radiusPow2 = radius() * radius();
+    const double radiusPow3 =  radiusPow2 * radius();
+
 	glm::dvec3 distanceVector = querriedPosition - position();
 	double distanceMagnitude = glm::length(distanceVector);
-	double divisor = (distanceMagnitude < m_Radius) ? (std::pow(m_Radius, 3)) : pow(distanceMagnitude, 3);
-	return (glm::cross(m_Vorticity, distanceVector) / divisor);
+	double divisor = (distanceMagnitude < radius()) ? (radiusPow2 * distanceMagnitude) : (distanceMagnitude * distanceMagnitude * distanceMagnitude);
+	return (VELOCITY_FROM_VORTICITY_CONSTANT * radiusPow3 * (glm::cross(m_Vorticity, distanceVector) / divisor));
 }
 
 void Vorton::printInfo() const
@@ -41,19 +53,22 @@ glm::dvec3 Vorton::vorticity() const
 	return m_Vorticity;
 }
 
-double Vorton::radius() const
-{
-	return m_Radius;
-}
-
-void Vorton::radius(double radius)
-{
-	m_Radius = radius;
-}
-
 void Vorton::vorticity(const glm::dvec3 & vorticity)
 {
 	m_Vorticity = vorticity;
+}
+
+void Vorton::vorticityByVelocity(const glm::dvec3 & velocity, const glm::dvec3 & positionOfVelocity)
+{
+    const auto vortonToPositionVector = positionOfVelocity - position();
+    const double distance = glm::length(vortonToPositionVector);
+    const double distancePow3 = distance * distance * distance;
+
+    const double radiusPow3 = radius() * radius() * radius();
+
+    const auto newVorticity = VORTICITY_FROM_VELOCITY_CONSTANT * distancePow3 * glm::cross(vortonToPositionVector, velocity) / (radiusPow3);
+
+    vorticity(newVorticity);
 }
 
 Object * Vorton::copy() const

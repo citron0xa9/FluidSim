@@ -3,6 +3,7 @@
 #include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
 #include <stdexcept>
+#include <random>
 
 VorticityDistribution::VorticityDistribution(const glm::dvec3 & center)
 	: m_Center{center}
@@ -135,4 +136,29 @@ glm::dvec3 VortexTubeVorticityDistribution::vorticityAtPosition(const glm::dvec3
 	else {
 		throw std::invalid_argument("VorticityDistribution::VortexTube: Unknown location");
 	}
+}
+
+
+
+NoiseVorticityDistribution::NoiseVorticityDistribution(const glm::dvec3& center, const glm::dvec3& extent)
+    : VorticityDistribution{ center }, m_Extent{extent}, m_Amplitude{1.0}
+{
+    m_DomainSize = calculateDomainSize();
+}
+
+NoiseVorticityDistribution::~NoiseVorticityDistribution()
+{
+}
+
+glm::dvec3 NoiseVorticityDistribution::vorticityAtPosition(const glm::dvec3& position) const
+{
+    static std::uniform_real_distribution<double> distribution(-1.0, 1.0);
+    static std::default_random_engine randomEngine(14);
+
+    return (m_Amplitude * glm::dvec3{ distribution(randomEngine), distribution(randomEngine) , distribution(randomEngine) });
+}
+
+glm::dvec3 NoiseVorticityDistribution::calculateDomainSize()
+{
+    return m_Extent;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DrawableObject.h"
+#include "Tracer.h"
 #include <vector>
 
 #include "VertexBufO.h"
@@ -10,7 +11,7 @@
 class TracerRenderer : public DrawableObject
 {
 public:
-	TracerRenderer(const std::vector<Object> &baseTracers);
+	TracerRenderer(const std::vector<Tracer> &baseTracers);
 	virtual ~TracerRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -22,7 +23,7 @@ private:
 
 	void updateVertexData();
 
-	const std::vector<Object> &m_BaseTracers;
+	const std::vector<Tracer> &m_BaseTracers;
 
 	std::vector<GLfloat> m_TracerVerticesRAM;
 	VertexBufO m_TracerVerticesBuf;

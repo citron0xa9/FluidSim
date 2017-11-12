@@ -75,14 +75,44 @@ void VortonSimRenderer::velocityVectorsRendered(bool isRendered)
 				std::unique_ptr<VectorFieldRenderer>(
 					new VectorFieldRenderer{ m_Scene, std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim), *m_PhongProgramPtr }
 				);
-		}
+            m_VelocityVectorsRendererPtr->renderLines(false);
+        } else {
+            m_VelocityVectorsRendererPtr->renderArrows(true);
+        }
 	}
 	else {
 		if (m_VelocityVectorsRendererPtr != nullptr) {
 			//was rendered before
-			m_VelocityVectorsRendererPtr = nullptr;
+            m_VelocityVectorsRendererPtr->renderArrows(false);
+            if (!m_VelocityVectorsRendererPtr->isRenderingLines()) {
+                m_VelocityVectorsRendererPtr = nullptr;
+            }
 		}
 	}
+}
+
+void VortonSimRenderer::velocityLinesRendered(bool isRendered)
+{
+    if (isRendered) {
+        if (m_VelocityVectorsRendererPtr == nullptr) {
+            //not rendered before
+            m_VelocityVectorsRendererPtr =
+                std::unique_ptr<VectorFieldRenderer>(
+                    new VectorFieldRenderer{ m_Scene, std::bind(&VortonSim::velocityGridPtr, &m_BaseVortonSim), *m_PhongProgramPtr }
+            );
+            m_VelocityVectorsRendererPtr->renderArrows(false);
+        } else {
+            m_VelocityVectorsRendererPtr->renderLines(true);
+        }
+    } else {
+        if (m_VelocityVectorsRendererPtr != nullptr) {
+            //was rendered before
+            m_VelocityVectorsRendererPtr->renderLines(false);
+            if (!m_VelocityVectorsRendererPtr->isRenderingArrows()) {
+                m_VelocityVectorsRendererPtr = nullptr;
+            }
+        }
+    }
 }
 
 void VortonSimRenderer::vortonOctHeapRendered(bool isRendered)

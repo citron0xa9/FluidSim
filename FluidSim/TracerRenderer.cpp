@@ -1,7 +1,7 @@
 
 #include "TracerRenderer.h"
 
-TracerRenderer::TracerRenderer(const std::vector<Object>& baseTracers)
+TracerRenderer::TracerRenderer(const std::vector<Tracer>& baseTracers)
 	: m_BaseTracers{baseTracers}, m_TracerVerticesBuf{false}, m_TracerVao{false}
 {
 	assert(!baseTracers.empty());

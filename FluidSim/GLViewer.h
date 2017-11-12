@@ -7,6 +7,7 @@
 #include <queue>
 #include <functional>
 
+#include "RigidBodySim.h"
 #include "VortonSim.h"
 #include "VertexArrO.h"
 #include "VertexBufO.h"
@@ -43,6 +44,7 @@ public:
 
 	Scene& scene();
 	VortonSim &vortonSim();
+    RigidBodySim& rigidBodySim();
 	VortonSimRenderer &vortonSimRenderer();
 
 	void resetSim(bool createPaused);
@@ -61,7 +63,7 @@ private:
 	static void mouseButtonFunction(GLFWwindow *windowPtr, int button, int action, int mods);
 	static void mouseMotionFunction(GLFWwindow *windowPtr, double x, double y);
 
-	void setupVortonSim(bool createPaused);
+	void setupSim(bool createPaused);
 	void attachTexturesToFBO();
 
 	void handleRightclick(glm::dvec2 &cursorPosition);
@@ -86,6 +88,7 @@ private:
 
 	VortonSim *m_VortonSimPtr;
 	VortonSimRenderer *m_VortonSimRendererPtr;
+    RigidBodySim* m_RigidBodySimPtr;
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;

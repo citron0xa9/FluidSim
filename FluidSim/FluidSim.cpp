@@ -39,9 +39,11 @@ void cli() {
 			}
 			else if (cmd == "pauseSim") {
 				inst->vortonSim().simulating(false);
+                inst->rigidBodySim().simulating(false);
 			}
 			else if (cmd == "continueSim") {
 				inst->vortonSim().simulating(true);
+                inst->rigidBodySim().simulating(true);
 			}
 			else if (cmd == "resetSim") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.resetSim(true); });
@@ -50,6 +52,7 @@ void cli() {
 				double f;
 				std::cin >> f;
 				inst->vortonSim().simulationTimescale(f);
+                inst->rigidBodySim().simulationTimescale(f);
 			}
 			else if (cmd == "showTracers") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().tracersRendered(true); });
@@ -74,7 +77,11 @@ void cli() {
 			}
 			else if (cmd == "hideVV") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityVectorsRendered(false); });
-			}
+			} else if (cmd == "showVLines") {
+                g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityLinesRendered(true); });
+            } else if (cmd == "hideVLines") {
+                g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().velocityLinesRendered(false); });
+            }
 			else if (cmd == "VVRes") {
 				float f;
 				std::cin >> f;

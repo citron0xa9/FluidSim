@@ -208,6 +208,11 @@
       <SDLCheck>true</SDLCheck>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>dependencies\glfw\include;dependencies\glew\include;dependencies\glm</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -216,6 +221,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);OpenGL32.lib;glfw3.lib;glew32s.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>dependencies\glfw\lib;dependencies\glew\lib</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -234,7 +240,11 @@
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="RigidBody.h" />
+    <ClInclude Include="RigidBodySim.h" />
+    <ClInclude Include="RigidBodySphere.h" />
     <ClInclude Include="Texture2DFixedSize.h" />
+    <ClInclude Include="Tracer.h" />
     <ClInclude Include="TracerRenderer.h" />
     <ClInclude Include="VectorFieldRenderer.h" />
     <ClInclude Include="VorticityDistribution.h" />
@@ -280,7 +290,11 @@
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
+    <ClCompile Include="RigidBodySim.cpp" />
+    <ClCompile Include="RigidBodySphere.cpp" />
     <ClCompile Include="Texture2DFixedSize.cpp" />
+    <ClCompile Include="Tracer.cpp" />
     <ClCompile Include="TracerRenderer.cpp" />
     <ClCompile Include="VectorFieldRenderer.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />

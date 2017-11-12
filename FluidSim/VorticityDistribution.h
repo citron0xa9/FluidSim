@@ -61,3 +61,18 @@ private:
 	double m_Wavenumber;
 	int m_Location;
 };
+
+class NoiseVorticityDistribution : public VorticityDistribution
+{
+    public:
+        NoiseVorticityDistribution(const glm::dvec3 &center, const glm::dvec3& extent);
+        virtual ~NoiseVorticityDistribution();
+
+        virtual glm::dvec3 vorticityAtPosition(const glm::dvec3 &position) const override;
+
+    private:
+        const glm::dvec3 m_Amplitude;
+        const glm::dvec3 m_Extent;
+
+        virtual glm::dvec3 calculateDomainSize() override;
+};

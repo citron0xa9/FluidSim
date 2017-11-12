@@ -87,6 +87,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+    glLineWidth(1.0f);
 
 	std::string cullMsg = std::string("Cull faces is ") + (glIsEnabled(GL_CULL_FACE) ? "enabled" : "disabled");
 	DEBUG(cullMsg);
@@ -98,7 +99,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	m_Scene.addObject(light);
 
-	setupVortonSim(false);
+	setupSim(true);
 	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
 	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 	
@@ -320,12 +321,17 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 	viewer->m_LastMouseCoordinates = currentCoordinates;
 }
 
-void GLViewer::setupVortonSim(bool createPaused)
+void GLViewer::setupSim(bool createPaused)
 {
-	std::vector<VorticityDistribution*> initialVorticityPtrs;
-	initialVorticityPtrs.push_back(new JetRingVorticityDistribution(glm::dvec3(0), 1, 1, glm::dvec3(1.0, 0.0, 0.0)));
+    m_RigidBodySimPtr = new RigidBodySim();
+    m_RigidBodySimPtr->simulating(!createPaused);
+    m_Scene.addObjectPtr(m_RigidBodySimPtr);
+
+	std::vector<const VorticityDistribution*> initialVorticityPtrs;
+    initialVorticityPtrs.push_back(new NoiseVorticityDistribution(glm::dvec3(0), glm::dvec3(4.0, 0.5, 0.5)));
+	//initialVorticityPtrs.push_back(new JetRingVorticityDistribution(glm::dvec3(0), 1, 1, glm::dvec3(1.0, 0.0, 0.0)));
 	//initialVorticityPtrs.push_back(new VortexTubeVorticityDistribution(glm::dvec3(0), 0.5, 0.0, 2.0, 2, -1));
-	m_VortonSimPtr = new VortonSim(0.05, 1.0, initialVorticityPtrs, 20.0);
+	m_VortonSimPtr = new VortonSim(*m_RigidBodySimPtr, 0.05, 1.0, initialVorticityPtrs, 0.5);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }
@@ -355,6 +361,11 @@ VortonSim & GLViewer::vortonSim()
 	return *m_VortonSimPtr;
 }
 
+RigidBodySim & GLViewer::rigidBodySim()
+{
+    return *m_RigidBodySimPtr;
+}
+
 VortonSimRenderer & GLViewer::vortonSimRenderer()
 {
 	return *m_VortonSimRendererPtr;
@@ -362,6 +373,12 @@ VortonSimRenderer & GLViewer::vortonSimRenderer()
 
 void GLViewer::resetSim(bool createPaused)
 {
+    if (m_RigidBodySimPtr != nullptr) {
+        m_Scene.removeObjectPtr(m_RigidBodySimPtr);
+        m_RigidBodySimPtr->inUpdateMutex().lock();
+        m_RigidBodySimPtr->inUpdateMutex().unlock();
+        delete m_RigidBodySimPtr;
+    }
 	if (m_VortonSimPtr != nullptr) {
 		m_Scene.removeObjectPtr(m_VortonSimRendererPtr);
 		m_Scene.removeObjectPtr(m_VortonSimPtr);
@@ -370,7 +387,7 @@ void GLViewer::resetSim(bool createPaused)
 		delete m_VortonSimPtr;
 		delete m_VortonSimRendererPtr;
 	}
-	setupVortonSim(createPaused);
+	setupSim(createPaused);
 	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
 	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 }
