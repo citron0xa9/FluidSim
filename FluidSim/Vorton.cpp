@@ -62,11 +62,11 @@ void Vorton::vorticityByVelocity(const glm::dvec3 & velocity, const glm::dvec3 &
 {
     const auto vortonToPositionVector = positionOfVelocity - position();
     const double distance = glm::length(vortonToPositionVector);
-    const double distancePow3 = distance * distance * distance;
 
     const double radiusPow3 = radius() * radius() * radius();
 
-    const auto newVorticity = VORTICITY_FROM_VELOCITY_CONSTANT * distancePow3 * glm::cross(vortonToPositionVector, velocity) / (radiusPow3);
+    //below using distance yields correct values although i can't explain the formula. Thought it would be distance^2
+    const auto newVorticity = VORTICITY_FROM_VELOCITY_CONSTANT * distance * glm::cross(vortonToPositionVector, velocity) / (radiusPow3);
 
     vorticity(newVorticity);
 }

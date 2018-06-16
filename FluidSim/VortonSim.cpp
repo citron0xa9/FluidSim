@@ -15,7 +15,6 @@ VortonSim::VortonSim(RigidBodySim& rbSim, double viscosity, double density, cons
 	: m_Viscosity{ viscosity }, m_Density{ density }, m_VortonHeapPtr{ nullptr }, m_VelocityGridPtr{ nullptr },
 	m_Simulating{true}, m_SimulationTimescale{1.0}, m_RigidBodySim{rbSim}
 {
-
 	for (auto initialVorticityPtr : initialVorticityPtrs) {
         const auto tracersSizeBefore = m_Tracers.size();
         const auto vortonsSizeBefore = m_Vortons.size();
@@ -28,14 +27,14 @@ VortonSim::VortonSim(RigidBodySim& rbSim, double viscosity, double density, cons
 
         const auto domainExtent = initialVorticityPtr->domainSize();
         const double volume = domainExtent.x * domainExtent.y * domainExtent.z;
-        const auto massPerObject = volume * density / addedObjectsAmount;
+        const auto massPerVorton = volume * density / addedVortons;
 
         for (auto it = m_Tracers.begin()+tracersSizeBefore; it != m_Tracers.end(); it++) {
-            it->mass(massPerObject);
+            //it->mass(massPerObject);
         }
 
         for (auto it = m_Vortons.begin()+vortonsSizeBefore; it != m_Vortons.end(); it++) {
-            it->mass(massPerObject);
+            it->mass(massPerVorton);
         }
 	}
 
@@ -456,7 +455,7 @@ void VortonSim::solveVortonRigidBodySphereCollision(Vorton& vorton, RigidBodySph
     vorton.vorticityByVelocity(-linearVelocitySphereToFluidDelta, sphereContactPointWorld);
 
     //delay shedding
-    constexpr double sheddingGain = 0.9;
+    constexpr double sheddingGain = 0.1;
     vorton.vorticity(vorton.vorticity() * sheddingGain + (1 - sheddingGain)*previousVorticity);
 
     //transfer angular momentum
@@ -470,7 +469,7 @@ void VortonSim::solveVortonRigidBodySphereCollision(Vorton& vorton, RigidBodySph
     //transfer linear momentum
     //const auto deltaVelocitySphereToVorton = vorton.velocity() - sphereLinearVelocityAtContactPoint;
     //sphere.addMomentum(deltaVelocitySphereToVorton * vorton.mass());
-    sphere.addMomentum((velocityFluidAtContactPoint -sphereLinearVelocityAtContactPoint) * vorton.mass(), sphereContactPointWorld);
+    sphere.addMomentum(linearVelocitySphereToFluidDelta * vorton.mass(), sphereContactPointWorld);
 
     vorton.velocity(sphereLinearVelocityAtContactPoint);
 }

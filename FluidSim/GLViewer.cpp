@@ -331,7 +331,7 @@ void GLViewer::setupSim(bool createPaused)
     initialVorticityPtrs.push_back(new NoiseVorticityDistribution(glm::dvec3(0), glm::dvec3(4.0, 0.5, 0.5)));
 	//initialVorticityPtrs.push_back(new JetRingVorticityDistribution(glm::dvec3(0), 1, 1, glm::dvec3(1.0, 0.0, 0.0)));
 	//initialVorticityPtrs.push_back(new VortexTubeVorticityDistribution(glm::dvec3(0), 0.5, 0.0, 2.0, 2, -1));
-	m_VortonSimPtr = new VortonSim(*m_RigidBodySimPtr, 0.05, 1.0, initialVorticityPtrs, 0.5);
+	m_VortonSimPtr = new VortonSim(*m_RigidBodySimPtr, 0.05, 1.0, initialVorticityPtrs, 0.125 * FLT_EPSILON);
 	m_VortonSimPtr->simulating(!createPaused);
 	m_Scene.addObjectPtr(m_VortonSimPtr);
 }

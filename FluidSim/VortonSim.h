@@ -86,7 +86,7 @@ private:
 	static constexpr size_t m_VORTONS_PER_DIMENSION = 16;
     static constexpr size_t m_VORTONS_TOTAL = m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_VORTONS_PER_DIMENSION;
 	static constexpr size_t m_TRACERS_PER_DIMENSION = 2 * m_VORTONS_PER_DIMENSION;
-    static constexpr size_t m_TRACERS_TOTAL = m_TRACERS_PER_DIMENSION * m_VORTONS_PER_DIMENSION * m_TRACERS_PER_DIMENSION;
+    static constexpr size_t m_TRACERS_TOTAL = m_TRACERS_PER_DIMENSION * m_TRACERS_PER_DIMENSION * m_TRACERS_PER_DIMENSION;
 
     double m_MassPerTracer;
 
