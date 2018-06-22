@@ -9,7 +9,7 @@
 
 UniformGridGeometry::UniformGridGeometry(size_t numElements, const glm::dvec3 & minCorner, const glm::dvec3 & maxCorner)
 {
-	defineShape(numElements, minCorner, maxCorner);
+	defineShape(std::max(static_cast<size_t>(1u), numElements), minCorner, maxCorner);
 }
 
 
@@ -38,6 +38,7 @@ void UniformGridGeometry::calculateSpacing()
 void UniformGridGeometry::calculatePointsAmount(size_t numElements)
 {
 	const double volume = m_GridExtent.x * m_GridExtent.y * m_GridExtent.z;
+
 	const double cellLength = std::cbrt(volume / numElements);  //first calculate temporary uniform length, cbrt = cubic root
 
 	glm::uvec3 numCells = glm::uvec3(

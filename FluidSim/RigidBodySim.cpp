@@ -32,6 +32,7 @@ void RigidBodySim::step(double secondsPassed)
 
     for (auto& sphere : m_Spheres) {
         sphere.update(secondsPassed);
+#if 0
         std::cout << "--------------------" << std::endl;
         std::cout << "Updated Sphere:" << std::endl;
         std::cout << "Position: " << glm::to_string(sphere.position()) << "Mass: " << 1.0 / sphere.massInverse() << std::endl;
@@ -39,6 +40,7 @@ void RigidBodySim::step(double secondsPassed)
         std::cout << "Linear Momentum: " << glm::to_string(sphere.momentum()) << "; Angular Momentum: " << glm::to_string(sphere.angularMomentum()) << std::endl;
         std::cout << "Force: " << glm::to_string(sphere.force()) << "Torque: " << glm::to_string(sphere.torque()) << std::endl;
         std::cout << std::endl;
+#endif
     }
 }
 

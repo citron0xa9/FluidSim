@@ -3,8 +3,8 @@
 #include "Scene.h"
 
 
-VortonRenderer::VortonRenderer(Scene &scene, const std::vector<Vorton>& baseVortons, Program &phongProgram)
-	: m_BaseVortons{ baseVortons }, m_DrawPrototype{}
+VortonRenderer::VortonRenderer(Scene &scene, const std::vector<std::unique_ptr<Particle>>& baseVortonPtrs, Program &phongProgram)
+	: m_BaseVortonPtrs{ baseVortonPtrs }, m_DrawPrototype{}
 {
 	/*
 	 * Setup m_DrawPrototype
@@ -29,8 +29,8 @@ VortonRenderer::~VortonRenderer()
 
 void VortonRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	for (auto &vorton : m_BaseVortons) {
-		m_DrawPrototype.position(vorton.position());
-		m_DrawPrototype.renderWithId(viewProjectTransform, vorton.id());
+	for (auto &vortonPtr : m_BaseVortonPtrs) {
+		m_DrawPrototype.position(vortonPtr->position());
+		m_DrawPrototype.renderWithId(viewProjectTransform, vortonPtr->id());
 	}
 }

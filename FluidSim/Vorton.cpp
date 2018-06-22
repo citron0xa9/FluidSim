@@ -11,14 +11,15 @@ const double Vorton::VELOCITY_FROM_VORTICITY_CONSTANT = ONE_OVER_4_PI * VOLUME_C
 const double Vorton::VORTICITY_FROM_VELOCITY_CONSTANT = 1.0 / VELOCITY_FROM_VORTICITY_CONSTANT;
 
 
-Vorton::Vorton(const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, double radius, const double mass)
-    : Tracer{ radius, mass }, m_Vorticity(vorticity)
+Vorton::Vorton(const glm::dvec3 &initialPosition, const glm::dvec3 &vorticity, const double birthTimeSeconds, double radius, const double mass)
+    : Particle{ birthTimeSeconds, radius, mass }, m_Vorticity(vorticity)
 {
 	position(initialPosition);
 }
 
 
-Vorton::Vorton() : m_Vorticity{ 0 }
+Vorton::Vorton(const double birthTimeSeconds, double radius, const double mass)
+    : Particle{ birthTimeSeconds, radius, mass}, m_Vorticity { 0 }
 {
 }
 
@@ -71,7 +72,7 @@ void Vorton::vorticityByVelocity(const glm::dvec3 & velocity, const glm::dvec3 &
     vorticity(newVorticity);
 }
 
-Object * Vorton::copy() const
+Vorton* Vorton::copy() const
 {
 	return new Vorton(*this);
 }

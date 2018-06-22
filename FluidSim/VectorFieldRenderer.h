@@ -12,7 +12,8 @@
 class VectorFieldRenderer : public DrawableObject
 {
 public:
-	VectorFieldRenderer(Scene &scene, std::function<const std::shared_ptr<UniformGrid<glm::dvec3>>(void)> gridGetter, Program& phongProgram);
+    using grid_getter_t = std::function<const std::unique_ptr<UniformGrid<glm::dvec3>>&()>;
+	VectorFieldRenderer(Scene &scene, const grid_getter_t& gridGetter, Program& phongProgram);
 	virtual ~VectorFieldRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -38,7 +39,7 @@ private:
 
 	TriangleNetObject m_DrawPrototype;
 
-	std::function<const std::shared_ptr<UniformGrid<glm::dvec3>>(void)> m_VelocityGridGetter;
+    grid_getter_t m_VelocityGridGetter;
 
 	static const double m_MAX_VELOCITY;
 	static const glm::dvec3 m_INITIAL_DIRECTION;

@@ -12,7 +12,8 @@
 class GridRenderer : public DrawableObject
 {
 public:
-	GridRenderer(std::function<const std::shared_ptr<UniformGridGeometry>(void)> gridGeometryGetter);
+    using grid_getter_t = std::function<const std::unique_ptr<UniformGridGeometry>&()>;
+	GridRenderer(const grid_getter_t& gridGeometryGetter);
 	virtual ~GridRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -35,6 +36,6 @@ private:
 	static const GLuint m_VertexPositionIndex;
 	static const std::string m_ColorUniformName;
 
-	std::function<const std::shared_ptr<UniformGridGeometry>(void)> m_GridGeometryGetter;
+	grid_getter_t m_GridGeometryGetter;
 };
 

@@ -17,6 +17,11 @@ namespace glm {
 namespace fsmath {
 #define MAX_UINT_POWER2 (1 << (sizeof(unsigned int) * 8 - 1))
 
+    struct BoundingBox {
+        glm::dvec3 m_MinCorner;
+        glm::dvec3 m_Extent;
+    };
+
 	inline double nextPowerOf2(double x)
 	{
 		double exponent = std::ceil(std::log2(x));

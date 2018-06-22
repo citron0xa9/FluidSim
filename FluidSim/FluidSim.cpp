@@ -38,12 +38,12 @@ void cli() {
 				inst->scene().camera().fovY(f);
 			}
 			else if (cmd == "pauseSim") {
-				inst->vortonSim().simulating(false);
-                inst->rigidBodySim().simulating(false);
+				//inst->vortonSim().simulating(false);
+                //inst->rigidBodySim().simulating(false);
 			}
 			else if (cmd == "continueSim") {
-				inst->vortonSim().simulating(true);
-                inst->rigidBodySim().simulating(true);
+				//inst->vortonSim().simulating(true);
+                //inst->rigidBodySim().simulating(true);
 			}
 			else if (cmd == "resetSim") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.resetSim(true); });
@@ -51,8 +51,8 @@ void cli() {
 			else if (cmd == "setTimescale") {
 				double f;
 				std::cin >> f;
-				inst->vortonSim().simulationTimescale(f);
-                inst->rigidBodySim().simulationTimescale(f);
+				//inst->vortonSim().simulationTimescale(f);
+                //inst->rigidBodySim().simulationTimescale(f);
 			}
 			else if (cmd == "showTracers") {
 				g_GlDpenedentCommands.push([](GLViewer &viewer) {viewer.vortonSimRenderer().tracersRendered(true); });

@@ -9,10 +9,17 @@
 #include "VortonOctHeapRenderer.h"
 #include "VortonRendererOctHeap.h"
 
+#include "ParticleSystem.h"
+#include "UpdateFluidOperation.h"
+
 class VortonSimRenderer : public DrawableObject
 {
 public:
-	VortonSimRenderer(const VortonSim &baseVortonSim, Scene &scene);
+	VortonSimRenderer(
+        const ParticleSystem& vortonParticleSystem,
+        const ParticleSystem& tracerParticleSystem,
+        const UpdateFluidOperation& updateFuildOperation,
+        Scene &scene);
 	virtual ~VortonSimRenderer();
 
 	void tracersRendered(bool areRendered);
@@ -32,7 +39,9 @@ public:
 private:
 	void setupPhongProgram(Scene &scene);
 
-	const VortonSim &m_BaseVortonSim;
+	const ParticleSystem& m_VortonParticleSystem;
+    const ParticleSystem& m_TracerParticleSystem;
+    const UpdateFluidOperation& m_UpdateFluidOperation;
 	Scene &m_Scene;
 
 	std::unique_ptr<GridRenderer> m_VelocityGridRendererPtr;

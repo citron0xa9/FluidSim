@@ -11,7 +11,7 @@
 const double VectorFieldRenderer::m_MAX_VELOCITY = 5.0f;
 const glm::dvec3 VectorFieldRenderer::m_INITIAL_DIRECTION = glm::dvec3(0, 0, -1);
 
-VectorFieldRenderer::VectorFieldRenderer(Scene &scene, std::function<const std::shared_ptr<UniformGrid<glm::dvec3>>(void)> gridGetter, Program &phongProgram)
+VectorFieldRenderer::VectorFieldRenderer(Scene &scene, const grid_getter_t& gridGetter, Program &phongProgram)
 	: m_VelocityGridGetter{ gridGetter }, m_GridResolutionFactor{ 1.0 }, m_GridResolutionChanged{true}, m_RenderArrows{true}, m_RenderLines{true}, m_LinesVerticesBuf{false}
 {
 	/*
@@ -41,23 +41,23 @@ VectorFieldRenderer::~VectorFieldRenderer()
 
 void VectorFieldRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	const std::shared_ptr<UniformGrid<glm::dvec3>> velocityGrid = m_VelocityGridGetter();
-	if (velocityGrid == nullptr) {
+	const auto& velocityGridPtr = m_VelocityGridGetter();
+	if (!velocityGridPtr) {
 		return;
 	}
 
-	glm::uvec3 expectedPointsAmount = glm::ceil(glm::vec3(velocityGrid->pointsAmount()) * m_GridResolutionFactor);
+	glm::uvec3 expectedPointsAmount = glm::ceil(glm::vec3(velocityGridPtr->pointsAmount()) * m_GridResolutionFactor);
 	size_t expectedCapacity = expectedPointsAmount.x * expectedPointsAmount.y * expectedPointsAmount.z;
 
 	if (m_GridResolutionChanged || (m_CurrentArrows.size() != expectedCapacity)) {
 		applyGridResolutionFactor();
 	}
 
-	glm::dvec3 currentPoint = velocityGrid->minCorner();
+	glm::dvec3 currentPoint = velocityGridPtr->minCorner();
 	size_t currentOffset = 0;
 
-	glm::uvec3 pointsAmount = glm::ceil(glm::vec3(velocityGrid->pointsAmount()) * m_GridResolutionFactor);
-	glm::dvec3 cellExtent = velocityGrid->gridExtent() / glm::dvec3(pointsAmount);
+	glm::uvec3 pointsAmount = glm::ceil(glm::vec3(velocityGridPtr->pointsAmount()) * m_GridResolutionFactor);
+	glm::dvec3 cellExtent = velocityGridPtr->gridExtent() / glm::dvec3(pointsAmount);
 
     std::vector<std::function<void()>> lineCreationFunctions;
 
@@ -68,14 +68,14 @@ void VectorFieldRenderer::render(const glm::mat4x4 & viewProjectTransform)
 	for (size_t x = 0; x < pointsAmount.x; x++) {
 		for (size_t y = 0; y < pointsAmount.y; y++) {
 			for (size_t z = 0; z < pointsAmount.z; z++) {
-				render(viewProjectTransform, currentPoint, currentOffset, *velocityGrid, lineCreationFunctions);
+				render(viewProjectTransform, currentPoint, currentOffset, *velocityGridPtr, lineCreationFunctions);
 				currentOffset++;
 				currentPoint.z += cellExtent.z;
 			}
-			currentPoint.z = velocityGrid->minCorner().z;
+			currentPoint.z = velocityGridPtr->minCorner().z;
 			currentPoint.y += cellExtent.y;
 		}
-		currentPoint.y = velocityGrid->minCorner().y;
+		currentPoint.y = velocityGridPtr->minCorner().y;
 		currentPoint.x += cellExtent.x;
 	}
 
@@ -118,10 +118,10 @@ void VectorFieldRenderer::applyGridResolutionFactor()
 {
 	m_GridResolutionChanged = false;
 
-	const std::shared_ptr<UniformGrid<glm::dvec3>> velocityGrid = m_VelocityGridGetter();
+	const auto& velocityGridPtr = m_VelocityGridGetter();
 
 	
-	glm::uvec3 pointsAmount = glm::ceil(glm::vec3(velocityGrid->pointsAmount())*m_GridResolutionFactor);
+	glm::uvec3 pointsAmount = glm::ceil(glm::vec3(velocityGridPtr->pointsAmount())*m_GridResolutionFactor);
 	size_t capacity = pointsAmount.x * pointsAmount.y * pointsAmount.z;
 
 	m_CurrentArrows.clear();

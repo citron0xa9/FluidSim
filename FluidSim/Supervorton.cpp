@@ -1,13 +1,11 @@
 
 #include "Supervorton.h"
 
-Supervorton::Supervorton() : m_VorticityMagnitudeSum{0}
+Supervorton::Supervorton(const double birthTimeSeconds, double radius, const double mass)
+    : Vorton{ birthTimeSeconds, radius, mass }, m_VorticityMagnitudeSum {0}
 {
 }
 
-Supervorton::~Supervorton()
-{
-}
 
 void Supervorton::addContainedVorton(Vorton & vorton)
 {
@@ -39,33 +37,32 @@ std::vector<Vorton*>& Supervorton::containedVortonPtrs()
 void Supervorton::containedVortonPtrs(const std::vector<Vorton*>& containedVortons)
 {
 	m_ContainedVortonPtrs = containedVortons;
-	Vorton &resultingVorton = calculateSupervorton(containedVortons);
-	vorticity(resultingVorton.vorticity());
-	position(resultingVorton.position());
+	calculateQuantitiesFromContainedVortons(containedVortons);
 }
 
-Vorton Supervorton::calculateSupervorton(const std::vector<Vorton*>& containedVortonPtrs)
+void Supervorton::calculateQuantitiesFromContainedVortons(const std::vector<Vorton*>& containedVortonPtrs)
 {
 	if (containedVortonPtrs.size() < 1) {
 		std::runtime_error("Supervorton::calculateSupervorton: no contained vortons given");
 	}
-	glm::dvec3 position(0);
-	glm::dvec3 vorticity(0);
+	glm::dvec3 calculatedPosition(0);
+	glm::dvec3 calculatedVorticity(0);
 	m_VorticityMagnitudeSum = 0;
 	for (auto vortonPtr : containedVortonPtrs) {
 
 		double vorticityMagnitude = glm::length(vortonPtr->vorticity());
 		m_VorticityMagnitudeSum += vorticityMagnitude;
 
-		position += vorticityMagnitude * vortonPtr->position();
-		vorticity += vortonPtr->vorticity();
+        calculatedPosition += vorticityMagnitude * vortonPtr->position();
+        calculatedVorticity += vortonPtr->vorticity();
 
 	}
 	if (m_VorticityMagnitudeSum > 0) {
-		position /= m_VorticityMagnitudeSum;
+        calculatedPosition /= m_VorticityMagnitudeSum;
 	}
 	else {
-		position = containedVortonPtrs[0]->position();
+        calculatedPosition = containedVortonPtrs[0]->position();
 	}
-	return Vorton(position, vorticity, containedVortonPtrs[0]->radius());
+    vorticity(calculatedVorticity);
+    position(calculatedPosition);
 }

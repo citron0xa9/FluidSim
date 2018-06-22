@@ -10,13 +10,13 @@
 class VortonRenderer : public DrawableObject
 {
 public:
-	VortonRenderer(Scene &scene, const std::vector<Vorton> &baseVortons, Program &phongProgram);
+	VortonRenderer(Scene &scene, const std::vector<std::unique_ptr<Particle>> &baseVortonPtrs, Program &phongProgram);
 	virtual ~VortonRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 
 private:
-	const std::vector<Vorton> &m_BaseVortons;
+	const std::vector<std::unique_ptr<Particle>> &m_BaseVortonPtrs;
 	TriangleNetObject m_DrawPrototype;
 };
 

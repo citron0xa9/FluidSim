@@ -6,13 +6,11 @@
 const double VortonOctHeap::m_MAX_VOLUME = 1.0;
 const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
 
-VortonOctHeap::VortonOctHeap(std::vector<Vorton>& vortons)
-	: m_NullSupervorton()
+VortonOctHeap::VortonOctHeap(const std::vector<std::reference_wrapper<Vorton>>& vortons)
+	: m_NullSupervorton(vortons.back().get().birthTimeSeconds(), vortons.back().get().radius(), vortons.back().get().mass())
 {
-	m_NullSupervorton.radius(vortons.back().radius());
-	if (vortons.empty()) {
-		std::runtime_error("VortonOctHeap::VortonOctHeap(const std::vector<Vorton>& vortons): given vorton vector is empty");
-	}
+    assert(!vortons.empty());
+
 	calculateBoundingBox(vortons);
 	const size_t divisionsCount = calculateNeededDivisions(vortons.size());
 	subdivide(divisionsCount);
@@ -72,13 +70,13 @@ size_t VortonOctHeap::divisions() const
 	return m_Divisions;
 }
 
-void VortonOctHeap::calculateBoundingBox(const std::vector<Vorton>& vortons)
+void VortonOctHeap::calculateBoundingBox(const std::vector<std::reference_wrapper<Vorton>>& vortons)
 {
-	glm::dvec3 minCorner = vortons[0].position();
-	glm::dvec3 maxCorner = vortons[0].position();
-	for (auto& vorton : vortons) {
-		minCorner = fsmath::allMin(minCorner, vorton.position());
-		maxCorner = fsmath::allMax(maxCorner, vorton.position());
+	glm::dvec3 minCorner = vortons[0].get().position();
+	glm::dvec3 maxCorner = vortons[0].get().position();
+	for (auto vorton : vortons) {
+		minCorner = fsmath::allMin(minCorner, vorton.get().position());
+		maxCorner = fsmath::allMax(maxCorner, vorton.get().position());
 	}
 	m_Extent = (maxCorner - minCorner);
 	glm::dvec3 adjustment = static_cast<double>(FLT_EPSILON) * m_Extent;
@@ -163,10 +161,10 @@ size_t VortonOctHeap::calculateNeededHeapSize()
 	return heapSize;
 }
 
-void VortonOctHeap::initializeLeafs(std::vector<Vorton>& vortons)
+void VortonOctHeap::initializeLeafs(const std::vector<std::reference_wrapper<Vorton>>& vortons)
 {
-	for (auto& vorton : vortons) {
-		VortonOctHeapElement &responsibleLeaf = leaftAtPosition(vorton.position());
+	for (auto vorton : vortons) {
+		VortonOctHeapElement &responsibleLeaf = leaftAtPosition(vorton.get().position());
 		responsibleLeaf.supervorton().addContainedVorton(vorton);
 	}
 }

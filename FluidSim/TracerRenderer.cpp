@@ -1,8 +1,8 @@
 
 #include "TracerRenderer.h"
 
-TracerRenderer::TracerRenderer(const std::vector<Tracer>& baseTracers)
-	: m_BaseTracers{baseTracers}, m_TracerVerticesBuf{false}, m_TracerVao{false}
+TracerRenderer::TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs)
+	: m_BaseTracerPtrs{baseTracerPtrs}, m_TracerVerticesBuf{false}, m_TracerVao{false}
 {
 	assert(!baseTracers.empty());
 	setupVertexData();
@@ -22,15 +22,15 @@ void TracerRenderer::render(const glm::mat4x4 & viewProjectTransform)
 	m_RenderProgram.loadModelViewProjectTransform(viewProjectTransform);
 	m_RenderProgram.use();
 
-	glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(m_BaseTracers.size()));
+	glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(m_BaseTracerPtrs.size()));
 
 	m_TracerVao.unbind();
 }
 
 void TracerRenderer::setupVertexData()
 {
-	for (auto &tracer : m_BaseTracers) {
-		glm::dvec3 position = tracer.position();
+	for (auto &tracerPtr : m_BaseTracerPtrs) {
+		glm::dvec3 position = tracerPtr->position();
 		for (int i = 0; i < position.length(); i++) {
 			m_TracerVerticesRAM.push_back(position[i]);
 		}
@@ -67,8 +67,8 @@ void TracerRenderer::updateVertexData()
 	assert(m_BaseTracers.size() == (m_TracerVerticesRAM.size() / 3));
 	{
 		size_t verticesRAMOffset = 0;
-		for (int i = 0; i < m_BaseTracers.size(); i++) {
-			glm::dvec3 position = m_BaseTracers[i].position();
+		for (int i = 0; i < m_BaseTracerPtrs.size(); i++) {
+			glm::dvec3 position = m_BaseTracerPtrs[i]->position();
 			for (int j = 0; j < position.length(); j++) {
 				m_TracerVerticesRAM[verticesRAMOffset] = position[j];
 				verticesRAMOffset++;

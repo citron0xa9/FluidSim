@@ -229,23 +229,34 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActiveObject.h" />
+    <ClInclude Include="AdvectParticlesOperation.h" />
+    <ClInclude Include="ApplyVelocityGridOperation.h" />
     <ClInclude Include="Arrow.h" />
     <ClInclude Include="BufferO.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="EmitParticlesOperation.h" />
+    <ClInclude Include="FindBoundingBoxOperation.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GridRenderer.h" />
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="IndexBufO.h" />
     <ClInclude Include="IndexCombination.h" />
+    <ClInclude Include="KillParticlesByAgeOperation.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleOperation.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="RigidBodySim.h" />
     <ClInclude Include="RigidBodySphere.h" />
+    <ClInclude Include="SolveBoundaryConditionsOperation.h" />
+    <ClInclude Include="SolveBoundaryConditionsVortonsOperation.h" />
     <ClInclude Include="Texture2DFixedSize.h" />
     <ClInclude Include="Tracer.h" />
     <ClInclude Include="TracerRenderer.h" />
+    <ClInclude Include="UpdateFluidOperation.h" />
     <ClInclude Include="VectorFieldRenderer.h" />
     <ClInclude Include="VorticityDistribution.h" />
     <ClInclude Include="LightSource.h" />
@@ -277,9 +288,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActiveObject.cpp" />
+    <ClCompile Include="AdvectParticlesOperation.cpp" />
+    <ClCompile Include="ApplyVelocityGridOperation.cpp" />
     <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="BufferO.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EmitParticlesOperation.cpp" />
+    <ClCompile Include="FindBoundingBoxOperation.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GridRenderer.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
@@ -289,13 +304,20 @@
     <ClCompile Include="GLViewer.cpp" />
     <ClCompile Include="IndexBufO.cpp" />
     <ClCompile Include="IndexCombination.cpp" />
+    <ClCompile Include="KillParticlesByAgeOperation.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleOperation.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="RigidBodySim.cpp" />
     <ClCompile Include="RigidBodySphere.cpp" />
+    <ClCompile Include="SolveBoundaryConditionsOperation.cpp" />
+    <ClCompile Include="SolveBoundaryConditionsVortonsOperation.cpp" />
     <ClCompile Include="Texture2DFixedSize.cpp" />
     <ClCompile Include="Tracer.cpp" />
     <ClCompile Include="TracerRenderer.cpp" />
+    <ClCompile Include="UpdateFluidOperation.cpp" />
     <ClCompile Include="VectorFieldRenderer.cpp" />
     <ClCompile Include="VorticityDistribution.cpp" />
     <ClCompile Include="LightSource.cpp" />

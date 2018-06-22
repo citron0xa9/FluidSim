@@ -29,10 +29,6 @@ VortonSim::VortonSim(RigidBodySim& rbSim, double viscosity, double density, cons
         const double volume = domainExtent.x * domainExtent.y * domainExtent.z;
         const auto massPerVorton = volume * density / addedVortons;
 
-        for (auto it = m_Tracers.begin()+tracersSizeBefore; it != m_Tracers.end(); it++) {
-            //it->mass(massPerObject);
-        }
-
         for (auto it = m_Vortons.begin()+vortonsSizeBefore; it != m_Vortons.end(); it++) {
             it->mass(massPerVorton);
         }
@@ -196,11 +192,6 @@ void VortonSim::initializeVortons(const VorticityDistribution & initialVorticity
 	for (double xPosition = minCorner.x; xPosition < maxCorner.x; xPosition+=vortonDistance) {
 		for (double yPosition = minCorner.y; yPosition < maxCorner.y; yPosition+=vortonDistance) {
 			for (double zPosition = minCorner.z; zPosition < maxCorner.z; zPosition+=vortonDistance) {
-				//glm::dvec3 position = glm::dvec3(
-				//	vortonDistance.x * xIndex,
-				//	vortonDistance.y * yIndex,
-				//	vortonDistance.z * zIndex);
-				//position += minCorner;
                 glm::dvec3 position{ xPosition, yPosition, zPosition };
 				Vorton vorton(position, initialVorticity.vorticityAtPosition(position) * vorticityMagnitude, vortonRadius, 0.0);
 				if (glm::length(vorton.vorticity()) > SIGNIFICANT_VORTICITY) {
@@ -233,11 +224,6 @@ void VortonSim::initializeTracers(const VorticityDistribution & initialVorticity
     for (double xPosition = minCorner.x; xPosition < maxCorner.x; xPosition += tracerDistance) {
         for (double yPosition = minCorner.y; yPosition < maxCorner.y; yPosition += tracerDistance) {
             for (double zPosition = minCorner.z; zPosition < maxCorner.z; zPosition += tracerDistance) {
-				//glm::dvec3 position = glm::dvec3(
-				//	tracerDistance.x * xIndex,
-				//	tracerDistance.y * yIndex,
-				//	tracerDistance.z * zIndex);
-				//position += minCorner;
                 glm::dvec3 position{ xPosition, yPosition, zPosition };
 				m_Tracers.emplace_back(tracerRadius);
 				m_Tracers.back().position(position);
@@ -393,13 +379,9 @@ void VortonSim::advectTracers(double secondsPassed)
 	for (int i = 0; i < m_Tracers.size(); i++) {
         const auto tracerVelocity = m_VelocityGridPtr->interpolate(m_Tracers[i].position());
 		glm::vec3 positionChange = tracerVelocity * secondsPassed;
-		m_Tracers[i].translate(positionChange);
-
+		
+        m_Tracers[i].translate(positionChange);
         m_Tracers[i].velocity(tracerVelocity);
-
-		//update m_TracerVericesRAM
-		//glm::dvec3 tracerPosition = m_Tracers[i].position();
-		//size_t iterationCounter = 0;
 	}
 	
 }
@@ -484,8 +466,6 @@ void VortonSim::solveTracerRigidBodySphereCollision(Tracer& tracer, RigidBodySph
     const auto sphereLinearRotationVelocity = glm::cross(sphere.angularVelocity(), newPositionDelta);
     const auto sphereLinearVelocityAtContactPoint = sphere.velocity() + sphereLinearRotationVelocity;
     const auto velocityTracerDelta = tracer.velocity() - sphereLinearVelocityAtContactPoint;
-
-    //sphere.addMomentum(velocityTracerDelta * tracer.mass());
 
     tracer.velocity(sphereLinearVelocityAtContactPoint);
 }

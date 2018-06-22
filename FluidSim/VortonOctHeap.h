@@ -11,7 +11,7 @@ class VortonOctHeap
 {
 	friend class VortonOctHeapElement;
 public:
-	VortonOctHeap(std::vector<Vorton> &vortons);
+	VortonOctHeap(const std::vector<std::reference_wrapper<Vorton>>& vortons);
 	~VortonOctHeap();
 
 	VortonOctHeapElement& root();
@@ -25,13 +25,13 @@ public:
 	size_t divisions() const;
 
 private:
-	void calculateBoundingBox(const std::vector<Vorton> &vortons);
+	void calculateBoundingBox(const std::vector<std::reference_wrapper<Vorton>>& vortons);
 	size_t calculateNeededDivisions(const size_t numElements);
 	void subdivide(double maxVolume);
 	void subdivide(size_t divisions);
 	void createEmptyOctHeap();
 	size_t calculateNeededHeapSize();
-	void initializeLeafs(std::vector<Vorton> &vortons);
+	void initializeLeafs(const std::vector<std::reference_wrapper<Vorton>>& vortons);
 	void initializeParents();
 
 	size_t leafIndexForPosition(const glm::dvec3 &position);
