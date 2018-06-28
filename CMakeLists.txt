@@ -17,6 +17,7 @@ find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
 
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
@@ -155,11 +156,13 @@ source_group_by_path(${SourceDirectory} "\\\\.h$|\\\\.cpp$|\\\\.inl$" ${group_al
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+
 add_executable(${Target} ${Sources})
 
 set_target_properties(${Target} PROPERTIES COMPILE_DEFINITIONS "$<$<CONFIG:DEBUG>:${CONDITIONCHECK_LEVEL_VARIABLE_NAME}=0>;$<$<CONFIG:RELEASE>:${CONDITIONCHECK_LEVEL_VARIABLE_NAME}=3>")
 
 target_include_directories(${Target} PUBLIC ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
-target_link_libraries(${Target} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
+target_link_libraries(${Target} ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
 
 install(TARGETS ${Target} RUNTIME DESTINATION ${BinaryInstallDirectory} COMPONENT runtime)

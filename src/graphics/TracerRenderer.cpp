@@ -1,7 +1,7 @@
 
 #include "TracerRenderer.h"
 
-#include "fsmath.h"
+#include "../util/fsmath.h"
 
 TracerRenderer::TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs)
 	: m_BaseTracerPtrs{baseTracerPtrs}, m_TracerVerticesBuf{false}, m_TracerVao{false}
@@ -43,10 +43,10 @@ void TracerRenderer::setupVao()
 void TracerRenderer::setupRenderProgram()
 {
 	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.loadSourceFromFile("shaders\\tracer.vert");
+	vertexShader.loadSourceFromFile("shaders/tracer.vert");
 
 	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.loadSourceFromFile("shaders\\tracer.frag");
+	fragmentShader.loadSourceFromFile("shaders/tracer.frag");
 
 	m_RenderProgram.attachShader(&vertexShader);
 	m_RenderProgram.attachShader(&fragmentShader);

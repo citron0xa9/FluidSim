@@ -7,13 +7,13 @@
 #include <queue>
 #include <functional>
 
-#include "RigidBodySim.h"
-#include "VertexArrO.h"
-#include "VertexBufO.h"
-#include "Program.h"
-#include "Scene.h"
-#include "VortonSimRenderer.h"
-#include "Framebuffer.h"
+#include "../simulation/RigidBodySim.h"
+#include "../graphics/VertexArrO.h"
+#include "../graphics/VertexBufO.h"
+#include "../graphics/Program.h"
+#include "../Scene.h"
+#include "../graphics/VortonSimRenderer.h"
+#include "../graphics/Framebuffer.h"
 
 class GLViewer {
 public:

@@ -2,14 +2,15 @@
 
 #include "Particle.h"
 
-#include "Log.h"
+#include "../util/Log.h"
 #include <glm/gtc/constants.hpp>
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 #include <cmath>
+#include <limits>
 
-const double DEFAULT_VORTON_RADIUS = FLT_EPSILON * 100;
-const double SIGNIFICANT_VORTICITY = expf(0.5f * (logf(FLT_EPSILON) + logf(FLT_MIN)));
+const double DEFAULT_VORTON_RADIUS = std::numeric_limits<float>::epsilon() * 100;
+const double SIGNIFICANT_VORTICITY = expf(0.5f * (logf(std::numeric_limits<float>::epsilon()) + logf(std::numeric_limits<float>::min())));
 
 class Vorton : public Particle
 {

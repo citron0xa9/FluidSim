@@ -1,7 +1,7 @@
 
 #include "VortonOctHeap.h"
 #include "VortonOctHeapElement.h"
-#include "fsmath.h"
+#include "../util/fsmath.h"
 
 const double VortonOctHeap::m_MAX_VOLUME = 1.0;
 const size_t VortonOctHeap::m_DEFAULT_DIVISIONS_COUNT = 4;
@@ -79,7 +79,7 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<std::reference_wrappe
 		maxCorner = fsmath::allMax(maxCorner, vorton.get().position());
 	}
 	m_Extent = (maxCorner - minCorner);
-	glm::dvec3 adjustment = static_cast<double>(FLT_EPSILON) * m_Extent;
+	glm::dvec3 adjustment = static_cast<double>(std::numeric_limits<float>::epsilon()) * m_Extent;
 	minCorner -= adjustment;
 	maxCorner += adjustment;
 	m_Extent = (maxCorner - minCorner);

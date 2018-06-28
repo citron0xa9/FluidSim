@@ -2,7 +2,7 @@
 #include "EmitParticlesOperation.h"
 
 #include "ParticleSystem.h"
-#include "Log.h"
+#include "../util/Log.h"
 
 #include <glm/gtx/string_cast.hpp>
 
@@ -57,7 +57,7 @@ void EmitParticlesOperation::emitParticle(const double stepSecondsPassed, const 
     m_Parent.addParticle(std::move(particlePtr));
 }
 
-glm::dvec3 EmitParticlesOperation::generateRandomVector() const
+glm::dvec3 EmitParticlesOperation::generateRandomVector()
 {
     return glm::dvec3{
         m_MinusOneToOneDistribution(s_RandomGenerator),

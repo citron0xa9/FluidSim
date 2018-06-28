@@ -5,6 +5,7 @@
 #include "UniformGrid.h"
 
 #include <memory>
+#include <functional>
 
 class SolveBoundaryConditionsVortonsOperation : public SolveBoundaryConditionsOperation
 {

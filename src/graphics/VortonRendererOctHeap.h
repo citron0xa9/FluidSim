@@ -5,6 +5,9 @@
 #include "TriangleNetObject.h"
 #include "../simulation/VortonOctHeap.h"
 
+#include <functional>
+#include <memory>
+
 class VortonRendererOctHeap : public DrawableObject
 {
 public:

@@ -21,7 +21,7 @@ VectorFieldRenderer::VectorFieldRenderer(Scene &scene, const grid_getter_t& grid
 	Material &arrowMatRef = scene.addMaterial(arrowMaterial);
 
 	//setup geometry
-	Geometry &geomArrow = scene.addGeometryFromFile("objects\\arrow.obj");
+	Geometry &geomArrow = scene.addGeometryFromFile("objects/arrow.obj");
 	geomArrow.setupAttribArrays(phongProgram);
 
 	//create vorton prototype
@@ -239,10 +239,10 @@ void VectorFieldRenderer::createLine(const glm::dvec3 & pointPosition, size_t po
 void VectorFieldRenderer::setupLinesRenderProgram()
 {
     Shader vertexShader{ GL_VERTEX_SHADER };
-    vertexShader.loadSourceFromFile("shaders\\vectorFieldLines.vert");
+    vertexShader.loadSourceFromFile("shaders/vectorFieldLines.vert");
 
     Shader fragmentShader{ GL_FRAGMENT_SHADER };
-    fragmentShader.loadSourceFromFile("shaders\\vectorFieldLines.frag");
+    fragmentShader.loadSourceFromFile("shaders/vectorFieldLines.frag");
 
     m_LinesRenderProgram.attachShader(&vertexShader);
     m_LinesRenderProgram.attachShader(&fragmentShader);

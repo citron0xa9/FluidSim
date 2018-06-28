@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ActiveObject.h"
+#include "../ActiveObject.h"
 #include "RigidBodySphere.h"
 
 class RigidBodySim : public ActiveObject

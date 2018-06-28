@@ -196,10 +196,10 @@ void VortonSimRenderer::setupPhongProgram(Scene &scene)
 	m_PhongProgramPtr = &(scene.addProgram(lightSrcVars));
 
 	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.loadSourceFromFile("shaders\\basic3D.vert");
+	vertexShader.loadSourceFromFile("shaders/basic3D.vert");
 
 	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.loadSourceFromFile("shaders\\basic3D_phong.frag");
+	fragmentShader.loadSourceFromFile("shaders/basic3D_phong.frag");
 
 	m_PhongProgramPtr->attachShader(&vertexShader);
 	m_PhongProgramPtr->attachShader(&fragmentShader);

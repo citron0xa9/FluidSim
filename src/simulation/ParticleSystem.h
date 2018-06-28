@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ActiveObject.h"
+#include "../ActiveObject.h"
 #include "Particle.h"
 #include "ParticleOperation.h"
 

@@ -7,14 +7,14 @@
 #include <vector>
 
 
-#include "Shader.h"
-#include "Log.h"
-#include "Debug.h"
-#include "SunLightSource.h"
-#include "TriangleNetObject.h"
-#include "VorticityDistribution.h"
+#include "../graphics/Shader.h"
+#include "../util/Log.h"
+#include "../util/Debug.h"
+#include "../graphics/SunLightSource.h"
+#include "../graphics/TriangleNetObject.h"
+#include "../simulation/VorticityDistribution.h"
 
-#include "EmitParticlesOperation.h"
+#include "../simulation/EmitParticlesOperation.h"
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -102,6 +102,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	setupSim(true);
 	m_VortonSimRendererPtr = new VortonSimRenderer(*m_TracerParticleSystemPtr, *m_TracerParticleSystemPtr, *reinterpret_cast<UpdateFluidOperation*>(0), m_Scene);
+    m_VortonSimRendererPtr->vortonsRendered(true);
 	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 	
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));

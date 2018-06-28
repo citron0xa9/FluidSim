@@ -51,6 +51,6 @@ private:
 
     static std::default_random_engine s_RandomGenerator;
 
-    glm::dvec3 generateRandomVector() const;
+    glm::dvec3 generateRandomVector();
 };
 

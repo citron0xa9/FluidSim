@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object.h"
+#include "../Object.h"
 
 #include <glm/mat3x3.hpp>
 

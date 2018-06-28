@@ -1,6 +1,6 @@
 
 #include "UniformGridGeometry.h"
-#include "fsmath.h"
+#include "../util/fsmath.h"
 #include <algorithm>
 
 //UniformGridGeometry::UniformGridGeometry()

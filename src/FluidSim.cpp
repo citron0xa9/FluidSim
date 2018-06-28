@@ -145,9 +145,6 @@ int main(int argc, char* argv[])
 	cliT.join();
 	std::cout << "cli finished, exiting..." << std::endl;
 
-
-	system("pause");
-
 	return 0;
 }
 

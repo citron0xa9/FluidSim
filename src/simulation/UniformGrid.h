@@ -47,7 +47,7 @@ private:
 	std::vector<ItemT> m_Points;
 };
 
-#include "fsmath.h"
+#include "../util/fsmath.h"
 
 template<class ItemT>
 inline ItemT UniformGrid<ItemT>::interpolate(const glm::dvec3 & position) const

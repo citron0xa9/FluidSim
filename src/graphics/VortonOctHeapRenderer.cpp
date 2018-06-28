@@ -146,10 +146,10 @@ void VortonOctHeapRenderer::setupVao()
 void VortonOctHeapRenderer::setupProgram()
 {
 	Shader vertexShader{ GL_VERTEX_SHADER };
-	vertexShader.loadSourceFromFile("shaders\\grid.vert");
+	vertexShader.loadSourceFromFile("shaders/grid.vert");
 
 	Shader fragmentShader{ GL_FRAGMENT_SHADER };
-	fragmentShader.loadSourceFromFile("shaders\\grid.frag");
+	fragmentShader.loadSourceFromFile("shaders/grid.frag");
 
 	m_Program.attachShader(&vertexShader);
 	m_Program.attachShader(&fragmentShader);

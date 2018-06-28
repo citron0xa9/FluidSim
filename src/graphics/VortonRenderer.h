@@ -3,6 +3,7 @@
 #include "DrawableObject.h"
 
 #include <vector>
+#include <memory>
 
 #include "../simulation/Vorton.h"
 #include "TriangleNetObject.h"

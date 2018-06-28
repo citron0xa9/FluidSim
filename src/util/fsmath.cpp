@@ -1,5 +1,6 @@
 
 #include "fsmath.h"
+#include "../simulation/UniformGrid.h"
 
 void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGrid<glm::dvec3>& velocityGrid)
 {
@@ -68,6 +69,51 @@ void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGri
 			currentOffset++;
 		}
 	}
+}
+
+void fsmath::computeFiniteDifference(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGrid<glm::dvec3>& velocityGrid,
+	const size_t xIndex, const size_t yIndex, const size_t zIndex, const size_t offset,
+	const glm::dvec3& doubleCellExtent, const glm::uvec3& pointsAmountMinus1, const size_t yOffsetDistance,
+	const size_t zOffsetDistance)
+{
+
+    glm::dmat3x3 &currentMatrix = jacobianGrid.atOffset(offset);
+
+
+    if (xIndex == 0) {
+        currentMatrix[0] = (velocityGrid.atOffset(offset + 1) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
+    }
+    else if (xIndex == pointsAmountMinus1.x) {
+        currentMatrix[0] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - 1)) / velocityGrid.cellExtent();
+    }
+    else {
+        currentMatrix[0] = (velocityGrid.atOffset(offset + 1) - velocityGrid.atOffset(offset - 1)) / doubleCellExtent;
+    }
+
+
+    if (yIndex == 0) {
+        currentMatrix[1] = (velocityGrid.atOffset(offset + yOffsetDistance) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
+    }
+    else if (yIndex == pointsAmountMinus1.y) {
+        currentMatrix[1] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - yOffsetDistance)) / velocityGrid.cellExtent();
+    }
+    else {
+        currentMatrix[1] = (velocityGrid.atOffset(offset + yOffsetDistance) - velocityGrid.atOffset(offset - yOffsetDistance)) / doubleCellExtent;
+    }
+
+
+    if (zIndex == 0) {
+        currentMatrix[2] = (velocityGrid.atOffset(offset + zOffsetDistance) - velocityGrid.atOffset(offset)) / velocityGrid.cellExtent();
+    }
+    else if (zIndex == pointsAmountMinus1.z) {
+        currentMatrix[2] = (velocityGrid.atOffset(offset) - velocityGrid.atOffset(offset - zOffsetDistance)) / velocityGrid.cellExtent();
+    }
+    else {
+        currentMatrix[2] = (velocityGrid.atOffset(offset + zOffsetDistance) - velocityGrid.atOffset(offset - zOffsetDistance)) / doubleCellExtent;
+    }
+
+    currentMatrix = glm::transpose(currentMatrix);
+
 }
 
 size_t fsmath::nextLargerMultipleOf(const size_t multipleBaseValue, const size_t threshold)

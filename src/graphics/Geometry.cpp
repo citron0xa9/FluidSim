@@ -25,7 +25,7 @@ Geometry::Geometry(const std::string& filePath) : m_VertexData{ false }, m_Ibo{ 
 		parseObjFile(filePath, m_vertexDataRAM, m_indicesRAM);
 	}
 	catch (const std::exception& ex) {
-		throw std::exception((std::string("Parsing .obj file failed: ") + ex.what()).c_str());
+		throw std::runtime_error(std::string("Parsing .obj file failed: ") + ex.what());
 	}
 
 	//push data to gpu

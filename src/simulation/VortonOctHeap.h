@@ -1,9 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 #include <glm/vec3.hpp>
 #include "Supervorton.h"
-#include "fsmath.h"
+#include "../util/fsmath.h"
 
 class VortonOctHeapElement;
 

@@ -13,7 +13,7 @@ VortonRenderer::VortonRenderer(Scene &scene, const std::vector<std::unique_ptr<P
 	Material &sphereMatRef = scene.addMaterial(sphereMaterial);
 
 	//setup geometry
-	Geometry &geomSphere = scene.addGeometryFromFile("objects\\sphere.obj");
+	Geometry &geomSphere = scene.addGeometryFromFile("objects/sphere.obj");
 	geomSphere.setupAttribArrays(phongProgram);
 
 	//create vorton prototype
