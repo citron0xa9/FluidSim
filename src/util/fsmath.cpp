@@ -2,6 +2,8 @@
 #include "fsmath.h"
 #include "../simulation/UniformGrid.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGrid<glm::dvec3>& velocityGrid)
 {
 	const glm::dvec3 doubleCellExtent = 2.0 * velocityGrid.cellExtent();

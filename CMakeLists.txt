@@ -162,7 +162,7 @@ add_executable(${Target} ${Sources})
 
 set_target_properties(${Target} PROPERTIES COMPILE_DEFINITIONS "$<$<CONFIG:DEBUG>:${CONDITIONCHECK_LEVEL_VARIABLE_NAME}=0>;$<$<CONFIG:RELEASE>:${CONDITIONCHECK_LEVEL_VARIABLE_NAME}=3>")
 
-target_include_directories(${Target} PUBLIC ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
+target_include_directories(${Target} PUBLIC ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
 target_link_libraries(${Target} ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
 
 install(TARGETS ${Target} RUNTIME DESTINATION ${BinaryInstallDirectory} COMPONENT runtime)

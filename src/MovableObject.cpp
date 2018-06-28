@@ -1,7 +1,7 @@
 #include "MovableObject.h"
 
 
-MovableObject::MovableObject() : m_MovementVelocityFactor{4.0}
+MovableObject::MovableObject() : m_MovementVelocityFactor{4.0}, m_LocalVelocity{0}
 {
 }
 

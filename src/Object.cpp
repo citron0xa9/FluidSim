@@ -22,6 +22,7 @@ std::mutex Object::m_AllObjectsLock{};
 
 
 Object::Object()
+    : m_TranslationTransform{1}, m_ScaleTransform{1}, m_RotationTransform{1}
 {
 	getId();
 }
