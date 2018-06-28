@@ -16,7 +16,7 @@ public:
 
     ParticleSystem& operator=(const ParticleSystem& original) = delete;
 
-    virtual void step(const double secondsPassed) override;
+    virtual void step(double secondsPassed) override;
 
     void addParticle(std::unique_ptr<Particle>&& particlePtr);
     void addParticleOperation(std::unique_ptr<ParticleOperation>&& operationPtr);

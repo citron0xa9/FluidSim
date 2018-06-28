@@ -138,9 +138,6 @@
     <ClInclude Include="DrawableObject.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="VortonSim.h">
-      <Filter>Header Files\Objects\Sim</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -176,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="RigidBody.h">
       <Filter>Header Files\Objects\Sim</Filter>
-    </ClInclude>
-    <ClInclude Include="Tracer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RigidBodySphere.h">
       <Filter>Header Files\Objects\Sim</Filter>
@@ -302,9 +296,6 @@
     <ClCompile Include="DrawableObject.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="VortonSim.cpp">
-      <Filter>Source Files\Objects\Sim</Filter>
-    </ClCompile>
     <ClCompile Include="ActiveObject.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -343,9 +334,6 @@
     </ClCompile>
     <ClCompile Include="RigidBody.cpp">
       <Filter>Source Files\Objects\Sim</Filter>
-    </ClCompile>
-    <ClCompile Include="Tracer.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RigidBodySphere.cpp">
       <Filter>Source Files\Objects\Sim</Filter>

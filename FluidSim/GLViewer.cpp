@@ -12,8 +12,9 @@
 #include "Debug.h"
 #include "SunLightSource.h"
 #include "TriangleNetObject.h"
-#include "VortonSim.h"
 #include "VorticityDistribution.h"
+
+#include "EmitParticlesOperation.h"
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -100,7 +101,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	m_Scene.addObject(light);
 
 	setupSim(true);
-	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
+	m_VortonSimRendererPtr = new VortonSimRenderer(*m_TracerParticleSystemPtr, *m_TracerParticleSystemPtr, *reinterpret_cast<UpdateFluidOperation*>(0), m_Scene);
 	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
 	
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
@@ -327,13 +328,53 @@ void GLViewer::setupSim(bool createPaused)
     m_RigidBodySimPtr->simulating(!createPaused);
     m_Scene.addObjectPtr(m_RigidBodySimPtr);
 
-	std::vector<const VorticityDistribution*> initialVorticityPtrs;
-    initialVorticityPtrs.push_back(new NoiseVorticityDistribution(glm::dvec3(0), glm::dvec3(4.0, 0.5, 0.5)));
+	//std::vector<const VorticityDistribution*> initialVorticityPtrs;
+    //initialVorticityPtrs.push_back(new NoiseVorticityDistribution(glm::dvec3(0), glm::dvec3(4.0, 0.5, 0.5)));
 	//initialVorticityPtrs.push_back(new JetRingVorticityDistribution(glm::dvec3(0), 1, 1, glm::dvec3(1.0, 0.0, 0.0)));
 	//initialVorticityPtrs.push_back(new VortexTubeVorticityDistribution(glm::dvec3(0), 0.5, 0.0, 2.0, 2, -1));
-	m_VortonSimPtr = new VortonSim(*m_RigidBodySimPtr, 0.05, 1.0, initialVorticityPtrs, 0.125 * FLT_EPSILON);
-	m_VortonSimPtr->simulating(!createPaused);
-	m_Scene.addObjectPtr(m_VortonSimPtr);
+	//m_VortonSimPtr = new VortonSim(*m_RigidBodySimPtr, 0.05, 1.0, initialVorticityPtrs, 0.125 * FLT_EPSILON);
+	//m_VortonSimPtr->simulating(!createPaused);
+	//m_Scene.addObjectPtr(m_VortonSimPtr);
+
+    constexpr size_t vortonsPerDimension = 16u;
+    constexpr size_t tracersPerDimension = 2 * vortonsPerDimension;
+    constexpr float extentPerDimension = 1.0f;
+    constexpr float density = 1.0;
+    constexpr double vortonRadius = (extentPerDimension / vortonsPerDimension) * 0.5;
+    constexpr double vortonMass = (extentPerDimension * extentPerDimension * extentPerDimension) * density / (vortonsPerDimension * vortonsPerDimension * vortonsPerDimension);
+
+    constexpr double tracerRadius = (extentPerDimension / tracersPerDimension) * 0.5;
+    constexpr double tracerMass = 1e-3;
+
+    //m_VortonParticleSystemPtr = new ParticleSystem();
+    /*auto emitVortonOperation =
+        std::make_unique<EmitParticlesOperation>(
+            *m_VortonParticleSystemPtr,
+            1,
+            glm::dvec3{ 0.1, 0.0, 0.0 },
+            glm::dvec3{ 0 },
+            glm::dvec3{ -3, 0, 0 }, glm::dvec3{ 0, 1, 1 },
+            vortonRadius, vortonMass,
+            [](const double birthTimeSeconds, const double initialRadius, const double initialMass)
+    {
+        return std::make_unique<Vorton>(birthTimeSeconds, initialRadius, initialMass);
+    });*/
+    
+    m_TracerParticleSystemPtr = new ParticleSystem();
+    auto emitTracerOperation =
+        std::make_unique<EmitParticlesOperation>(
+            *m_TracerParticleSystemPtr,
+            1,
+            glm::dvec3{ 0.1, 0.0, 0.0 }, glm::dvec3{ 0 },
+            glm::dvec3{ -3.0, 0.0, 0.0 }, glm::dvec3{ 0.0, 1.0, 1.0 },
+            tracerRadius, tracerMass,
+            [](const double birthTimeSeconds, const double initialRadius, const double initialMass)
+    {
+        return std::make_unique<Particle>(birthTimeSeconds, initialRadius, initialMass);
+    });
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(emitTracerOperation));
+    m_Scene.addObjectPtr(m_TracerParticleSystemPtr);
+
 }
 
 unsigned int GLViewer::frameCount() const {
@@ -353,14 +394,6 @@ Scene & GLViewer::scene()
 	return m_Scene;
 }
 
-VortonSim & GLViewer::vortonSim()
-{
-	if (m_VortonSimPtr == nullptr) {
-		throw std::runtime_error("GLViewer::vortonSim() m_VortonSimPtr is nullptr");
-	}
-	return *m_VortonSimPtr;
-}
-
 RigidBodySim & GLViewer::rigidBodySim()
 {
     return *m_RigidBodySimPtr;
@@ -373,23 +406,22 @@ VortonSimRenderer & GLViewer::vortonSimRenderer()
 
 void GLViewer::resetSim(bool createPaused)
 {
+    /*
     if (m_RigidBodySimPtr != nullptr) {
         m_Scene.removeObjectPtr(m_RigidBodySimPtr);
         m_RigidBodySimPtr->inUpdateMutex().lock();
         m_RigidBodySimPtr->inUpdateMutex().unlock();
         delete m_RigidBodySimPtr;
     }
-	if (m_VortonSimPtr != nullptr) {
-		m_Scene.removeObjectPtr(m_VortonSimRendererPtr);
-		m_Scene.removeObjectPtr(m_VortonSimPtr);
-		m_VortonSimPtr->inUpdateMutex().lock();
-		m_VortonSimPtr->inUpdateMutex().unlock();
-		delete m_VortonSimPtr;
-		delete m_VortonSimRendererPtr;
+	if (m_TracerParticleSystemPtr != nullptr) {
+		m_Scene.removeObjectPtr(m_TracerParticleSystemPtr);
+		
+		delete m_TracerParticleSystemPtr;
 	}
 	setupSim(createPaused);
 	m_VortonSimRendererPtr = new VortonSimRenderer{ *m_VortonSimPtr, m_Scene };
 	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
+    */
 }
 
 void GLViewer::title(const std::string& title) {

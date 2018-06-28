@@ -69,3 +69,8 @@ void fsmath::computeJacobian(UniformGrid<glm::dmat3x3>& jacobianGrid, UniformGri
 		}
 	}
 }
+
+size_t fsmath::nextLargerMultipleOf(const size_t multipleBaseValue, const size_t threshold)
+{
+    return ( multipleBaseValue * ((threshold / multipleBaseValue) + 1) );
+}

@@ -17,7 +17,6 @@ public:
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
 
 private:
-	void setupVertexData();
 	void setupVao();
 	void setupRenderProgram();
 
@@ -26,6 +25,8 @@ private:
 	const std::vector<std::unique_ptr<Particle>> &m_BaseTracerPtrs;
 
 	std::vector<GLfloat> m_TracerVerticesRAM;
+    static constexpr size_t COMPONENTS_PER_TRACER = 3u;
+    static constexpr size_t TRACER_VBO_SIZE_STEP = 2048 * COMPONENTS_PER_TRACER;
 	VertexBufO m_TracerVerticesBuf;
 	VertexArrO m_TracerVao;
 	Program m_RenderProgram;

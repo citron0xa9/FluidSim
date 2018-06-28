@@ -4,7 +4,7 @@
 #include "Scene.h"
 #include "Supervorton.h"
 
-VortonRendererOctHeap::VortonRendererOctHeap(Scene & scene, Program & phongProgram, std::function<const std::shared_ptr<VortonOctHeap>(void)> octHeapGetter)
+VortonRendererOctHeap::VortonRendererOctHeap(Scene & scene, Program & phongProgram, const oct_heap_getter_t& octHeapGetter)
 	: m_OctHeapGetter{ octHeapGetter }, m_DrawPrototype{}, m_RenderedLevel{0}
 {
 	/*
@@ -30,7 +30,7 @@ VortonRendererOctHeap::~VortonRendererOctHeap()
 
 void VortonRendererOctHeap::render(const glm::mat4x4 & viewProjectTransform)
 {
-	const std::shared_ptr<VortonOctHeap> octHeap = m_OctHeapGetter();
+	const auto& octHeap = m_OctHeapGetter();
 	if (octHeap == nullptr) {
 		return;
 	}

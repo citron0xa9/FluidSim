@@ -254,7 +254,6 @@
     <ClInclude Include="SolveBoundaryConditionsOperation.h" />
     <ClInclude Include="SolveBoundaryConditionsVortonsOperation.h" />
     <ClInclude Include="Texture2DFixedSize.h" />
-    <ClInclude Include="Tracer.h" />
     <ClInclude Include="TracerRenderer.h" />
     <ClInclude Include="UpdateFluidOperation.h" />
     <ClInclude Include="VectorFieldRenderer.h" />
@@ -283,7 +282,6 @@
     <ClInclude Include="VortonOctHeapRenderer.h" />
     <ClInclude Include="VortonRenderer.h" />
     <ClInclude Include="VortonRendererOctHeap.h" />
-    <ClInclude Include="VortonSim.h" />
     <ClInclude Include="VortonSimRenderer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -315,7 +313,6 @@
     <ClCompile Include="SolveBoundaryConditionsOperation.cpp" />
     <ClCompile Include="SolveBoundaryConditionsVortonsOperation.cpp" />
     <ClCompile Include="Texture2DFixedSize.cpp" />
-    <ClCompile Include="Tracer.cpp" />
     <ClCompile Include="TracerRenderer.cpp" />
     <ClCompile Include="UpdateFluidOperation.cpp" />
     <ClCompile Include="VectorFieldRenderer.cpp" />
@@ -340,7 +337,6 @@
     <ClCompile Include="VortonOctHeapRenderer.cpp" />
     <ClCompile Include="VortonRenderer.cpp" />
     <ClCompile Include="VortonRendererOctHeap.cpp" />
-    <ClCompile Include="VortonSim.cpp" />
     <ClCompile Include="VortonSimRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>

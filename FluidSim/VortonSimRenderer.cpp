@@ -60,7 +60,10 @@ void VortonSimRenderer::velocityGridRendered(bool isRendered)
 		if (m_VelocityGridRendererPtr == nullptr) {
 			//not rendered before
 			m_VelocityGridRendererPtr = 
-				std::unique_ptr<GridRenderer>(new GridRenderer{ std::bind(&UpdateFluidOperation::velocityGridPtr, &m_UpdateFluidOperation) });
+                std::unique_ptr<GridRenderer>(new GridRenderer{ [this]()
+            {
+                return m_UpdateFluidOperation.velocityGridPtr().get();
+            } });
 		}
 	}
 	else {

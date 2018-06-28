@@ -2,9 +2,12 @@
 #include "EmitParticlesOperation.h"
 
 #include "ParticleSystem.h"
+#include "Log.h"
+
+#include <glm/gtx/string_cast.hpp>
 
 std::default_random_engine EmitParticlesOperation::s_RandomGenerator{
-    std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count()
+    static_cast<std::default_random_engine::result_type>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count())
 };
 
 EmitParticlesOperation::EmitParticlesOperation(
@@ -47,6 +50,10 @@ void EmitParticlesOperation::emitParticle(const double stepSecondsPassed, const 
     auto particlePtr = m_CreationFunction(secondsPassedTotal, m_InitialRadius, m_InitialMass);
     particlePtr->position(particlePosition);
     particlePtr->velocity(particleVelocity);
+
+    std::string infoString{ "Emitted particle at position: " };
+    infoString += glm::to_string(particlePosition) + " with velocity: " + glm::to_string(particleVelocity);
+    INFO(infoString);
     m_Parent.addParticle(std::move(particlePtr));
 }
 

@@ -1,11 +1,12 @@
 
 #include "TracerRenderer.h"
 
+#include "fsmath.h"
+
 TracerRenderer::TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs)
 	: m_BaseTracerPtrs{baseTracerPtrs}, m_TracerVerticesBuf{false}, m_TracerVao{false}
 {
-	assert(!baseTracers.empty());
-	setupVertexData();
+    //updateVertexData();
 	setupVao();
 	setupRenderProgram();
 }
@@ -16,6 +17,10 @@ TracerRenderer::~TracerRenderer()
 
 void TracerRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
+    if (m_BaseTracerPtrs.empty()) {
+        return;
+    }
+
 	updateVertexData();
 	m_TracerVao.bind();
 
@@ -27,16 +32,6 @@ void TracerRenderer::render(const glm::mat4x4 & viewProjectTransform)
 	m_TracerVao.unbind();
 }
 
-void TracerRenderer::setupVertexData()
-{
-	for (auto &tracerPtr : m_BaseTracerPtrs) {
-		glm::dvec3 position = tracerPtr->position();
-		for (int i = 0; i < position.length(); i++) {
-			m_TracerVerticesRAM.push_back(position[i]);
-		}
-	}
-	m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
-}
 
 void TracerRenderer::setupVao()
 {
@@ -64,7 +59,18 @@ void TracerRenderer::setupRenderProgram()
 
 void TracerRenderer::updateVertexData()
 {
-	assert(m_BaseTracers.size() == (m_TracerVerticesRAM.size() / 3));
+    if (m_BaseTracerPtrs.empty()) {
+        return;
+    }
+
+    bool resized = false;
+    const size_t neededVboSize = m_BaseTracerPtrs.size() * COMPONENTS_PER_TRACER;
+    if (m_TracerVerticesRAM.size() < neededVboSize) {
+        const size_t newVboSize = fsmath::nextLargerMultipleOf(TRACER_VBO_SIZE_STEP, neededVboSize);
+        m_TracerVerticesRAM.resize(newVboSize);
+        resized = true;
+    }
+
 	{
 		size_t verticesRAMOffset = 0;
 		for (int i = 0; i < m_BaseTracerPtrs.size(); i++) {
@@ -75,5 +81,9 @@ void TracerRenderer::updateVertexData()
 			}
 		}
 	}
-	m_TracerVerticesBuf.pushDataSubset(m_TracerVerticesRAM, 0, m_TracerVerticesRAM.size(), true);
+    if (resized) {
+        m_TracerVerticesBuf.pushData(m_TracerVerticesRAM, GL_DYNAMIC_DRAW, true);
+    } else {
+        m_TracerVerticesBuf.pushDataSubset(m_TracerVerticesRAM, 0, neededVboSize, true);
+    }
 }

@@ -117,4 +117,6 @@ namespace fsmath {
 
 	}
 
+    size_t nextLargerMultipleOf(const size_t multipleBaseValue, const size_t threshold);
+
 }

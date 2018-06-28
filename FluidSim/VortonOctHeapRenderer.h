@@ -10,7 +10,9 @@
 class VortonOctHeapRenderer : public DrawableObject
 {
 public:
-	VortonOctHeapRenderer(std::function<const std::shared_ptr<VortonOctHeap>(void)> octHeapGetter);
+using oct_heap_getter_t = std::function<const std::unique_ptr<VortonOctHeap>&(void)>;
+
+	VortonOctHeapRenderer(const oct_heap_getter_t& octHeapGetter);
 	virtual ~VortonOctHeapRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -37,6 +39,6 @@ private:
 	static const GLuint m_VertexPositionIndex;
 	static const std::string m_ColorUniformName;
 
-	std::function<const std::shared_ptr<VortonOctHeap>(void)> m_OctHeapGetter;
+    oct_heap_getter_t m_OctHeapGetter;
 };
 
