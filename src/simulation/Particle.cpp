@@ -2,7 +2,7 @@
 #include "Particle.h"
 
 
-Particle::Particle(const double birthTimeSeconds, const double initialRadius = 0.0, const double initialMass = 0.0)
+Particle::Particle(const double birthTimeSeconds, const double initialRadius, const double initialMass)
     : m_BirthTimeSeconds{birthTimeSeconds}, m_Radius{initialRadius}, m_Mass{initialMass}, m_Velocity{0.0}
 {
 }

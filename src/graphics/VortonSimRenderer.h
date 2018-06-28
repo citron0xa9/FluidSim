@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DrawableObject.h"
-#include "../simulation/VortonSim.h"
 #include "GridRenderer.h"
 #include "VortonRenderer.h"
 #include "TracerRenderer.h"

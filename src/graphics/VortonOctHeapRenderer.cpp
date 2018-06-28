@@ -6,7 +6,7 @@
 const GLuint VortonOctHeapRenderer::m_VertexPositionIndex = 0;
 const std::string VortonOctHeapRenderer::m_ColorUniformName = "color";
 
-VortonOctHeapRenderer::VortonOctHeapRenderer(std::function<const std::shared_ptr<VortonOctHeap>(void)> octHeapGetter)
+VortonOctHeapRenderer::VortonOctHeapRenderer(const oct_heap_getter_t& octHeapGetter)
 	: m_LinePointsBuf{ false }, m_Color{ 1.0f, 1.0f, 0.0f }, m_OctHeapGetter{ octHeapGetter }, m_RenderedLevel{0}
 {
 	setupRendering();
@@ -19,7 +19,7 @@ VortonOctHeapRenderer::~VortonOctHeapRenderer()
 
 void VortonOctHeapRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	const std::shared_ptr<VortonOctHeap> octHeap = m_OctHeapGetter();
+	const auto& octHeap = m_OctHeapGetter();
 	if (octHeap == nullptr) {
 		return;
 	}

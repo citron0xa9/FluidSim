@@ -12,7 +12,7 @@
 class GridRenderer : public DrawableObject
 {
 public:
-    using grid_getter_t = std::function<const std::unique_ptr<UniformGridGeometry>&()>;
+    using grid_getter_t = std::function<const UniformGridGeometry*()>;
 	GridRenderer(const grid_getter_t& gridGeometryGetter);
 	virtual ~GridRenderer();
 

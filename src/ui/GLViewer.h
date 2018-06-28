@@ -8,7 +8,6 @@
 #include <functional>
 
 #include "RigidBodySim.h"
-#include "VortonSim.h"
 #include "VertexArrO.h"
 #include "VertexBufO.h"
 #include "Program.h"
@@ -43,7 +42,6 @@ public:
 	void incrementFrameCount();
 
 	Scene& scene();
-	VortonSim &vortonSim();
     RigidBodySim& rigidBodySim();
 	VortonSimRenderer &vortonSimRenderer();
 
@@ -86,7 +84,8 @@ private:
 	std::unique_ptr<Texture2DFixedSize> m_ObjectIndexTexturePtr;
 	std::unique_ptr<Texture2DFixedSize> m_MainDepthTexturePtr;
 
-	VortonSim *m_VortonSimPtr;
+    ParticleSystem* m_VortonParticleSystemPtr;
+    ParticleSystem* m_TracerParticleSystemPtr;
 	VortonSimRenderer *m_VortonSimRendererPtr;
     RigidBodySim* m_RigidBodySimPtr;
 

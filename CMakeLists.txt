@@ -123,8 +123,6 @@ set(Sources
     ${SimulationDirectory}/SolveBoundaryConditionsVortonsOperation.h
     ${SimulationDirectory}/Supervorton.cpp
     ${SimulationDirectory}/Supervorton.h
-    ${SimulationDirectory}/Tracer.cpp
-    ${SimulationDirectory}/Tracer.h
     ${SimulationDirectory}/UniformGrid.cpp
     ${SimulationDirectory}/UniformGridGeometry.cpp
     ${SimulationDirectory}/UniformGridGeometry.h
@@ -139,8 +137,6 @@ set(Sources
     ${SimulationDirectory}/VortonOctHeapElement.cpp
     ${SimulationDirectory}/VortonOctHeapElement.h
     ${SimulationDirectory}/VortonOctHeap.h
-    ${SimulationDirectory}/VortonSim.cpp
-    ${SimulationDirectory}/VortonSim.h
 
 	${UiDirectory}/GLViewer.h
 	${UiDirectory}/GLViewer.cpp

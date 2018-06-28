@@ -17,8 +17,8 @@ GridRenderer::~GridRenderer()
 
 void GridRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
-	const auto& gridGeometryPtr = m_GridGeometryGetter();
-	if (!gridGeometryPtr) {
+	const auto gridGeometryPtr = m_GridGeometryGetter();
+	if (gridGeometryPtr == nullptr) {
 		return;
 	}
 	
