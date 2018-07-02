@@ -3,8 +3,8 @@
 #include "../Scene.h"
 
 
-VortonRenderer::VortonRenderer(Scene &scene, const std::vector<std::unique_ptr<Particle>>& baseVortonPtrs, Program &phongProgram)
-	: m_BaseVortonPtrs{ baseVortonPtrs }, m_DrawPrototype{}
+VortonRenderer::VortonRenderer(Scene &scene, const std::vector<std::unique_ptr<Particle>>& baseVortonPtrs, std::shared_mutex& vortonVectorMutex, Program &phongProgram)
+    : m_BaseVortonPtrs{ baseVortonPtrs }, m_VortonVectorMutex{ vortonVectorMutex }, m_DrawPrototype {}
 {
 	/*
 	 * Setup m_DrawPrototype
@@ -29,6 +29,7 @@ VortonRenderer::~VortonRenderer()
 
 void VortonRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
+    std::shared_lock<std::shared_mutex> vortonVectorLock{ m_VortonVectorMutex };
 	for (auto &vortonPtr : m_BaseVortonPtrs) {
 		m_DrawPrototype.position(vortonPtr->position());
 		m_DrawPrototype.renderWithId(viewProjectTransform, vortonPtr->id());

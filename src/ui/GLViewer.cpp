@@ -15,6 +15,8 @@
 #include "../simulation/VorticityDistribution.h"
 
 #include "../simulation/EmitParticlesOperation.h"
+#include "../simulation/AdvectParticlesOperation.h"
+#include "../simulation/KillParticlesByAgeOperation.h"
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -44,7 +46,10 @@ void GLViewer::deleteInstance() {
 	}
 }
 
-GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height) : m_width( width ), m_height( height ), m_title( titlePrefix ), m_TitlePrefix( titlePrefix ) {
+GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int height)
+    : m_width( width ), m_height( height ), m_title( titlePrefix ), m_TitlePrefix( titlePrefix ),
+    m_MouseRotationReady{ false }
+{
 
 	glfwSetErrorCallback(&errorFunction);
 
@@ -101,9 +106,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	m_Scene.addObject(light);
 
 	setupSim(true);
-	m_VortonSimRendererPtr = new VortonSimRenderer(*m_TracerParticleSystemPtr, *m_TracerParticleSystemPtr, *reinterpret_cast<UpdateFluidOperation*>(0), m_Scene);
-    m_VortonSimRendererPtr->vortonsRendered(true);
-	m_Scene.addObjectPtr(m_VortonSimRendererPtr);
+	m_VortonSimRendererPtr = createVortonSimRenderer();
 	
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
@@ -325,9 +328,8 @@ void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 
 void GLViewer::setupSim(bool createPaused)
 {
-    m_RigidBodySimPtr = new RigidBodySim();
+    m_RigidBodySimPtr = createRigidBodySim();
     m_RigidBodySimPtr->simulating(!createPaused);
-    m_Scene.addObjectPtr(m_RigidBodySimPtr);
 
 	//std::vector<const VorticityDistribution*> initialVorticityPtrs;
     //initialVorticityPtrs.push_back(new NoiseVorticityDistribution(glm::dvec3(0), glm::dvec3(4.0, 0.5, 0.5)));
@@ -361,7 +363,7 @@ void GLViewer::setupSim(bool createPaused)
         return std::make_unique<Vorton>(birthTimeSeconds, initialRadius, initialMass);
     });*/
     
-    m_TracerParticleSystemPtr = new ParticleSystem();
+    m_TracerParticleSystemPtr = createParticleSystem();
     auto emitTracerOperation =
         std::make_unique<EmitParticlesOperation>(
             *m_TracerParticleSystemPtr,
@@ -374,8 +376,48 @@ void GLViewer::setupSim(bool createPaused)
         return std::make_unique<Particle>(birthTimeSeconds, initialRadius, initialMass);
     });
     m_TracerParticleSystemPtr->addParticleOperation(std::move(emitTracerOperation));
-    m_Scene.addObjectPtr(m_TracerParticleSystemPtr);
 
+    auto advectTracersOperation = std::make_unique<AdvectParticlesOperation>(*m_TracerParticleSystemPtr);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(advectTracersOperation));
+
+    auto killParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_TracerParticleSystemPtr, 20.0);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(killParticleOperation));
+
+}
+
+GLViewer::unique_particle_system_ptr_t GLViewer::createParticleSystem()
+{
+    auto createdParticleSystemPtr = unique_particle_system_ptr_t(new ParticleSystem{}, [this](ParticleSystem* particleSystemPtr)
+    {
+        m_Scene.removeObjectPtr(particleSystemPtr);
+        delete particleSystemPtr;
+    });
+    m_Scene.addObjectPtr(createdParticleSystemPtr.get());
+    return createdParticleSystemPtr;
+}
+
+GLViewer::unique_vorton_sim_renderer_ptr_t GLViewer::createVortonSimRenderer()
+{
+    auto createdRendererPtr =
+        unique_vorton_sim_renderer_ptr_t(new VortonSimRenderer{*m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr, *reinterpret_cast<UpdateFluidOperation*>(0), m_Scene},
+        [this](VortonSimRenderer* rendererPtr)
+    {
+        m_Scene.removeObjectPtr(rendererPtr);
+        delete rendererPtr;
+    });
+    m_Scene.addObjectPtr(createdRendererPtr.get());
+    return createdRendererPtr;
+}
+
+GLViewer::unique_rigid_body_sim_ptr_t GLViewer::createRigidBodySim()
+{
+    auto createdSimPtr = unique_rigid_body_sim_ptr_t(new RigidBodySim{}, [this](RigidBodySim* simPtr)
+    {
+        m_Scene.removeObjectPtr(simPtr);
+        delete simPtr;
+    });
+    m_Scene.addObjectPtr(createdSimPtr.get());
+    return createdSimPtr;
 }
 
 unsigned int GLViewer::frameCount() const {

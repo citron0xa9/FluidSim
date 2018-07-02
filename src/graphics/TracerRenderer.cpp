@@ -3,8 +3,8 @@
 
 #include "../util/fsmath.h"
 
-TracerRenderer::TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs)
-	: m_BaseTracerPtrs{baseTracerPtrs}, m_TracerVerticesBuf{false}, m_TracerVao{false}
+TracerRenderer::TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs, std::shared_mutex& tracerVectorMutex)
+    : m_BaseTracerPtrs{ baseTracerPtrs }, m_TracerVectorMutex{ tracerVectorMutex }, m_TracerVerticesBuf {false}, m_TracerVao{ false }
 {
     //updateVertexData();
 	setupVao();
@@ -17,6 +17,7 @@ TracerRenderer::~TracerRenderer()
 
 void TracerRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
+    std::shared_lock<std::shared_mutex> vectorLock{ m_TracerVectorMutex };
     if (m_BaseTracerPtrs.empty()) {
         return;
     }

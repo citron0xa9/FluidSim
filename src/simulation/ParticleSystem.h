@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <shared_mutex>
 
 class ParticleSystem : public ActiveObject
 {
@@ -24,10 +25,13 @@ public:
     std::vector<std::unique_ptr<Particle>>& particlePtrs();
     const std::vector<std::unique_ptr<Particle>>& particlePtrs() const;
 
+    std::shared_mutex& particleVectorMutex() const;
+
     virtual ParticleSystem* copy() const override;
 
 private:
     std::vector<std::unique_ptr<Particle>> m_ParticlePtrs;
+    mutable std::shared_mutex m_ParticleVectorMutex;
     std::vector<std::unique_ptr<ParticleOperation>> m_ParticleOperationPtrs;
 
     std::chrono::time_point<std::chrono::steady_clock> m_CreationTime;

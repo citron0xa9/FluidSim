@@ -18,6 +18,7 @@ void ParticleSystem::step(double secondsPassed)
 
 void ParticleSystem::addParticle(std::unique_ptr<Particle>&& particlePtr)
 {
+    std::unique_lock<std::shared_mutex> particleVectorLock{ m_ParticleVectorMutex };
     m_ParticlePtrs.push_back(std::move(particlePtr));
 }
 
@@ -34,6 +35,11 @@ std::vector<std::unique_ptr<Particle>>& ParticleSystem::particlePtrs()
 const std::vector<std::unique_ptr<Particle>>& ParticleSystem::particlePtrs() const
 {
     return m_ParticlePtrs;
+}
+
+std::shared_mutex & ParticleSystem::particleVectorMutex() const
+{
+    return m_ParticleVectorMutex;
 }
 
 ParticleSystem* ParticleSystem::copy() const

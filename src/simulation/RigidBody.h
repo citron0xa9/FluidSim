@@ -44,6 +44,5 @@ class RigidBody : public Object {
         glm::dvec3 m_Torque;
         glm::dvec3 m_Momentum;
         glm::dvec3 m_AngularMomentum;
-        glm::dvec3 m_Orientation;
 };
 

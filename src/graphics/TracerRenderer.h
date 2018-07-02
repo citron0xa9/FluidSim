@@ -2,8 +2,10 @@
 
 #include "DrawableObject.h"
 #include "../simulation/Particle.h"
+
 #include <vector>
 #include <memory>
+#include <shared_mutex>
 
 #include "VertexBufO.h"
 #include "VertexArrO.h"
@@ -12,7 +14,7 @@
 class TracerRenderer : public DrawableObject
 {
 public:
-	TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs);
+	TracerRenderer(const std::vector<std::unique_ptr<Particle>>& baseTracerPtrs, std::shared_mutex& tracerVectorMutex);
 	virtual ~TracerRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -24,6 +26,7 @@ private:
 	void updateVertexData();
 
 	const std::vector<std::unique_ptr<Particle>> &m_BaseTracerPtrs;
+    std::shared_mutex& m_TracerVectorMutex;
 
 	std::vector<GLfloat> m_TracerVerticesRAM;
     static constexpr size_t COMPONENTS_PER_TRACER = 3u;

@@ -47,6 +47,14 @@ public:
 
 	void resetSim(bool createPaused);
 private:
+    using particle_system_deleter_t = std::function<void(ParticleSystem*)>;
+    using rigid_body_sim_deleter_t = std::function<void(RigidBodySim*)>;
+    using vorton_sim_renderer_deleter_t = std::function<void(VortonSimRenderer*)>;
+
+    using unique_particle_system_ptr_t = std::unique_ptr<ParticleSystem, particle_system_deleter_t>;
+    using unique_vorton_sim_renderer_ptr_t = std::unique_ptr<VortonSimRenderer, vorton_sim_renderer_deleter_t>;
+    using unique_rigid_body_sim_ptr_t = std::unique_ptr<RigidBodySim, rigid_body_sim_deleter_t>;
+
 	GLViewer(const char* titlePrefix, unsigned int width, unsigned int height);
 	GLViewer(const GLViewer& v) = delete;
 
@@ -66,6 +74,10 @@ private:
 
 	void handleRightclick(glm::dvec2 &cursorPosition);
 
+    unique_particle_system_ptr_t createParticleSystem();
+    unique_vorton_sim_renderer_ptr_t createVortonSimRenderer();
+    unique_rigid_body_sim_ptr_t createRigidBodySim();
+
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;
 	std::queue<std::function<void()>> m_PerformAfterRender;
 
@@ -84,10 +96,10 @@ private:
 	std::unique_ptr<Texture2DFixedSize> m_ObjectIndexTexturePtr;
 	std::unique_ptr<Texture2DFixedSize> m_MainDepthTexturePtr;
 
-    ParticleSystem* m_VortonParticleSystemPtr;
-    ParticleSystem* m_TracerParticleSystemPtr;
-	VortonSimRenderer *m_VortonSimRendererPtr;
-    RigidBodySim* m_RigidBodySimPtr;
+    unique_particle_system_ptr_t m_VortonParticleSystemPtr;
+    unique_particle_system_ptr_t m_TracerParticleSystemPtr;
+	unique_vorton_sim_renderer_ptr_t m_VortonSimRendererPtr;
+    unique_rigid_body_sim_ptr_t m_RigidBodySimPtr;
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;

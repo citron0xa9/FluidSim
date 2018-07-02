@@ -12,7 +12,7 @@ VortonSimRenderer::VortonSimRenderer(
 	m_TracerRendererPtr{ nullptr }, m_VortonRendererPtr{ nullptr }, m_VelocityGridRendererPtr{ nullptr },
 	m_VortonOctHeapRendererPtr{nullptr}
 {
-	m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ tracerParticleSystem.particlePtrs() });
+	m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ tracerParticleSystem.particlePtrs(), tracerParticleSystem.particleVectorMutex() });
 
 	setupPhongProgram(scene);
 }
@@ -26,7 +26,7 @@ void VortonSimRenderer::tracersRendered(bool areRendered)
 	if (areRendered) {
 		if (m_TracerRendererPtr == nullptr) {
 			//not rendered before
-			m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ m_TracerParticleSystem.particlePtrs() });
+			m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ m_TracerParticleSystem.particlePtrs(), m_TracerParticleSystem.particleVectorMutex() });
 		}
 	}
 	else {
@@ -43,7 +43,7 @@ void VortonSimRenderer::vortonsRendered(bool areRendered)
 		if (m_VortonRendererPtr == nullptr) {
 			//not rendered before
 			m_VortonRendererPtr =
-				std::unique_ptr<VortonRenderer>(new VortonRenderer{ m_Scene, m_VortonParticleSystem.particlePtrs(), *m_PhongProgramPtr });
+				std::unique_ptr<VortonRenderer>(new VortonRenderer{ m_Scene, m_VortonParticleSystem.particlePtrs(), m_VortonParticleSystem.particleVectorMutex(), *m_PhongProgramPtr });
 		}
 	}
 	else {

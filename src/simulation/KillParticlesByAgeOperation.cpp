@@ -12,6 +12,7 @@ KillParticlesByAgeOperation::KillParticlesByAgeOperation(ParticleSystem& parent,
 
 void KillParticlesByAgeOperation::process(const double stepSecondsPassed, const double secondsPassedTotal)
 {
+    std::unique_lock<std::shared_mutex> particleVectorLock{ m_Parent.particleVectorMutex() };
     auto& particlePtrs = m_Parent.particlePtrs();
     auto newVectorEnd = std::remove_if(particlePtrs.begin(), particlePtrs.end(), [this, secondsPassedTotal](const std::unique_ptr<Particle>& particlePtr)
     {

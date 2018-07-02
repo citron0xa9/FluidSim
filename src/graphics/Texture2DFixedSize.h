@@ -19,8 +19,8 @@ public:
 	void magFilter(GLint mode);
 
 private:
-		GLuint m_Id;
-		size_t m_Width;
-		size_t m_Height;
+	GLuint m_Id;
+	size_t m_Width;
+	size_t m_Height;
 };
 

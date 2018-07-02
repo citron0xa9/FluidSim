@@ -24,7 +24,6 @@ RigidBodySim::RigidBodySim(const RigidBodySim& original)
 
 void RigidBodySim::step(double secondsPassed)
 {
-    std::lock_guard<std::mutex> lock(m_InUpdateMutex);
     if (!m_IsSimulating) {
         return;
     }
@@ -62,9 +61,4 @@ void RigidBodySim::simulating(const bool shouldSimulate)
 void RigidBodySim::simulationTimescale(double timescale)
 {
     m_SimulationTimescale = timescale;
-}
-
-std::mutex & RigidBodySim::inUpdateMutex()
-{
-    return m_InUpdateMutex;
 }

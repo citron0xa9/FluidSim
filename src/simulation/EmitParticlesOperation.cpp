@@ -50,10 +50,6 @@ void EmitParticlesOperation::emitParticle(const double stepSecondsPassed, const 
     auto particlePtr = m_CreationFunction(secondsPassedTotal, m_InitialRadius, m_InitialMass);
     particlePtr->position(particlePosition);
     particlePtr->velocity(particleVelocity);
-
-    std::string infoString{ "Emitted particle at position: " };
-    infoString += glm::to_string(particlePosition) + " with velocity: " + glm::to_string(particleVelocity);
-    INFO(infoString);
     m_Parent.addParticle(std::move(particlePtr));
 }
 

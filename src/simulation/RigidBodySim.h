@@ -19,14 +19,10 @@ class RigidBodySim : public ActiveObject
         void simulating(const bool shouldSimulate);
         void simulationTimescale(double timescale);
 
-        std::mutex& inUpdateMutex();
-
     private:
         std::vector<RigidBodySphere> m_Spheres;
 
         bool m_IsSimulating;
         double m_SimulationTimescale;
-
-        std::mutex m_InUpdateMutex;
 };
 

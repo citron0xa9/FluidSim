@@ -5,7 +5,7 @@
 #include "../util/Log.h"
 
 Arrow::Arrow(const glm::dvec3 &velocity, float angle)
-	: m_Velocity{velocity}, m_Angle{angle}, m_IsHighlighted{false}
+	: m_Velocity{velocity}, m_VelocityNormalized{0}, m_Angle{angle}, m_IsHighlighted{false}
 {
 }
 
