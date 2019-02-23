@@ -3,16 +3,15 @@
 
 
 ParticleSystem::ParticleSystem()
-    : m_CreationTime{std::chrono::steady_clock::now()}
+    : m_CreationTime{std::chrono::steady_clock::now()}, mTotalSecondsPassed{0}
 {
 }
 
 void ParticleSystem::step(double secondsPassed)
 {
-    using duration_seconds_t = std::chrono::duration<double>;
-    const double totalSecondsPassed = std::chrono::duration_cast<duration_seconds_t>(std::chrono::steady_clock::now() - m_CreationTime).count();
+    mTotalSecondsPassed += secondsPassed;
     for (auto& operationPtr : m_ParticleOperationPtrs) {
-        operationPtr->process(secondsPassed, totalSecondsPassed);
+        operationPtr->process(secondsPassed, mTotalSecondsPassed);
     }
 }
 

@@ -50,6 +50,7 @@ void UniformGridGeometry::calculatePointsAmount(size_t numElements)
 	while (numCells.x * numCells.y * numCells.z >= numElements * 8)
 	{   // Grid capacity is excessive.
 		// This can occur when the trial numCells is below 0.5 in which case the integer arithmetic loses the subtlety.
+        // Also the dimensions might be sized very differently
 		numCells.x = std::max(1u, numCells.x / 2);
 		numCells.y = std::max(1u, numCells.y / 2);
 		numCells.z = std::max(1u, numCells.z / 2);

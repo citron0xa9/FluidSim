@@ -33,20 +33,32 @@ void FindBoundingBoxOperation::calculateBoundingBox()
 
 void FindBoundingBoxOperation::resetBoundingBox()
 {
-    m_CurrentBoundingBox.m_MinCorner = glm::dvec3{ std::numeric_limits<double>::max() };
-    m_CurrentBoundingBox.m_Extent = glm::dvec3{ 0.0 };
+    m_CurrentBoundingBox.m_MinCorner = glm::dvec3{ std::numeric_limits<double>::infinity() };
+    m_CurrentBoundingBox.m_Extent = glm::dvec3{ -std::numeric_limits<double>::infinity() };
 }
 
 void FindBoundingBoxOperation::updateBoundingBox(std::reference_wrapper<ParticleSystem> particleSystem)
 {
+    if (particleSystem.get().particlePtrs().empty()) {
+        return;
+    }
+
     glm::dvec3 minCorner = m_CurrentBoundingBox.m_MinCorner;
-    glm::dvec3 maxCorner = minCorner + m_CurrentBoundingBox.m_Extent;
+    glm::dvec3 maxCorner;
+    if (m_CurrentBoundingBox.m_Extent == glm::dvec3{ -std::numeric_limits<double>::infinity() }) {
+        maxCorner = glm::dvec3{ -std::numeric_limits<double>::infinity() };
+    } else {
+        maxCorner = minCorner + m_CurrentBoundingBox.m_Extent;
+    }
 
     for (auto& particlePtr : particleSystem.get().particlePtrs()) {
-        minCorner = fsmath::allMin(minCorner, particlePtr->position());
-        maxCorner = fsmath::allMax(maxCorner, particlePtr->position());
+        minCorner = fsmath::allMin(minCorner, particlePtr->position() - particlePtr->radius());
+        maxCorner = fsmath::allMax(maxCorner, particlePtr->position() + particlePtr->radius());
     }
-    m_CurrentBoundingBox.m_Extent = (maxCorner - minCorner);
+    assert(minCorner != glm::dvec3{ std::numeric_limits<double>::infinity() });
+    assert(maxCorner != glm::dvec3{ -std::numeric_limits<double>::infinity() });
+
+    m_CurrentBoundingBox.m_Extent = fsmath::allMax(glm::dvec3{ std::numeric_limits<float>::epsilon() }, (maxCorner - minCorner));
     m_CurrentBoundingBox.m_MinCorner = minCorner;
 }
 

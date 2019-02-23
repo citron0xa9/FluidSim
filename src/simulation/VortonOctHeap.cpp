@@ -78,7 +78,7 @@ void VortonOctHeap::calculateBoundingBox(const std::vector<std::reference_wrappe
 		minCorner = fsmath::allMin(minCorner, vorton.get().position());
 		maxCorner = fsmath::allMax(maxCorner, vorton.get().position());
 	}
-	m_Extent = (maxCorner - minCorner);
+    m_Extent = fsmath::allMax(glm::dvec3{ std::numeric_limits<float>::epsilon() }, (maxCorner - minCorner));
 	glm::dvec3 adjustment = static_cast<double>(std::numeric_limits<float>::epsilon()) * m_Extent;
 	minCorner -= adjustment;
 	maxCorner += adjustment;

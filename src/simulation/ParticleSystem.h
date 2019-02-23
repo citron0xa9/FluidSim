@@ -35,5 +35,6 @@ private:
     std::vector<std::unique_ptr<ParticleOperation>> m_ParticleOperationPtrs;
 
     std::chrono::time_point<std::chrono::steady_clock> m_CreationTime;
+    double mTotalSecondsPassed;
 };
 

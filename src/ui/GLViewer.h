@@ -75,7 +75,7 @@ private:
 	void handleRightclick(glm::dvec2 &cursorPosition);
 
     unique_particle_system_ptr_t createParticleSystem();
-    unique_vorton_sim_renderer_ptr_t createVortonSimRenderer();
+    void createVortonSimRenderer(UpdateFluidOperation* updateFluidOperationPtr);
     unique_rigid_body_sim_ptr_t createRigidBodySim();
 
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;

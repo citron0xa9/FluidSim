@@ -17,6 +17,9 @@
 #include "../simulation/EmitParticlesOperation.h"
 #include "../simulation/AdvectParticlesOperation.h"
 #include "../simulation/KillParticlesByAgeOperation.h"
+#include "../simulation/SolveBoundaryConditionsOperation.h"
+#include "../simulation/SolveBoundaryConditionsVortonsOperation.h"
+#include "../simulation/UpdateFluidOperation.h"
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -105,8 +108,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 
 	m_Scene.addObject(light);
 
-	setupSim(true);
-	m_VortonSimRendererPtr = createVortonSimRenderer();
+	setupSim(false);
 	
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
@@ -340,35 +342,52 @@ void GLViewer::setupSim(bool createPaused)
 	//m_Scene.addObjectPtr(m_VortonSimPtr);
 
     constexpr size_t vortonsPerDimension = 16u;
+    constexpr size_t vortonsTotal = vortonsPerDimension * vortonsPerDimension * vortonsPerDimension;
     constexpr size_t tracersPerDimension = 2 * vortonsPerDimension;
+    constexpr size_t tracersTotal = tracersPerDimension * tracersPerDimension * tracersPerDimension;
     constexpr float extentPerDimension = 1.0f;
     constexpr float density = 1.0;
     constexpr double vortonRadius = (extentPerDimension / vortonsPerDimension) * 0.5;
-    constexpr double vortonMass = (extentPerDimension * extentPerDimension * extentPerDimension) * density / (vortonsPerDimension * vortonsPerDimension * vortonsPerDimension);
+    constexpr double vortonMass = (extentPerDimension * extentPerDimension * extentPerDimension) * density / (vortonsTotal);
 
     constexpr double tracerRadius = (extentPerDimension / tracersPerDimension) * 0.5;
     constexpr double tracerMass = 1e-3;
 
-    //m_VortonParticleSystemPtr = new ParticleSystem();
-    /*auto emitVortonOperation =
+    m_VortonParticleSystemPtr = createParticleSystem();
+    m_TracerParticleSystemPtr = createParticleSystem();
+
+    auto emitVortonOperation =
         std::make_unique<EmitParticlesOperation>(
             *m_VortonParticleSystemPtr,
-            1,
-            glm::dvec3{ 0.1, 0.0, 0.0 },
-            glm::dvec3{ 0 },
+            vortonsTotal,
+            glm::dvec3{ 1.0, 0.0, 0.0 }, glm::dvec3{ 0 },
             glm::dvec3{ -3, 0, 0 }, glm::dvec3{ 0, 1, 1 },
             vortonRadius, vortonMass,
             [](const double birthTimeSeconds, const double initialRadius, const double initialMass)
     {
         return std::make_unique<Vorton>(birthTimeSeconds, initialRadius, initialMass);
-    });*/
+    });
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(emitVortonOperation));
+
+    auto killVortonParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_VortonParticleSystemPtr, 20.0);
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(killVortonParticleOperation));
+
+    std::vector<std::reference_wrapper<ParticleSystem>> fluidOperationRespectedParticleSystems{ *m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr };
+    auto updateFluidOperation = std::make_unique<UpdateFluidOperation>(*m_VortonParticleSystemPtr, 1.0, fluidOperationRespectedParticleSystems);
+    UpdateFluidOperation* updateFluidOperationRawPtr = updateFluidOperation.get();
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(updateFluidOperation));
+
+    auto solveVortonBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsVortonsOperation>(*m_TracerParticleSystemPtr, *m_RigidBodySimPtr, std::bind(std::mem_fn(&UpdateFluidOperation::velocityGridPtr), updateFluidOperationRawPtr));
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(solveVortonBoundaryConditionsOperation));
+
+    auto advectVortonsOperation = std::make_unique<AdvectParticlesOperation>(*m_VortonParticleSystemPtr);
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(advectVortonsOperation));
     
-    m_TracerParticleSystemPtr = createParticleSystem();
     auto emitTracerOperation =
         std::make_unique<EmitParticlesOperation>(
             *m_TracerParticleSystemPtr,
-            1,
-            glm::dvec3{ 0.1, 0.0, 0.0 }, glm::dvec3{ 0 },
+            tracersTotal,
+            glm::dvec3{ 1, 0.0, 0.0 }, glm::dvec3{ 0 },
             glm::dvec3{ -3.0, 0.0, 0.0 }, glm::dvec3{ 0.0, 1.0, 1.0 },
             tracerRadius, tracerMass,
             [](const double birthTimeSeconds, const double initialRadius, const double initialMass)
@@ -377,12 +396,16 @@ void GLViewer::setupSim(bool createPaused)
     });
     m_TracerParticleSystemPtr->addParticleOperation(std::move(emitTracerOperation));
 
-    auto advectTracersOperation = std::make_unique<AdvectParticlesOperation>(*m_TracerParticleSystemPtr);
-    m_TracerParticleSystemPtr->addParticleOperation(std::move(advectTracersOperation));
-
     auto killParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_TracerParticleSystemPtr, 20.0);
     m_TracerParticleSystemPtr->addParticleOperation(std::move(killParticleOperation));
 
+    auto solveTracerBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsOperation>(*m_TracerParticleSystemPtr, *m_RigidBodySimPtr);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(solveTracerBoundaryConditionsOperation));
+
+    auto advectTracersOperation = std::make_unique<AdvectParticlesOperation>(*m_TracerParticleSystemPtr);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(advectTracersOperation));
+
+    createVortonSimRenderer(updateFluidOperationRawPtr);
 }
 
 GLViewer::unique_particle_system_ptr_t GLViewer::createParticleSystem()
@@ -396,17 +419,16 @@ GLViewer::unique_particle_system_ptr_t GLViewer::createParticleSystem()
     return createdParticleSystemPtr;
 }
 
-GLViewer::unique_vorton_sim_renderer_ptr_t GLViewer::createVortonSimRenderer()
+void GLViewer::createVortonSimRenderer(UpdateFluidOperation* updateFluidOperationPtr)
 {
-    auto createdRendererPtr =
-        unique_vorton_sim_renderer_ptr_t(new VortonSimRenderer{*m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr, *reinterpret_cast<UpdateFluidOperation*>(0), m_Scene},
+    m_VortonSimRendererPtr =
+        unique_vorton_sim_renderer_ptr_t(new VortonSimRenderer{*m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr, *updateFluidOperationPtr, m_Scene},
         [this](VortonSimRenderer* rendererPtr)
     {
         m_Scene.removeObjectPtr(rendererPtr);
         delete rendererPtr;
     });
-    m_Scene.addObjectPtr(createdRendererPtr.get());
-    return createdRendererPtr;
+    m_Scene.addObjectPtr(m_VortonSimRendererPtr.get());
 }
 
 GLViewer::unique_rigid_body_sim_ptr_t GLViewer::createRigidBodySim()

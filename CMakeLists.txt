@@ -13,6 +13,8 @@ set(META_PROJECT_NAME        "FluidSim")
 # Declare project
 project(${META_PROJECT_NAME} C CXX)
 
+option(GLEW_STATIC "Use static GLEW" True)
+
 find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
@@ -164,5 +166,8 @@ set_target_properties(${Target} PROPERTIES COMPILE_DEFINITIONS "$<$<CONFIG:DEBUG
 
 target_include_directories(${Target} PUBLIC ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
 target_link_libraries(${Target} ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
+if (GLEW_STATIC)
+	target_compile_options(${Target} PUBLIC -DGLEW_STATIC=1)
+endif()
 
 install(TARGETS ${Target} RUNTIME DESTINATION ${BinaryInstallDirectory} COMPONENT runtime)
