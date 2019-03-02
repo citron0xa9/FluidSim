@@ -20,9 +20,13 @@
 #include "../simulation/SolveBoundaryConditionsOperation.h"
 #include "../simulation/SolveBoundaryConditionsVortonsOperation.h"
 #include "../simulation/UpdateFluidOperation.h"
+#include "../simulation/ApplyVelocityGridOperation.h"
+#include "../simulation/WindOperation.h"
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
+
+#define DO_GUI 1
 
 GLViewer* GLViewer::m_instance = nullptr;
 const float GLViewer::m_MOUSE_TRANSLATION_TO_CAMERA_ROTATION = -0.001f;
@@ -54,8 +58,8 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
     m_MouseRotationReady{ false }
 {
 
+#if DO_GUI
 	glfwSetErrorCallback(&errorFunction);
-
 	if (!glfwInit()) {
 		throw std::runtime_error("Failed to initialize glfw");
 	}
@@ -107,13 +111,14 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	SunLightSource light{ m_Scene, 0.8f, glm::vec3(0.0f, 0.0f, -1.0f) };
 
 	m_Scene.addObject(light);
-
+#endif
 	setupSim(false);
-	
+#if DO_GUI
 	m_Scene.camera().translate(glm::dvec3(0, 6, 12));
 	m_Scene.camera().rotateLocalX(glm::radians(-20.0));
+#endif
 	m_Scene.startStepping();
-
+#if DO_GUI
 	m_MainFramebufferPtr = std::make_unique<Framebuffer>();
 	attachTexturesToFBO();
 	m_MainFramebufferPtr->addDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -122,6 +127,7 @@ GLViewer::GLViewer(const char* titlePrefix, unsigned int width, unsigned int hei
 	if (!m_MainFramebufferPtr->isComplete()) {
 		throw std::runtime_error("GLViewer::GLViewer: Main Framebuffer isn't complete!");
 	}
+#endif
 }
 
 void GLViewer::attachTexturesToFBO()
@@ -163,8 +169,10 @@ void GLViewer::handleRightclick(glm::dvec2 &cursorPosition)
 
 GLViewer::~GLViewer()
 {
+#if DO_GUI
 	glfwDestroyWindow(m_WindowPtr);
 	glfwTerminate();
+#endif
 }
 
 void GLViewer::errorFunction(int error, const char * description)
@@ -188,6 +196,7 @@ void GLViewer::framebufferResizeFunction(GLFWwindow * windowPtr, int width, int 
 
 void GLViewer::cycle()
 {
+#if DO_GUI
 	incrementFrameCount();
 	m_MainFramebufferPtr->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -196,17 +205,23 @@ void GLViewer::cycle()
 	m_MainFramebufferPtr->blitColorToDefaultFBO(
 		GL_COLOR_ATTACHMENT0, glm::ivec2(0), glm::ivec2(m_width, m_height), glm::ivec2(0), glm::ivec2(m_width, m_height)
 	);
+#endif
 	while (!m_PerformAfterRender.empty()) {
 		(m_PerformAfterRender.front())();
 		m_PerformAfterRender.pop();
 	}
+#if DO_GUI
 	glfwSwapBuffers(m_WindowPtr);
 	glfwPollEvents();
+#endif
 }
 
 bool GLViewer::shouldClose() const
 {
+#if DO_GUI
 	return (glfwWindowShouldClose(m_WindowPtr) == 1);
+#endif
+    return false;
 }
 
 void GLViewer::width(int width) {
@@ -308,6 +323,7 @@ void GLViewer::mouseButtonFunction(GLFWwindow *windowPtr, int button, int action
 
 void GLViewer::mouseMotionFunction(GLFWwindow *windowPtr, double x, double y)
 {
+    return;
 	glm::vec2 currentCoordinates = glm::vec2(x, y);
 
 	GLViewer* viewer = GLViewer::instance();
@@ -353,13 +369,36 @@ void GLViewer::setupSim(bool createPaused)
     constexpr double tracerRadius = (extentPerDimension / tracersPerDimension) * 0.5;
     constexpr double tracerMass = 1e-3;
 
+	constexpr double particleLifetime = 5.0;
+
     m_VortonParticleSystemPtr = createParticleSystem();
     m_TracerParticleSystemPtr = createParticleSystem();
+
+    std::vector<std::reference_wrapper<ParticleSystem>> fluidOperationRespectedParticleSystems{ *m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr };
+    std::vector<std::reference_wrapper<RigidBodySim>> fluidOperationRespectedRigidBodySims{*m_RigidBodySimPtr};
+    auto updateFluidOperation = std::make_unique<UpdateFluidOperation>(*m_VortonParticleSystemPtr, 1.0, fluidOperationRespectedParticleSystems, fluidOperationRespectedRigidBodySims);
+    UpdateFluidOperation* updateFluidOperationRawPtr = updateFluidOperation.get();
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(updateFluidOperation));
+
+    auto solveVortonBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsVortonsOperation>(*m_VortonParticleSystemPtr, *m_RigidBodySimPtr, std::bind(std::mem_fn(&UpdateFluidOperation::velocityGridPtr), updateFluidOperationRawPtr));
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(solveVortonBoundaryConditionsOperation));
+
+	auto getVelocityGridLambda = [updateFluidOperationRawPtr](){
+		return updateFluidOperationRawPtr->velocityGridPtr().get();
+	};
+	auto vortonWindOperation = std::make_unique<WindOperation>(*m_VortonParticleSystemPtr, glm::dvec3{1.0, 0.0, 0.0}, 1.0);
+	m_VortonParticleSystemPtr->addParticleOperation(std::move(vortonWindOperation));
+
+	auto vortonApplyVelocityGridOperation = std::make_unique<ApplyVelocityGridOperation>(*m_VortonParticleSystemPtr, getVelocityGridLambda);
+	m_VortonParticleSystemPtr->addParticleOperation(std::move(vortonApplyVelocityGridOperation));
+
+    auto advectVortonsOperation = std::make_unique<AdvectParticlesOperation>(*m_VortonParticleSystemPtr);
+    m_VortonParticleSystemPtr->addParticleOperation(std::move(advectVortonsOperation));
 
     auto emitVortonOperation =
         std::make_unique<EmitParticlesOperation>(
             *m_VortonParticleSystemPtr,
-            vortonsTotal,
+            vortonsTotal / particleLifetime,
             glm::dvec3{ 1.0, 0.0, 0.0 }, glm::dvec3{ 0 },
             glm::dvec3{ -3, 0, 0 }, glm::dvec3{ 0, 1, 1 },
             vortonRadius, vortonMass,
@@ -369,24 +408,25 @@ void GLViewer::setupSim(bool createPaused)
     });
     m_VortonParticleSystemPtr->addParticleOperation(std::move(emitVortonOperation));
 
-    auto killVortonParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_VortonParticleSystemPtr, 20.0);
+    auto killVortonParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_VortonParticleSystemPtr, particleLifetime);
     m_VortonParticleSystemPtr->addParticleOperation(std::move(killVortonParticleOperation));
 
-    std::vector<std::reference_wrapper<ParticleSystem>> fluidOperationRespectedParticleSystems{ *m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr };
-    auto updateFluidOperation = std::make_unique<UpdateFluidOperation>(*m_VortonParticleSystemPtr, 1.0, fluidOperationRespectedParticleSystems);
-    UpdateFluidOperation* updateFluidOperationRawPtr = updateFluidOperation.get();
-    m_VortonParticleSystemPtr->addParticleOperation(std::move(updateFluidOperation));
+    auto solveTracerBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsOperation>(*m_TracerParticleSystemPtr, *m_RigidBodySimPtr);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(solveTracerBoundaryConditionsOperation));
 
-    auto solveVortonBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsVortonsOperation>(*m_TracerParticleSystemPtr, *m_RigidBodySimPtr, std::bind(std::mem_fn(&UpdateFluidOperation::velocityGridPtr), updateFluidOperationRawPtr));
-    m_VortonParticleSystemPtr->addParticleOperation(std::move(solveVortonBoundaryConditionsOperation));
+	auto tracerWindOperation = std::make_unique<WindOperation>(*m_TracerParticleSystemPtr, glm::dvec3{1.0, 0.0, 0.0}, 1.0);
+	m_TracerParticleSystemPtr->addParticleOperation(std::move(tracerWindOperation));
 
-    auto advectVortonsOperation = std::make_unique<AdvectParticlesOperation>(*m_VortonParticleSystemPtr);
-    m_VortonParticleSystemPtr->addParticleOperation(std::move(advectVortonsOperation));
-    
+	auto tracerApplyVelocityGridOperation = std::make_unique<ApplyVelocityGridOperation>(*m_TracerParticleSystemPtr, getVelocityGridLambda);
+	m_TracerParticleSystemPtr->addParticleOperation(std::move(tracerApplyVelocityGridOperation));
+
+    auto advectTracersOperation = std::make_unique<AdvectParticlesOperation>(*m_TracerParticleSystemPtr);
+    m_TracerParticleSystemPtr->addParticleOperation(std::move(advectTracersOperation));
+
     auto emitTracerOperation =
         std::make_unique<EmitParticlesOperation>(
             *m_TracerParticleSystemPtr,
-            tracersTotal,
+            tracersTotal / particleLifetime,
             glm::dvec3{ 1, 0.0, 0.0 }, glm::dvec3{ 0 },
             glm::dvec3{ -3.0, 0.0, 0.0 }, glm::dvec3{ 0.0, 1.0, 1.0 },
             tracerRadius, tracerMass,
@@ -396,16 +436,12 @@ void GLViewer::setupSim(bool createPaused)
     });
     m_TracerParticleSystemPtr->addParticleOperation(std::move(emitTracerOperation));
 
-    auto killParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_TracerParticleSystemPtr, 20.0);
+    auto killParticleOperation = std::make_unique<KillParticlesByAgeOperation>(*m_TracerParticleSystemPtr, particleLifetime);
     m_TracerParticleSystemPtr->addParticleOperation(std::move(killParticleOperation));
 
-    auto solveTracerBoundaryConditionsOperation = std::make_unique<SolveBoundaryConditionsOperation>(*m_TracerParticleSystemPtr, *m_RigidBodySimPtr);
-    m_TracerParticleSystemPtr->addParticleOperation(std::move(solveTracerBoundaryConditionsOperation));
-
-    auto advectTracersOperation = std::make_unique<AdvectParticlesOperation>(*m_TracerParticleSystemPtr);
-    m_TracerParticleSystemPtr->addParticleOperation(std::move(advectTracersOperation));
-
+#if DO_GUI
     createVortonSimRenderer(updateFluidOperationRawPtr);
+#endif
 }
 
 GLViewer::unique_particle_system_ptr_t GLViewer::createParticleSystem()

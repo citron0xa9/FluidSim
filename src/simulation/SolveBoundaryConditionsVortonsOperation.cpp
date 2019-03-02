@@ -28,7 +28,7 @@ void SolveBoundaryConditionsVortonsOperation::solveParticleRigidBodySphereCollis
 {
     const auto& velocityGridPtr = m_GetFluidVelocityGridFunction();
     assert(velocityGridPtr);
-    Vorton& vorton = static_cast<Vorton&>(particle);
+    Vorton& vorton = dynamic_cast<Vorton&>(particle);
 
     const auto sphereToVortonVector = vorton.position() - sphere.position();
     const double sphereToVortonDistance = glm::length(sphereToVortonVector);

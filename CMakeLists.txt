@@ -37,66 +37,66 @@ set(SimulationDirectory                                 "${SourceDirectory}/simu
 set(UiDirectory                                         "${SourceDirectory}/ui")
 set(UtilDirectory                                       "${SourceDirectory}/util")
 set(Sources
-	${SourceDirectory}/Object.h
-	${SourceDirectory}/Object.cpp
-	${SourceDirectory}/ActiveObject.h
-	${SourceDirectory}/ActiveObject.cpp
-	${SourceDirectory}/MovableObject.h
-	${SourceDirectory}/MovableObject.cpp
-	${SourceDirectory}/Scene.h
-	${SourceDirectory}/Scene.cpp
-	${SourceDirectory}/FluidSim.cpp
+    ${SourceDirectory}/Object.h
+    ${SourceDirectory}/Object.cpp
+    ${SourceDirectory}/ActiveObject.h
+    ${SourceDirectory}/ActiveObject.cpp
+    ${SourceDirectory}/MovableObject.h
+    ${SourceDirectory}/MovableObject.cpp
+    ${SourceDirectory}/Scene.h
+    ${SourceDirectory}/Scene.cpp
+    ${SourceDirectory}/FluidSim.cpp
 
-	${GraphicsDirectory}/Arrow.h
-	${GraphicsDirectory}/Arrow.cpp
-	${GraphicsDirectory}/BufferO.h
-	${GraphicsDirectory}/BufferO.cpp
-	${GraphicsDirectory}/Camera.h
-	${GraphicsDirectory}/Camera.cpp
-	${GraphicsDirectory}/DrawableObject.h
-	${GraphicsDirectory}/DrawableObject.cpp
-	${GraphicsDirectory}/Framebuffer.h
-	${GraphicsDirectory}/Framebuffer.cpp
-	${GraphicsDirectory}/Geometry.h
-	${GraphicsDirectory}/Geometry.cpp
-	${GraphicsDirectory}/GridRenderer.h
-	${GraphicsDirectory}/GridRenderer.cpp
-	${GraphicsDirectory}/IndexBufO.h
-	${GraphicsDirectory}/IndexBufO.cpp
-	${GraphicsDirectory}/IndexCombination.h
-	${GraphicsDirectory}/IndexCombination.cpp
-	${GraphicsDirectory}/LightSource.h
-	${GraphicsDirectory}/LightSource.cpp
-	${GraphicsDirectory}/SunLightSource.h
-	${GraphicsDirectory}/SunLightSource.cpp
-	${GraphicsDirectory}/Material.h
-	${GraphicsDirectory}/Material.cpp
-	${GraphicsDirectory}/Program.h
-	${GraphicsDirectory}/Program.cpp
-	${GraphicsDirectory}/Shader.h
-	${GraphicsDirectory}/Shader.cpp
-	${GraphicsDirectory}/Texture2DFixedSize.h
-	${GraphicsDirectory}/Texture2DFixedSize.cpp
-	${GraphicsDirectory}/TracerRenderer.h
-	${GraphicsDirectory}/TracerRenderer.cpp
-	${GraphicsDirectory}/TriangleNetObject.h
-	${GraphicsDirectory}/TriangleNetObject.cpp
-	${GraphicsDirectory}/VectorFieldRenderer.h
-	${GraphicsDirectory}/VectorFieldRenderer.cpp
-	${GraphicsDirectory}/VertexArrO.h
-	${GraphicsDirectory}/VertexArrO.cpp
-	${GraphicsDirectory}/VertexAttribArray.h
-	${GraphicsDirectory}/VertexAttribArray.cpp
-	${GraphicsDirectory}/VertexBufO.h
-	${GraphicsDirectory}/VertexBufO.cpp
-	${GraphicsDirectory}/VortonOctHeapRenderer.h
-	${GraphicsDirectory}/VortonOctHeapRenderer.cpp
-	${GraphicsDirectory}/VortonRenderer.h
-	${GraphicsDirectory}/VortonRenderer.cpp
-	${GraphicsDirectory}/VortonRendererOctHeap.h
-	${GraphicsDirectory}/VortonRendererOctHeap.cpp
-	${GraphicsDirectory}/VortonSimRenderer.h
-	${GraphicsDirectory}/VortonSimRenderer.cpp
+    ${GraphicsDirectory}/Arrow.h
+    ${GraphicsDirectory}/Arrow.cpp
+    ${GraphicsDirectory}/BufferO.h
+    ${GraphicsDirectory}/BufferO.cpp
+    ${GraphicsDirectory}/Camera.h
+    ${GraphicsDirectory}/Camera.cpp
+    ${GraphicsDirectory}/DrawableObject.h
+    ${GraphicsDirectory}/DrawableObject.cpp
+    ${GraphicsDirectory}/Framebuffer.h
+    ${GraphicsDirectory}/Framebuffer.cpp
+    ${GraphicsDirectory}/Geometry.h
+    ${GraphicsDirectory}/Geometry.cpp
+    ${GraphicsDirectory}/GridRenderer.h
+    ${GraphicsDirectory}/GridRenderer.cpp
+    ${GraphicsDirectory}/IndexBufO.h
+    ${GraphicsDirectory}/IndexBufO.cpp
+    ${GraphicsDirectory}/IndexCombination.h
+    ${GraphicsDirectory}/IndexCombination.cpp
+    ${GraphicsDirectory}/LightSource.h
+    ${GraphicsDirectory}/LightSource.cpp
+    ${GraphicsDirectory}/SunLightSource.h
+    ${GraphicsDirectory}/SunLightSource.cpp
+    ${GraphicsDirectory}/Material.h
+    ${GraphicsDirectory}/Material.cpp
+    ${GraphicsDirectory}/Program.h
+    ${GraphicsDirectory}/Program.cpp
+    ${GraphicsDirectory}/Shader.h
+    ${GraphicsDirectory}/Shader.cpp
+    ${GraphicsDirectory}/Texture2DFixedSize.h
+    ${GraphicsDirectory}/Texture2DFixedSize.cpp
+    ${GraphicsDirectory}/TracerRenderer.h
+    ${GraphicsDirectory}/TracerRenderer.cpp
+    ${GraphicsDirectory}/TriangleNetObject.h
+    ${GraphicsDirectory}/TriangleNetObject.cpp
+    ${GraphicsDirectory}/VectorFieldRenderer.h
+    ${GraphicsDirectory}/VectorFieldRenderer.cpp
+    ${GraphicsDirectory}/VertexArrO.h
+    ${GraphicsDirectory}/VertexArrO.cpp
+    ${GraphicsDirectory}/VertexAttribArray.h
+    ${GraphicsDirectory}/VertexAttribArray.cpp
+    ${GraphicsDirectory}/VertexBufO.h
+    ${GraphicsDirectory}/VertexBufO.cpp
+    ${GraphicsDirectory}/VortonOctHeapRenderer.h
+    ${GraphicsDirectory}/VortonOctHeapRenderer.cpp
+    ${GraphicsDirectory}/VortonRenderer.h
+    ${GraphicsDirectory}/VortonRenderer.cpp
+    ${GraphicsDirectory}/VortonRendererOctHeap.h
+    ${GraphicsDirectory}/VortonRendererOctHeap.cpp
+    ${GraphicsDirectory}/VortonSimRenderer.h
+    ${GraphicsDirectory}/VortonSimRenderer.cpp
 
     ${SimulationDirectory}/AdvectParticlesOperation.cpp
     ${SimulationDirectory}/AdvectParticlesOperation.h
@@ -108,6 +108,8 @@ set(Sources
     ${SimulationDirectory}/FindBoundingBoxOperation.h
     ${SimulationDirectory}/KillParticlesByAgeOperation.cpp
     ${SimulationDirectory}/KillParticlesByAgeOperation.h
+    ${SimulationDirectory}/WindOperation.cpp
+    ${SimulationDirectory}/WindOperation.h
     ${SimulationDirectory}/Particle.cpp
     ${SimulationDirectory}/Particle.h
     ${SimulationDirectory}/ParticleOperation.cpp
@@ -141,8 +143,8 @@ set(Sources
     ${SimulationDirectory}/VortonOctHeapElement.h
     ${SimulationDirectory}/VortonOctHeap.h
 
-	${UiDirectory}/GLViewer.h
-	${UiDirectory}/GLViewer.cpp
+    ${UiDirectory}/GLViewer.h
+    ${UiDirectory}/GLViewer.cpp
 
     ${UtilDirectory}/Debug.h
     ${UtilDirectory}/fsmath.cpp
@@ -167,7 +169,7 @@ set_target_properties(${Target} PROPERTIES COMPILE_DEFINITIONS "$<$<CONFIG:DEBUG
 target_include_directories(${Target} PUBLIC ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
 target_link_libraries(${Target} ${CMAKE_THREAD_LIBS_INIT} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
 if (GLEW_STATIC)
-	target_compile_options(${Target} PUBLIC -DGLEW_STATIC=1)
+    target_compile_options(${Target} PUBLIC -DGLEW_STATIC=1)
 endif()
 
 install(TARGETS ${Target} RUNTIME DESTINATION ${BinaryInstallDirectory} COMPONENT runtime)

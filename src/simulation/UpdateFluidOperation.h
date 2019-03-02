@@ -12,7 +12,9 @@
 class UpdateFluidOperation : public ParticleOperation
 {
 public:
-    UpdateFluidOperation(ParticleSystem& parent, const double viscosity, const std::vector<std::reference_wrapper<ParticleSystem>>& sizeRespectedParticleSystems);
+    UpdateFluidOperation(ParticleSystem& parent, const double viscosity,
+        const std::vector<std::reference_wrapper<ParticleSystem>>& sizeRespectedParticleSystems,
+        const std::vector<std::reference_wrapper<RigidBodySim>>& sizeRespectedRigidBodySims);
 
     virtual void process(const double stepSecondsPassed, const double secondsPassedTotal) override;
 

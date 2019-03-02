@@ -127,6 +127,7 @@ int main(int argc, char* argv[])
 		GLViewer::initInstance("OpenGL test", 800, 600);
 		GLViewer *viewer = GLViewer::instance();
 		while (!viewer->shouldClose()) {
+			viewer->vortonSimRenderer().velocityLinesRendered(true);
 			viewer->cycle();
 			while (!g_GlDpenedentCommands.empty()) {
 				(g_GlDpenedentCommands.front())(*viewer);

@@ -5,9 +5,11 @@
 
 #include "VortonOctHeapElement.h"
 
-UpdateFluidOperation::UpdateFluidOperation(ParticleSystem& parent, const double viscosity, const std::vector<std::reference_wrapper<ParticleSystem>>& sizeRespectedParticleSystems)
+UpdateFluidOperation::UpdateFluidOperation(ParticleSystem& parent, const double viscosity,
+    const std::vector<std::reference_wrapper<ParticleSystem>>& sizeRespectedParticleSystems,
+    const std::vector<std::reference_wrapper<RigidBodySim>>& sizeRespectedRigidBodySims)
     : ParticleOperation{parent}, m_Viscosity{viscosity}, m_Simulating{true},
-    m_BoundingBoxOperation{parent, sizeRespectedParticleSystems}
+    m_BoundingBoxOperation{parent, sizeRespectedParticleSystems, sizeRespectedRigidBodySims}
 {
 }
 

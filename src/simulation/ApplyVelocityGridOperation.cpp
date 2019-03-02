@@ -11,11 +11,12 @@ ApplyVelocityGridOperation::ApplyVelocityGridOperation(ParticleSystem& parent, c
 
 void ApplyVelocityGridOperation::process(const double stepSecondsPassed, const double secondsPassedTotal)
 {
-    const auto& gridPtr = m_GetGridFunction();
+    const auto gridPtr = m_GetGridFunction();
     if (!gridPtr) {
         return;
     }
     for (auto& particlePtr : m_Parent.particlePtrs()) {
-        particlePtr->addVelocity(gridPtr->interpolate(particlePtr->position()));
+        const auto fluidVelocity = gridPtr->interpolate(particlePtr->position());
+        particlePtr->addVelocity(fluidVelocity);
     }
 }

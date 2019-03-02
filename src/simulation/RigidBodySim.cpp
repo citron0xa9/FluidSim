@@ -8,7 +8,7 @@
 RigidBodySim::RigidBodySim()
     : m_IsSimulating{true}, m_SimulationTimescale{1.0}
 {
-    m_Spheres.emplace_back(glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), 0.2, 0.2);
+    m_Spheres.emplace_back(glm::dvec3(0, 0, 0), glm::dvec3(-0.1, 0, 0), 100.2, 1.0);
     m_Spheres.back().addAngularMomentum(glm::dvec3{0.0, 0.0, 0.0});
 }
 
