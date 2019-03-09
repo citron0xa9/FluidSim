@@ -4,8 +4,10 @@
 #include "../Scene.h"
 #include "../simulation/Supervorton.h"
 
-VortonRendererOctHeap::VortonRendererOctHeap(Scene & scene, Program & phongProgram, const oct_heap_getter_t& octHeapGetter)
-	: m_OctHeapGetter{ octHeapGetter }, m_DrawPrototype{}, m_RenderedLevel{0}
+VortonRendererOctHeap::VortonRendererOctHeap(Scene& scene, Program& phongProgram,
+	const oct_heap_getter_t& octHeapGetter, std::shared_mutex& octHeapMutex)
+	: m_OctHeapGetter{octHeapGetter}, m_DrawPrototype{}, m_RenderedLevel{0},
+	m_OctHeapMutex{octHeapMutex}
 {
 	/*
 	* Setup m_DrawPrototype
@@ -30,6 +32,7 @@ VortonRendererOctHeap::~VortonRendererOctHeap()
 
 void VortonRendererOctHeap::render(const glm::mat4x4 & viewProjectTransform)
 {
+	std::shared_lock<std::shared_mutex> octHeapLock{m_OctHeapMutex};
 	const auto& octHeap = m_OctHeapGetter();
 	if (octHeap == nullptr) {
 		return;

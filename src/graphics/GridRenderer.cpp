@@ -5,8 +5,9 @@
 const GLuint GridRenderer::m_VertexPositionIndex = 0;
 const std::string GridRenderer::m_ColorUniformName = "color";
 
-GridRenderer::GridRenderer(const grid_getter_t& gridGeometryGetter)
-	: m_LinePointsBuf{ false }, m_Color{ 0.345f, 0.949f, 0.122f }, m_GridGeometryGetter{gridGeometryGetter}
+GridRenderer::GridRenderer(const grid_getter_t& gridGeometryGetter, std::shared_mutex& gridMutex)
+	: m_LinePointsBuf{ false }, m_Color{ 0.345f, 0.949f, 0.122f }, m_GridGeometryGetter{gridGeometryGetter},
+	m_GridMutex{gridMutex}
 {
 	setupRendering();
 }
@@ -17,12 +18,15 @@ GridRenderer::~GridRenderer()
 
 void GridRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
+	std::shared_lock<std::shared_mutex> gridLock{m_GridMutex};
 	const auto gridGeometryPtr = m_GridGeometryGetter();
 	if (gridGeometryPtr == nullptr) {
 		return;
 	}
 	
 	updateGeometry(*gridGeometryPtr);
+	gridLock.unlock();
+
 	m_LinePointsBuf.pushData(m_LinePointsRAM, GL_STATIC_DRAW, true);
 	
 	m_Program.use();
@@ -48,7 +52,10 @@ void GridRenderer::setupRendering()
 void GridRenderer::updateGeometry(const UniformGridGeometry &geometry)
 {
 	m_LinePointsRAM.clear();
-	m_LinePointsRAM.reserve(18 * geometry.pointsAmount().x*geometry.pointsAmount().x); //3*(2*x*y+2*x*z+2*y*z) with x=y=z, 3* because 3 components per point
+	const size_t halfLinesZAxis = geometry.pointsAmount().x*geometry.pointsAmount().y;
+	const size_t halfLinesYAxis = geometry.pointsAmount().x*geometry.pointsAmount().z;
+	const size_t halfLinesXAxis = geometry.pointsAmount().y*geometry.pointsAmount().z;
+	m_LinePointsRAM.reserve(6*(halfLinesXAxis+halfLinesYAxis+halfLinesZAxis)); //3*(2*x*y+2*x*z+2*y*z) with x=y=z, 3* because 3 components per point
 	glm::dvec3 currentPoint;
 
 	//push lines along z axis

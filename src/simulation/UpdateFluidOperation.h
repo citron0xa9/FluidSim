@@ -8,6 +8,7 @@
 #include "UniformGrid.h"
 
 #include <memory>
+#include <shared_mutex>
 
 class UpdateFluidOperation : public ParticleOperation
 {
@@ -19,7 +20,9 @@ public:
     virtual void process(const double stepSecondsPassed, const double secondsPassedTotal) override;
 
     const std::unique_ptr<UniformGrid<glm::dvec3>>& velocityGridPtr() const;
+    std::shared_mutex& velocityGridMutex() const;
     const std::unique_ptr<VortonOctHeap>& vortonOctHeapPtr() const;
+    std::shared_mutex& vortonHeapMutex() const;
 
 private:
     const double m_Viscosity;
@@ -27,7 +30,9 @@ private:
     bool m_Simulating;
 
     std::unique_ptr<VortonOctHeap> m_VortonHeapPtr;
+    mutable std::shared_mutex m_VortonHeapMutex;
     std::unique_ptr<UniformGrid<glm::dvec3>> m_VelocityGridPtr;
+    mutable std::shared_mutex m_VelocityGridMutex;
 
     std::vector<std::reference_wrapper<Vorton>> m_CurrentVortons;
 

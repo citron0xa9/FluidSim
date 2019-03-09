@@ -12,7 +12,8 @@ VortonSimRenderer::VortonSimRenderer(
 	m_TracerRendererPtr{ nullptr }, m_VortonRendererPtr{ nullptr }, m_VelocityGridRendererPtr{ nullptr },
 	m_VortonOctHeapRendererPtr{nullptr}
 {
-	m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ tracerParticleSystem.particlePtrs(), tracerParticleSystem.particleVectorMutex() });
+	m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(
+		new TracerRenderer{tracerParticleSystem.particlePtrs(), tracerParticleSystem.particleVectorMutex()});
 
 	setupPhongProgram(scene);
 }
@@ -26,7 +27,9 @@ void VortonSimRenderer::tracersRendered(bool areRendered)
 	if (areRendered) {
 		if (m_TracerRendererPtr == nullptr) {
 			//not rendered before
-			m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(new TracerRenderer{ m_TracerParticleSystem.particlePtrs(), m_TracerParticleSystem.particleVectorMutex() });
+			m_TracerRendererPtr = std::unique_ptr<TracerRenderer>(
+				new TracerRenderer{m_TracerParticleSystem.particlePtrs(),
+								   m_TracerParticleSystem.particleVectorMutex()});
 		}
 	}
 	else {
@@ -43,7 +46,9 @@ void VortonSimRenderer::vortonsRendered(bool areRendered)
 		if (m_VortonRendererPtr == nullptr) {
 			//not rendered before
 			m_VortonRendererPtr =
-				std::unique_ptr<VortonRenderer>(new VortonRenderer{ m_Scene, m_VortonParticleSystem.particlePtrs(), m_VortonParticleSystem.particleVectorMutex(), *m_PhongProgramPtr });
+				std::unique_ptr<VortonRenderer>(new VortonRenderer{m_Scene, m_VortonParticleSystem.particlePtrs(),
+																   m_VortonParticleSystem.particleVectorMutex(),
+																   *m_PhongProgramPtr});
 		}
 	}
 	else {
@@ -63,7 +68,7 @@ void VortonSimRenderer::velocityGridRendered(bool isRendered)
                 std::unique_ptr<GridRenderer>(new GridRenderer{ [this]()
             {
                 return m_UpdateFluidOperation.velocityGridPtr().get();
-            } });
+            }, m_UpdateFluidOperation.velocityGridMutex()});
 		}
 	}
 	else {
@@ -81,7 +86,10 @@ void VortonSimRenderer::velocityVectorsRendered(bool isRendered)
 			//not rendered before
 			m_VelocityVectorsRendererPtr = 
 				std::unique_ptr<VectorFieldRenderer>(
-					new VectorFieldRenderer{ m_Scene, std::bind(&UpdateFluidOperation::velocityGridPtr, &m_UpdateFluidOperation), *m_PhongProgramPtr }
+					new VectorFieldRenderer{m_Scene,
+											std::bind(&UpdateFluidOperation::velocityGridPtr, &m_UpdateFluidOperation),
+											m_UpdateFluidOperation.velocityGridMutex(),
+											*m_PhongProgramPtr}
 				);
             m_VelocityVectorsRendererPtr->renderLines(false);
         } else {
@@ -106,8 +114,11 @@ void VortonSimRenderer::velocityLinesRendered(bool isRendered)
             //not rendered before
             m_VelocityVectorsRendererPtr =
                 std::unique_ptr<VectorFieldRenderer>(
-                    new VectorFieldRenderer{ m_Scene, std::bind(&UpdateFluidOperation::velocityGridPtr, &m_UpdateFluidOperation), *m_PhongProgramPtr }
-            );
+					new VectorFieldRenderer{m_Scene,
+											std::bind(&UpdateFluidOperation::velocityGridPtr, &m_UpdateFluidOperation),
+											m_UpdateFluidOperation.velocityGridMutex(),
+											*m_PhongProgramPtr}
+				);
             m_VelocityVectorsRendererPtr->renderArrows(false);
         } else {
             m_VelocityVectorsRendererPtr->renderLines(true);
@@ -130,7 +141,9 @@ void VortonSimRenderer::vortonOctHeapRendered(bool isRendered)
 			//not rendered before
 			m_VortonOctHeapRendererPtr =
 				std::unique_ptr<VortonOctHeapRenderer>(
-					new VortonOctHeapRenderer{ std::bind(&UpdateFluidOperation::vortonOctHeapPtr, &m_UpdateFluidOperation)}
+					new VortonOctHeapRenderer{
+						std::bind(&UpdateFluidOperation::vortonOctHeapPtr, &m_UpdateFluidOperation),
+						m_UpdateFluidOperation.vortonHeapMutex()}
 				);
 		}
 	}
@@ -149,8 +162,10 @@ void VortonSimRenderer::vortonsOctHeapRendered(bool isRendered)
 			//not rendered before
 			m_VortonRendererOctHeapPtr =
 				std::unique_ptr<VortonRendererOctHeap>(
-					new VortonRendererOctHeap{ m_Scene, *m_PhongProgramPtr, std::bind(&UpdateFluidOperation::vortonOctHeapPtr, &m_UpdateFluidOperation) }
-			);
+					new VortonRendererOctHeap{m_Scene, *m_PhongProgramPtr,
+                        std::bind(&UpdateFluidOperation::vortonOctHeapPtr, &m_UpdateFluidOperation),
+                        m_UpdateFluidOperation.vortonHeapMutex()}
+				);
 		}
 	}
 	else {

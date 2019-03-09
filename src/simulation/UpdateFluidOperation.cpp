@@ -36,9 +36,19 @@ const std::unique_ptr<UniformGrid<glm::dvec3>>& UpdateFluidOperation::velocityGr
     return m_VelocityGridPtr;
 }
 
+std::shared_mutex& UpdateFluidOperation::velocityGridMutex() const
+{
+    return m_VelocityGridMutex;
+}
+
 const std::unique_ptr<VortonOctHeap>& UpdateFluidOperation::vortonOctHeapPtr() const
 {
     return m_VortonHeapPtr;
+}
+
+std::shared_mutex& UpdateFluidOperation::vortonHeapMutex() const
+{
+    return m_VortonHeapMutex;
 }
 
 void UpdateFluidOperation::retrieveCurrentVortons()
@@ -53,6 +63,7 @@ void UpdateFluidOperation::retrieveCurrentVortons()
 void UpdateFluidOperation::createOctHeap()
 {
     retrieveCurrentVortons();
+    std::unique_lock<std::shared_mutex> vortonHeapLock{m_VortonHeapMutex};
     m_VortonHeapPtr = std::make_unique<VortonOctHeap>(m_CurrentVortons);
 }
 
@@ -80,6 +91,7 @@ void UpdateFluidOperation::calculateVelocityGrid()
         currentGridPosition.y = velocityGridPtr->minCorner().y;
         currentGridPosition.z += velocityGridPtr->cellExtent().z;
     }
+    std::unique_lock<std::shared_mutex> gridLock{m_VelocityGridMutex};
     m_VelocityGridPtr = std::move(velocityGridPtr);
 }
 

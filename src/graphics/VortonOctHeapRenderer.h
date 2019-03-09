@@ -2,6 +2,8 @@
 
 #include <functional>
 #include <memory>
+#include <shared_mutex>
+
 #include "../simulation/VortonOctHeap.h"
 #include "DrawableObject.h"
 #include "Program.h"
@@ -12,7 +14,7 @@ class VortonOctHeapRenderer : public DrawableObject
 public:
 using oct_heap_getter_t = std::function<const std::unique_ptr<VortonOctHeap>&(void)>;
 
-	VortonOctHeapRenderer(const oct_heap_getter_t& octHeapGetter);
+	VortonOctHeapRenderer(const oct_heap_getter_t& octHeapGetter, std::shared_mutex& octHeapMutex);
 	virtual ~VortonOctHeapRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -40,5 +42,6 @@ private:
 	static const std::string m_ColorUniformName;
 
     oct_heap_getter_t m_OctHeapGetter;
+    std::shared_mutex& m_OctHeapMutex;
 };
 

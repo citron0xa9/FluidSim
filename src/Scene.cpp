@@ -17,16 +17,9 @@ Scene::~Scene()
 	m_Alive = false;
 	m_StepLoopThread.join();
 
-	for (auto geometryPtr : m_GeometriePtrs) {
-		delete geometryPtr;
-	}
-	for (auto &programPtr : m_ProgramPtrs) {
-		delete programPtr;
-	}
-
-	for (auto objectPtr : m_ObjectPtrs) {
-		delete objectPtr;
-	}
+	m_GeometriePtrs.clear();
+	m_ProgramPtrs.clear();
+	m_ObjectPtrs.clear();
 }
 
 void Scene::stepLoop()
@@ -61,9 +54,8 @@ void Scene::addLightSource(LightSource &lightSource)
 
 Geometry& Scene::addGeometryFromFile(const std::string &fileName)
 {
-	Geometry *newGeometry = new Geometry(fileName);
-	m_GeometriePtrs.push_back(newGeometry);
-	return *newGeometry;
+	m_GeometriePtrs.emplace_back(new Geometry{fileName});
+	return *m_GeometriePtrs.back();
 }
 
 Material& Scene::addMaterial(const Material &material)
@@ -74,16 +66,13 @@ Material& Scene::addMaterial(const Material &material)
 
 Program & Scene::addProgram()
 {
-	Program *newProg = new Program{};
-	m_ProgramPtrs.push_back(newProg);
+	m_ProgramPtrs.emplace_back(new Program{});
 	return *m_ProgramPtrs.back();
 }
 
 Program& Scene::addProgram(const std::vector<ShaderLightSourceVariable> &lightVars)
 {
-	Program *newProg = new Program{ lightVars };
-	m_ProgramPtrs.push_back(newProg);
-
+	m_ProgramPtrs.emplace_back(new Program{lightVars});
 	return *m_ProgramPtrs.back();
 }
 
@@ -92,7 +81,7 @@ void Scene::render()
 	glm::mat4x4 viewProjectTransform = m_Camera.viewPerspectiveTransform();
 	glm::vec3 cameraPosition = m_Camera.position();
 
-	for (auto programPtr : m_ProgramPtrs) {
+	for (auto& programPtr : m_ProgramPtrs) {
 		programPtr->loadCameraPosition(cameraPosition);
 	}
 	
@@ -116,7 +105,7 @@ void Scene::startStepping()
 
 void Scene::loadLightsIntoPrograms()
 {
-	for (auto programPtr : m_ProgramPtrs) {
+	for (auto& programPtr : m_ProgramPtrs) {
 		programPtr->loadLights(m_LightSourcePtrs);
 	}
 }
@@ -144,7 +133,7 @@ Object& Scene::addObject(const Object & object)
 	m_UsingObjectListsRender.lock();
 	m_UsingObjectListsStep.lock();
 
-	m_ObjectPtrs.push_back(object.copy());
+	m_ObjectPtrs.emplace_back(object.copy());
 	m_ObjectPtrs.back()->registerSceneHooks(*this);
 	Object &addedObject = *m_ObjectPtrs.back();
 
@@ -154,18 +143,22 @@ Object& Scene::addObject(const Object & object)
 	return addedObject;
 }
 
-void Scene::addObjectPtr(Object * objPtr)
+Object* Scene::addObjectPtr(std::unique_ptr<Object>&& objPtr)
 {
 	m_UsingObjectListsRender.lock();
 	m_UsingObjectListsStep.lock();
 
-	m_ObjectPtrs.push_back(objPtr);
+	m_ObjectPtrs.push_back(std::move(objPtr));
 	m_ObjectPtrs.back()->registerSceneHooks(*this);
+	auto objectPtr = m_ObjectPtrs.back().get();
 
 	m_UsingObjectListsStep.unlock();
 	m_UsingObjectListsRender.unlock();
+
+	return objectPtr;
 }
 
+#if 0
 void Scene::removeObjectPtr(Object *objectPtr)
 {
 	m_UsingObjectListsRender.lock();
@@ -177,6 +170,7 @@ void Scene::removeObjectPtr(Object *objectPtr)
 	m_UsingObjectListsStep.unlock();
 	m_UsingObjectListsRender.unlock();
 }
+#endif
 
 void Scene::addActiveObject(ActiveObject & object)
 {

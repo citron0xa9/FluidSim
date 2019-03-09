@@ -444,38 +444,22 @@ void GLViewer::setupSim(bool createPaused)
 #endif
 }
 
-GLViewer::unique_particle_system_ptr_t GLViewer::createParticleSystem()
+ParticleSystem* GLViewer::createParticleSystem()
 {
-    auto createdParticleSystemPtr = unique_particle_system_ptr_t(new ParticleSystem{}, [this](ParticleSystem* particleSystemPtr)
-    {
-        m_Scene.removeObjectPtr(particleSystemPtr);
-        delete particleSystemPtr;
-    });
-    m_Scene.addObjectPtr(createdParticleSystemPtr.get());
-    return createdParticleSystemPtr;
+    return dynamic_cast<ParticleSystem*>(m_Scene.addObjectPtr(std::make_unique<ParticleSystem>()));
 }
 
 void GLViewer::createVortonSimRenderer(UpdateFluidOperation* updateFluidOperationPtr)
 {
-    m_VortonSimRendererPtr =
-        unique_vorton_sim_renderer_ptr_t(new VortonSimRenderer{*m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr, *updateFluidOperationPtr, m_Scene},
-        [this](VortonSimRenderer* rendererPtr)
-    {
-        m_Scene.removeObjectPtr(rendererPtr);
-        delete rendererPtr;
-    });
-    m_Scene.addObjectPtr(m_VortonSimRendererPtr.get());
+	auto addedObjectPtr = m_Scene.addObjectPtr(std::make_unique<VortonSimRenderer>(
+		*m_VortonParticleSystemPtr, *m_TracerParticleSystemPtr,
+		*updateFluidOperationPtr, m_Scene));
+	m_VortonSimRendererPtr = dynamic_cast<VortonSimRenderer*>(addedObjectPtr);
 }
 
-GLViewer::unique_rigid_body_sim_ptr_t GLViewer::createRigidBodySim()
+RigidBodySim* GLViewer::createRigidBodySim()
 {
-    auto createdSimPtr = unique_rigid_body_sim_ptr_t(new RigidBodySim{}, [this](RigidBodySim* simPtr)
-    {
-        m_Scene.removeObjectPtr(simPtr);
-        delete simPtr;
-    });
-    m_Scene.addObjectPtr(createdSimPtr.get());
-    return createdSimPtr;
+    return dynamic_cast<RigidBodySim*>(m_Scene.addObjectPtr(std::make_unique<RigidBodySim>()));
 }
 
 unsigned int GLViewer::frameCount() const {

@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <shared_mutex>
 
 #include "DrawableObject.h"
 #include "TriangleNetObject.h"
@@ -13,7 +14,10 @@ class VectorFieldRenderer : public DrawableObject
 {
 public:
     using grid_getter_t = std::function<const std::unique_ptr<UniformGrid<glm::dvec3>>&()>;
-	VectorFieldRenderer(Scene &scene, const grid_getter_t& gridGetter, Program& phongProgram);
+
+	VectorFieldRenderer(Scene& scene, const grid_getter_t& gridGetter, std::shared_mutex& gridMutex,
+		Program& phongProgram);
+
 	virtual ~VectorFieldRenderer();
 
 	virtual void render(const glm::mat4x4 &viewProjectTransform) override;
@@ -40,6 +44,7 @@ private:
 	TriangleNetObject m_DrawPrototype;
 
     grid_getter_t m_VelocityGridGetter;
+    std::shared_mutex& m_VelocityGridMutex;
 
 	static const double m_MAX_VELOCITY;
 	static const glm::dvec3 m_INITIAL_DIRECTION;

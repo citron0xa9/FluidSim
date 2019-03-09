@@ -11,8 +11,10 @@
 const double VectorFieldRenderer::m_MAX_VELOCITY = 5.0f;
 const glm::dvec3 VectorFieldRenderer::m_INITIAL_DIRECTION = glm::dvec3(0, 0, -1);
 
-VectorFieldRenderer::VectorFieldRenderer(Scene &scene, const grid_getter_t& gridGetter, Program &phongProgram)
-	: m_VelocityGridGetter{ gridGetter }, m_GridResolutionFactor{ 1.0 }, m_GridResolutionChanged{true}, m_RenderArrows{true}, m_RenderLines{true}, m_LinesVerticesBuf{false}
+VectorFieldRenderer::VectorFieldRenderer(Scene& scene, const grid_getter_t& gridGetter, std::shared_mutex& gridMutex,
+    Program& phongProgram)
+    : m_VelocityGridGetter{gridGetter}, m_GridResolutionFactor{1.0}, m_GridResolutionChanged{true},
+    m_RenderArrows{true}, m_RenderLines{true}, m_LinesVerticesBuf{false}, m_VelocityGridMutex{gridMutex}
 {
 	/*
 	* Setup m_DrawPrototype
@@ -41,6 +43,7 @@ VectorFieldRenderer::~VectorFieldRenderer()
 
 void VectorFieldRenderer::render(const glm::mat4x4 & viewProjectTransform)
 {
+    std::shared_lock<std::shared_mutex> gridLock{m_VelocityGridMutex};
 	const auto& velocityGridPtr = m_VelocityGridGetter();
 	if (!velocityGridPtr) {
 		return;
@@ -84,6 +87,7 @@ void VectorFieldRenderer::render(const glm::mat4x4 & viewProjectTransform)
         for (int i = 0; i < lineCreationFunctions.size(); i++) {
             lineCreationFunctions[i]();
         }
+        gridLock.unlock();
         renderLines(viewProjectTransform);
     }
 }
@@ -207,7 +211,7 @@ void VectorFieldRenderer::createLine(const glm::dvec3 & pointPosition, size_t po
 
     glm::dvec3 position = pointPosition;
 
-    glm::dvec3 velocity = velocityGrid.interpolate(position);
+    glm::dvec3 velocity = velocityGrid.interpolate(position) + glm::dvec3{1.0, 0.0, 0.0};
     glm::vec3 rgbColor = rgbColorFromVelocity(velocity);
     insertLinePoint(position, rgbColor, lineOffset);
 
@@ -216,7 +220,7 @@ void VectorFieldRenderer::createLine(const glm::dvec3 & pointPosition, size_t po
         position += positionDelta;
 
         if (!fsmath::anyLess(position, velocityGrid.minCorner()) && !fsmath::anyLess(velocityGrid.minCorner() + velocityGrid.gridExtent(), position)) {
-            velocity = velocityGrid.interpolate(position);
+            velocity = velocityGrid.interpolate(position) + glm::dvec3{1.0, 0.0, 0.0};
             rgbColor = rgbColorFromVelocity(velocity);
         } else {
             position -= positionDelta;
@@ -229,7 +233,7 @@ void VectorFieldRenderer::createLine(const glm::dvec3 & pointPosition, size_t po
     position += glm::normalize(velocity) * m_LineStepDistance;
 
     if (!fsmath::anyLess(position, velocityGrid.minCorner()) && !fsmath::anyLess(velocityGrid.minCorner() + velocityGrid.gridExtent(), position)) {
-        velocity = velocityGrid.interpolate(position);
+        velocity = velocityGrid.interpolate(position) + glm::dvec3{1.0, 0.0, 0.0};
         rgbColor = rgbColorFromVelocity(velocity);
     }
     insertLinePoint(position, rgbColor, lineOffset + (m_LineStepAmount * verticesPerLine) - 1);

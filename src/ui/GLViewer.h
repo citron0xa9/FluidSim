@@ -74,9 +74,9 @@ private:
 
 	void handleRightclick(glm::dvec2 &cursorPosition);
 
-    unique_particle_system_ptr_t createParticleSystem();
+    ParticleSystem* createParticleSystem();
     void createVortonSimRenderer(UpdateFluidOperation* updateFluidOperationPtr);
-    unique_rigid_body_sim_ptr_t createRigidBodySim();
+    RigidBodySim* createRigidBodySim();
 
 	std::unordered_map<unsigned char, bool> m_KeysPressedState;
 	std::queue<std::function<void()>> m_PerformAfterRender;
@@ -96,10 +96,10 @@ private:
 	std::unique_ptr<Texture2DFixedSize> m_ObjectIndexTexturePtr;
 	std::unique_ptr<Texture2DFixedSize> m_MainDepthTexturePtr;
 
-    unique_particle_system_ptr_t m_VortonParticleSystemPtr;
-    unique_particle_system_ptr_t m_TracerParticleSystemPtr;
-	unique_vorton_sim_renderer_ptr_t m_VortonSimRendererPtr;
-    unique_rigid_body_sim_ptr_t m_RigidBodySimPtr;
+    ParticleSystem* m_VortonParticleSystemPtr = nullptr;
+    ParticleSystem* m_TracerParticleSystemPtr = nullptr;
+	VortonSimRenderer* m_VortonSimRendererPtr = nullptr;
+    RigidBodySim* m_RigidBodySimPtr = nullptr;
 
 	bool m_MouseRotationReady;
 	glm::vec2 m_LastMouseCoordinates;
